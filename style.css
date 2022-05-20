@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+* {
+    box-sizing: border-box;
+    font-family: 'Bangers', cursive;
+}
+
+.game-container{
+    position: relative;
+    display: inline-block;
+}
+
+.bars-ui{
+    position: absolute;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.health-bar-container {
+    width: 100%;
+    height: 36px;
+    position: relative;
+    border: 3px solid white;
+}
+
+.player-bar, .enemy-bar{
+    background-color: red;
+    height: 30px;
+}
+
+.player-health-bar, .enemy-health-bar{
+    background-color: yellow;
+    height: 30px;
+    width: 100%;
+    position: absolute;
+}
+
+.player-health-bar{
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.enemy-health-bar{
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.timer {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    flex-shrink: 0;
+    border: 3px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 72px;
+    font-weight: bold;
+}
+.game-msg{
+    font-size: 100px;
+    font-weight: bold;
+    color: white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 17px;
+}
