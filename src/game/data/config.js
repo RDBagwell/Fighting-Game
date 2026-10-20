@@ -19,8 +19,8 @@ export const config = {
   jumpSquat: 4, // grounded frames before leaving the ground
   landRecovery: 4, // frames (including the landing frame) before acting after a jump
 
-  knockdownFrames: 40,
-  wakeupFrames: 20, // invulnerable while getting up
+  knockdownFrames: 26,
+  wakeupFrames: 18, // invulnerable while getting up
   throwProtect: 6, // frames after hitstun, blockstun or wake-up in which you can't be thrown
 
   techWindow: 10, // frames after a throw connects in which pressing throw escapes it

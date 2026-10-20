@@ -82,7 +82,13 @@ export class TouchControls {
       const bit = Number(b.dataset.bits);
       b.addEventListener('pointerdown', (e) => {
         e.preventDefault();
-        b.releasePointerCapture?.(e.pointerId);
+        // Touch pointers are captured by the element they start on; release
+        // it so sliding onto the next button works.
+        try {
+          b.releasePointerCapture(e.pointerId);
+        } catch {
+          // not captured
+        }
         held.set(e.pointerId, bit);
         b.classList.add('down');
         this.refreshButtons(held);

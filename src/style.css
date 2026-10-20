@@ -254,7 +254,7 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
   cursor: pointer;
   z-index: 2;
 }
-.touch-on .pause-btn { display: none; }
+.touch-on .pause-btn, .training-on .pause-btn, .training-on .touch-pause { display: none; }
 
 /* ── Touch controls ────────────────────────────────────────────────── */
 .touch { position: absolute; inset: 0; display: none; pointer-events: none; z-index: 4; }
@@ -266,7 +266,7 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
 .touch-buttons {
   position: absolute;
   right: max(12px, env(safe-area-inset-right));
-  bottom: max(14px, env(safe-area-inset-bottom));
+  bottom: max(34px, env(safe-area-inset-bottom));
   display: grid;
   grid-template-columns: repeat(3, 58px);
   grid-template-rows: repeat(2, 58px);

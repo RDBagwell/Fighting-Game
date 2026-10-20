@@ -34,7 +34,7 @@ const SPEEDS = [1, 0.5, 0.25];
 export class Training {
   /**
    * @param {import('../App.js').App} app
-   * @param {{ getState: () => import('../../engine/sim/types.js').MatchState, setState: (s: import('../../engine/sim/types.js').MatchState) => void, config: import('../scenes/select.js').MatchConfig }} host
+   * @param {{ getState: () => import('../../engine/sim/types.js').MatchState, setState: (s: import('../../engine/sim/types.js').MatchState) => void, config: import('../scenes/select.js').MatchConfig, openPauseMenu: () => void }} host
    */
   constructor(app, host) {
     this.app = app;
@@ -64,8 +64,11 @@ export class Training {
       tb('Reset', 'Reset position (R; gamepad View/Share)', () => this.reset(this.position), 'reset'),
       tb('Rec', 'Record the dummy: you control it (O)', () => this.toggleRecord(), 'rec'),
       tb('Replay', 'Play the recording on a loop (Y)', () => this.togglePlayback(), 'play'),
-      tb('Menu', 'Training menu (Tab)', () => this.openPanel(), 'menu'));
+      tb('Menu', 'Training menu (Tab)', () => this.openPanel(), 'menu'),
+      tb('Exit', 'Pause menu: restart, character select, quit (Esc)', () => this.host.openPauseMenu(), 'exit'));
     this.app.ui.append(this.toolbar);
+    // The toolbar's Exit replaces the touch pause button, which would cover the frame meter.
+    this.app.root.classList.add('training-on');
     window.addEventListener('keydown', this.onKey);
     this.refreshToolbar();
   }
@@ -73,6 +76,7 @@ export class Training {
   unmount() {
     window.removeEventListener('keydown', this.onKey);
     this.toolbar?.remove();
+    this.app.root.classList.remove('training-on');
     this.app.loop.setFrozen(false);
     this.app.loop.timeScale = 1;
   }

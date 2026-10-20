@@ -223,20 +223,21 @@ export function drawProjectile(ctx, p, look, camX, groundY) {
     ctx.fillStyle = '#c9a24a';
     ctx.fillRect(d === 1 ? x - 12 : x + 9, y - 2, 3, 4);
   } else {
-    // A crescent of light: two arcs, the inner one cut out.
+    // A crescent of light: an outer glow and a thinner bright core,
+    // translucent so the fighters stay visible through it.
     const pulse = (p.age % 6) / 6;
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(d, 1);
-    ctx.fillStyle = `rgba(255,236,170,${0.25 + 0.15 * pulse})`;
+    ctx.fillStyle = `rgba(255,220,140,${0.22 + 0.12 * pulse})`;
     ctx.beginPath();
-    ctx.arc(-6, 0, 52, -Math.PI / 2, Math.PI / 2);
-    ctx.arc(-26, 0, 46, Math.PI / 2, -Math.PI / 2, true);
+    ctx.arc(-4, 0, 36, -Math.PI / 2, Math.PI / 2);
+    ctx.arc(-18, 0, 32, Math.PI / 2, -Math.PI / 2, true);
     ctx.fill();
-    ctx.fillStyle = '#fff4c8';
+    ctx.fillStyle = 'rgba(255,246,210,0.75)';
     ctx.beginPath();
-    ctx.arc(-6, 0, 44, -Math.PI / 2, Math.PI / 2);
-    ctx.arc(-20, 0, 40, Math.PI / 2, -Math.PI / 2, true);
+    ctx.arc(-4, 0, 30, -Math.PI / 2, Math.PI / 2);
+    ctx.arc(-12, 0, 27, Math.PI / 2, -Math.PI / 2, true);
     ctx.fill();
     ctx.restore();
   }

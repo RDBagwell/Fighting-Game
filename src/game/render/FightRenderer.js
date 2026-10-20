@@ -132,7 +132,7 @@ export class FightRenderer {
     const jitter = s.freeze > 0 && (f.state === 'hitstun' || f.state === 'airHit') && f.stateFrame <= 1 ? (s.freeze % 2 ? 2 : -2) : 0;
     const y = Math.round(GROUND_Y + f.y / SUB);
     let source;
-    if (choice.tint === 'flash') source = sheet.variant('flash', '#ffffff', 0.85);
+    if (choice.tint === 'flash') source = sheet.variant('flash', '#ffffff', 0.55);
     else if (choice.tint === 'guard') source = sheet.variant('guard', '#5aa8ff', 0.35);
     drawFrame(ctx, sheet, choice.frame, x + jitter, y, {
       anchor: ch.sprites.anchor,

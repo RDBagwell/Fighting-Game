@@ -45,7 +45,7 @@ export class MatchScene {
     this.hud = new Hud();
     this.cpu = config.mode === 'cpu' ? new Cpu(1, DIFFICULTIES[config.cpu], app.sim, (Math.random() * 2 ** 31) | 0) : null;
     this.training = training
-      ? new Training(app, { getState: () => this.state, setState: (s) => (this.state = s), config })
+      ? new Training(app, { getState: () => this.state, setState: (s) => (this.state = s), config, openPauseMenu: () => this.onPause() })
       : null;
     const names = config.chars.map((c) => app.sim.characters[c].name);
     this.names = /** @type {[string, string]} */ (names);

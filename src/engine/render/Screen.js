@@ -6,9 +6,16 @@
  * The backing canvas is 640k × 360k device pixels, where k is the largest
  * integer that fits the space available; drawing code works in logical
  * pixels through a k× transform, so sprites drawn with smoothing off stay
- * crisp and text is rendered at full resolution. Only if the window is
- * smaller than 640×360 device pixels does the canvas shrink by a fraction
- * (CSS `image-rendering: pixelated` keeps it sharp-edged).
+ * crisp and text is rendered at full resolution.
+ *
+ * Two exceptions, both to use the screen well:
+ * - on high-density screens (2+ device pixels per CSS pixel: phones,
+ *   tablets, retina laptops) the canvas is drawn one whole step larger and
+ *   shown at exactly the space available. Each game pixel is then 3+
+ *   device pixels give or take one, which the eye can't see at that
+ *   density, and a phone gets the whole screen rather than a box in it;
+ * - if the window is smaller than 640×360 device pixels it shrinks by a
+ *   fraction (CSS `image-rendering: pixelated` keeps it sharp-edged).
  */
 export const WIDTH = 640;
 export const HEIGHT = 360;
@@ -33,13 +40,14 @@ export class Screen {
     const w = Math.max(1, this.container.clientWidth);
     const h = Math.max(1, this.container.clientHeight);
     const fit = Math.min((w * dpr) / WIDTH, (h * dpr) / HEIGHT);
-    const k = Math.max(1, Math.floor(fit));
+    const dense = dpr >= 2 && fit > Math.floor(fit) + 0.05;
+    const k = Math.max(1, dense ? Math.ceil(fit) : Math.floor(fit));
     this.scale = k;
     this.canvas.width = WIDTH * k;
     this.canvas.height = HEIGHT * k;
     // CSS size: exactly k device pixels per game pixel when it fits;
     // otherwise shrink to fit.
-    const cssScale = fit >= 1 ? k / dpr : Math.min(w / WIDTH, h / HEIGHT);
+    const cssScale = fit >= 1 && !dense ? k / dpr : Math.min(w / WIDTH, h / HEIGHT);
     this.canvas.style.width = `${Math.round(WIDTH * cssScale)}px`;
     this.canvas.style.height = `${Math.round(HEIGHT * cssScale)}px`;
     this.cssWidth = WIDTH * cssScale;

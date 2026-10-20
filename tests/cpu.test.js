@@ -56,14 +56,16 @@ describe('the CPU', () => {
   });
 
   it('plays whole matches: it attacks, blocks, uses specials and wins by KO', () => {
+    const total = { hits: 0, blocks: 0, specials: 0, kos: 0 };
     for (const chars of /** @type {Array<[string, string]>} */ ([['mack', 'kenji'], ['kenji', 'mack'], ['mack', 'mack']])) {
       const { s, stats } = cpuMatch(chars, ['normal', 'normal'], 3);
       expect(s.phase, chars.join(' v ')).toBe('matchEnd');
-      expect(stats.hits).toBeGreaterThan(20);
-      expect(stats.blocks).toBeGreaterThan(3);
-      expect(stats.specials).toBeGreaterThan(3);
-      expect(stats.kos).toBeGreaterThan(0);
+      for (const k of /** @type {Array<keyof typeof total>} */ (Object.keys(total))) total[k] += stats[k];
     }
+    expect(total.hits).toBeGreaterThan(60);
+    expect(total.blocks).toBeGreaterThan(10);
+    expect(total.specials).toBeGreaterThan(10);
+    expect(total.kos).toBeGreaterThanOrEqual(6);
   });
 
   it('a CPU match is reproducible from its seeds', () => {

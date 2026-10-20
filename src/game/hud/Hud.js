@@ -62,7 +62,7 @@ export class Hud {
       const ratio = f.health / max;
       // The red bar holds while a combo is going on, then drains.
       if (ratio < this.lag[side]) {
-        if (f.combo > 0 || f.state === 'hitstun' || f.state === 'airHit') this.lagHold[side] = 20;
+        if (f.health > 0 && (f.combo > 0 || f.state === 'hitstun' || f.state === 'airHit')) this.lagHold[side] = 20;
         else if (this.lagHold[side] > 0) this.lagHold[side]--;
         else this.lag[side] = Math.max(ratio, this.lag[side] - 0.01);
       } else this.lag[side] = ratio;
