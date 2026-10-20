@@ -14,7 +14,8 @@
     "test:e2e": "playwright test --grep-invert @screenshots",
     "screenshots": "playwright test --grep @screenshots",
     "bench": "node tools/bench.mjs",
-    "framedata": "node tools/frame-data-table.mjs"
+    "framedata": "node tools/frame-data-table.mjs",
+    "desync": "node tools/desync.mjs"
   },
   "engines": {
     "node": ">=20.19"
