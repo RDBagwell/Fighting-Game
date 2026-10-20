@@ -17,6 +17,8 @@
     "bench": "node tools/bench.mjs",
     "framedata": "node tools/frame-data-table.mjs",
     "desync": "node tools/desync.mjs",
+    "netplay-stats": "node tools/netplay-stats.mjs",
+    "load-test": "node tools/load-test.mjs",
     "start": "node server/index.js",
     "dev:server": "node --watch-path=server --watch-path=shared server/index.js"
   },
