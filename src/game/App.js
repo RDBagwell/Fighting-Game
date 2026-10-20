@@ -9,6 +9,10 @@ import { FixedStepLoop } from '../engine/loop/FixedStepLoop.js';
 import { InputManager } from '../engine/input/InputManager.js';
 import { TouchControls } from '../engine/input/TouchControls.js';
 import { Sfx } from '../engine/audio/Sfx.js';
+import { Music } from '../engine/audio/Music.js';
+import music from 'virtual:music';
+import { Captions } from './hud/Captions.js';
+import { EVENT_SOUNDS, trackFor } from './audio.js';
 import { SpriteSheet } from '../engine/render/sprites.js';
 import { loadImages, loadOptionalImage } from '../engine/assets/loader.js';
 import licensedArt from 'virtual:licensed-art';
@@ -47,6 +51,9 @@ export class App {
     this.sfx = new Sfx();
     this.sfx.setVolume(this.settings.volume);
     this.sfx.muted = this.settings.muted;
+    this.music = new Music(music);
+    this.captions = new Captions(root);
+    this.applyAudio();
     this.touch = new TouchControls(root, { easy: this.settings.easySpecials, onPause: () => this.scene?.onPause?.() });
     this.input.touch = this.touch;
     this.isTouchDevice = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
@@ -64,7 +71,10 @@ export class App {
     this.loop.pauseWhenHidden(document);
 
     // Audio may only start after a user gesture.
-    const unlock = () => this.sfx.unlock();
+    const unlock = () => {
+      this.sfx.unlock();
+      this.music.unlock();
+    };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
 
@@ -107,8 +117,11 @@ export class App {
     this.assets = { sheets, shrine: buildDuskShrine(sim.config.stage.width), licensed: { background, shop } };
   }
 
-  start() {
-    this.setScene(new TitleScene(this));
+  /**
+   * @param {Scene} [first]  Where to start (an invite link opens the online lobby).
+   */
+  start(first) {
+    this.setScene(first ?? new TitleScene(this));
     this.loop.start();
   }
 
@@ -122,7 +135,29 @@ export class App {
     this.loop.timeScale = 1;
     this.scene = scene;
     scene.enter();
+    this.music.play(trackFor(scene.name));
     this.updateTouch();
+  }
+
+  /**
+   * Plays the sounds for a frame's simulation events, and captions them
+   * when captions are on. Every scene that shows a fight presents its
+   * events through here.
+   * @param {import('../engine/sim/types.js').SimEvent[]} events
+   */
+  presentSounds(events) {
+    for (const e of events) {
+      const sound = EVENT_SOUNDS[e.type];
+      if (sound) this.sfx.play(sound, e.strength);
+    }
+    this.captions.show(events);
+  }
+
+  applyAudio() {
+    this.music.volume = this.settings.musicVolume;
+    this.music.muted = this.settings.muted;
+    this.music.applyVolume();
+    this.captions.enabled = this.settings.captions;
   }
 
   updateTouch() {
@@ -174,6 +209,7 @@ export class App {
     this.sfx.setVolume(this.settings.volume);
     this.sfx.muted = this.settings.muted;
     this.sfx.applyVolume();
+    this.applyAudio();
     this.updateTouch();
   }
 

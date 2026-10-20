@@ -1,0 +1,33 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Creates Dusk Duel's matchmaking server as a free web service. The game
+# itself is deployed separately, to GitHub Pages (.github/workflows/pages.yml).
+#
+# The server never runs the game: it pairs players, relays WebRTC
+# signalling, and relays input packets when a direct connection fails.
+services:
+  - type: web
+    name: dusk-duel-server
+    runtime: node
+    plan: free
+    # Only runtime dependencies (express, helmet, socket.io, zod).
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Node 22.12 or later is required; "22" gets the latest 22.x.
+      - key: NODE_VERSION
+        value: "22"
+      # Your GitHub Pages origin, e.g. https://rdbagwell.github.io (no path,
+      # no trailing slash). Render asks for this value when you create the
+      # Blueprint. Several origins: comma-separated.
+      - key: ALLOWED_ORIGINS
+        sync: false
+      # Render sits behind Cloudflare, which overwrites True-Client-IP; used
+      # for per-IP rate limits. X-Forwarded-For hop counting is the fallback.
+      - key: CLIENT_IP_HEADER
+        value: true-client-ip
+      - key: TRUST_PROXY_HOPS
+        value: "1"

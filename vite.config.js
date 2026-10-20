@@ -55,9 +55,73 @@ function licensedArt() {
   };
 }
 
+/**
+ * `import music from 'virtual:music'` gives the URL of each music track
+ * found in `public/music/` (title, select, stage, results), or null. The
+ * game plays only the tracks that exist, and never requests a missing one
+ * (docs/AUDIO.md).
+ */
+function music() {
+  const id = 'virtual:music';
+  const resolved = `\0${id}`;
+  const tracks = ['title', 'select', 'stage', 'results'];
+  const present = () =>
+    Object.fromEntries(tracks.map((t) => [t, fs.existsSync(path.resolve('public/music', `${t}.ogg`)) ? `music/${t}.ogg` : null]));
+  return {
+    name: 'music',
+    resolveId(/** @type {string} */ source) {
+      return source === id ? resolved : null;
+    },
+    load(/** @type {string} */ source) {
+      return source === resolved ? `export default ${JSON.stringify(present())};` : null;
+    },
+  };
+}
+
+/**
+ * The production build's Content-Security-Policy, as a <meta> tag (GitHub
+ * Pages can't send headers), the same policy as Netcode Pong's Pages build.
+ * `connect-src` allows exactly the matchmaking server from VITE_SERVER_URL
+ * (https:// and wss://; http://localhost only for the e2e build), and
+ * nothing else. WebRTC's STUN requests are not covered by CSP (SECURITY.md).
+ * The build fails on a bad server URL or an inline script.
+ */
+function contentSecurityPolicy() {
+  return {
+    name: 'csp',
+    apply: /** @type {const} */ ('build'),
+    transformIndexHtml(/** @type {string} */ html) {
+      const raw = (process.env.VITE_SERVER_URL || '').trim();
+      let connect = "'self'";
+      if (raw) {
+        const url = new URL(raw);
+        const local = url.protocol === 'http:' && (url.hostname === 'localhost' || url.hostname === '127.0.0.1');
+        if (url.protocol !== 'https:' && !local) throw new Error(`VITE_SERVER_URL must be https:// (got ${raw})`);
+        if (url.hostname.endsWith('github.io')) throw new Error('VITE_SERVER_URL points at GitHub Pages, which cannot run the server: use the Render service URL');
+        connect += ` ${url.origin} ${url.origin.replace(/^http/, 'ws')}`;
+      }
+      if (/<script(?![^>]*\bsrc=)[^>]*>/.test(html)) throw new Error('index.html has an inline script, which the CSP would block');
+      const csp = [
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self'",
+        "img-src 'self' data: blob:",
+        "media-src 'self'",
+        "font-src 'self'",
+        `connect-src ${connect}`,
+        "object-src 'none'",
+        "base-uri 'none'",
+        "form-action 'none'",
+      ].join('; ');
+      if (!html.includes('<meta charset="UTF-8" />')) throw new Error('index.html: expected <meta charset="UTF-8" />');
+      return html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${csp}" />\n    <meta name="referrer" content="no-referrer" />`);
+    },
+  };
+}
+
 export default defineConfig({
   base: site.base,
-  plugins: [licensedArt()],
+  plugins: [licensedArt(), music(), contentSecurityPolicy()],
   build: { target: 'es2022' },
   test: {
     environment: 'node',

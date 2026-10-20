@@ -113,3 +113,20 @@ test('phone: touch controls appear in a match and move the fighter', async ({ br
   expectNoErrors(errors);
   await context.close();
 });
+
+test('captions for important sounds appear when turned on', async ({ page }) => {
+  await page.addInitScript(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('dusk-duel-settings-v1') ?? '{}');
+      localStorage.setItem('dusk-duel-settings-v1', JSON.stringify({ ...s, captions: true }));
+    } catch {}
+  });
+  const errors = await openGame(page);
+  await page.getByRole('button', { name: 'Versus CPU' }).click();
+  await waitForScene(page, 'select');
+  await page.getByRole('button', { name: 'Fight!' }).click();
+  await waitForScene(page, 'match');
+  await expect(page.locator('.captions')).toContainText('Round start');
+  await expect(page.locator('.captions')).toContainText('Fight!');
+  expectNoErrors(errors);
+});

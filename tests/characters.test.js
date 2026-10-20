@@ -119,3 +119,11 @@ describe('the roster', () => {
     }
   });
 });
+
+describe('the server knows the roster', () => {
+  it('shared/protocol.js CHARACTERS matches the game’s characters (an online pick the server refuses would be a dead end)', async () => {
+    const { CHARACTERS } = await import('../shared/protocol.js');
+    const { characters } = await import('../src/game/data/characters/index.js');
+    expect([...CHARACTERS].sort()).toEqual(Object.keys(characters).sort());
+  });
+});

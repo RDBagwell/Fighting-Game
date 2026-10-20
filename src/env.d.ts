@@ -9,3 +9,12 @@ declare module 'virtual:licensed-art' {
   const art: { oakWoodsBackground: string | null; oakWoodsShop: string | null };
   export default art;
 }
+
+/**
+ * Music tracks found in public/music/ at build time (vite.config.js): a
+ * URL for each track that exists, null for the rest (docs/AUDIO.md).
+ */
+declare module 'virtual:music' {
+  const music: { title: string | null; select: string | null; stage: string | null; results: string | null };
+  export default music;
+}

@@ -117,6 +117,30 @@ export class FightRenderer {
   }
 
   /**
+   * A see-through, recoloured fighter: the rollback lab's ghost of where
+   * the prediction had put the opponent before a correction. Reads a
+   * fighter-shaped snapshot (only the fields the sprite choice needs).
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {Pick<import('../../engine/sim/types.js').FighterState, 'x' | 'y' | 'facing' | 'char' | 'state' | 'move' | 'moveFrame' | 'stateFrame' | 'vy' | 'crouching'>} f
+   * @param {number} camX
+   * @param {number} alpha
+   */
+  drawGhost(ctx, f, camX, alpha) {
+    const ch = this.sim.characters[f.char];
+    const choice = chooseSprite(/** @type {import('../../engine/sim/types.js').FighterState} */ (f), ch);
+    const sheet = this.assets.sheets[f.char]?.[choice.sheet];
+    if (!sheet) return;
+    drawFrame(ctx, sheet, choice.frame, Math.round(f.x / SUB - camX), Math.round(GROUND_Y + f.y / SUB), {
+      anchor: ch.sprites.anchor,
+      scale: ch.sprites.scale,
+      flip: f.facing !== ch.nativeFacing,
+      squash: choice.squash,
+      source: sheet.variant('ghost', '#e264ff', 0.85),
+      alpha,
+    });
+  }
+
+  /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {import('../../engine/sim/types.js').MatchState} s
    * @param {import('../../engine/sim/types.js').FighterState} f

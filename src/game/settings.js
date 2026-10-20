@@ -12,6 +12,8 @@ const KEY = 'dusk-duel-settings-v1';
  * @typedef {object} Settings
  * @property {number} volume  0..1
  * @property {boolean} muted
+ * @property {number} musicVolume  0..1
+ * @property {boolean} captions  Text for the sounds that carry information.
  * @property {boolean} reducedMotion  No screen shake, flashes or petals.
  * @property {'auto'|'on'|'off'} touch  Touch controls ("auto": on touch screens).
  * @property {boolean} easySpecials  Show the Special button on touch controls.
@@ -27,6 +29,8 @@ export function defaultSettings() {
   return {
     volume: 0.7,
     muted: false,
+    musicVolume: 0.5,
+    captions: false,
     reducedMotion: prefersReduced,
     touch: 'auto',
     easySpecials: true,
@@ -50,6 +54,8 @@ export function sanitiseSettings(raw) {
   return {
     volume: typeof src.volume === 'number' && src.volume >= 0 && src.volume <= 1 ? src.volume : d.volume,
     muted: bool(src.muted, d.muted),
+    musicVolume: typeof src.musicVolume === 'number' && src.musicVolume >= 0 && src.musicVolume <= 1 ? src.musicVolume : d.musicVolume,
+    captions: bool(src.captions, d.captions),
     reducedMotion: bool(src.reducedMotion, d.reducedMotion),
     touch: ['auto', 'on', 'off'].includes(src.touch) ? src.touch : d.touch,
     easySpecials: bool(src.easySpecials, d.easySpecials),

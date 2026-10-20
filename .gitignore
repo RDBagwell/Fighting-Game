@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-e2e/
 .DS_Store
 *.log
 .vite/
@@ -9,3 +10,8 @@ playwright-report/
 # Art bought by Robert under a licence that forbids redistribution (e.g.
 # brullov's Oak Woods). Loaded by the game only when present; never committed.
 art/licensed/
+
+# Local environment (only .env.example is committed)
+.env
+.env.*
+!.env.example

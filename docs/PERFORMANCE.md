@@ -1,7 +1,8 @@
 # Performance
 
-What has been measured so far, on what, and what it means for session 2's
-rollback netcode.
+What has been measured, on what, and how to reproduce it: the simulation's
+cost (session 1), and the rollback netcode, its bandwidth and the
+matchmaking server under load (session 2).
 
 **Read this first:** every number below was measured in a cloud container
 (an Intel Xeon @ 2.80 GHz with 4 cores, no GPU), in Node and in headless
@@ -87,9 +88,124 @@ jitter are the things to watch.
 
 ### Download
 
-`npm run build` on 2026-10-20: the JavaScript bundle is 118 KB (40 KB
-gzipped) and the CSS 9 KB (3 KB gzipped); the 16 sprite sheets add up to
-89 KB. About 250 KB in all, well inside the 1 MB budget. Everything loads before the title screen.
+`npm run build` on 2026-10-20 (session 2):
+
+| Part | Size | Gzipped |
+|---|---|---|
+| JavaScript | 306 KB | 97 KB |
+| CSS | 12 KB | 3 KB |
+| The 16 sprite sheets | 89 KB | (PNG) |
+
+The whole `dist/` is 409 KB, well inside the 1 MB budget. Everything loads
+before the title screen. Session 2 added 188 KB of JavaScript, mostly the
+socket.io client and zod, which the online play and the replay validation
+need. (Session 1's build was 118 KB.)
+
+## Rollback netcode (session 2)
+
+### Rollback frequency, cost and bandwidth per network preset
+
+```sh
+npm run netplay-stats
+```
+
+Two real `RollbackSession`s in one process, through the lab's simulated
+network on a virtual 60 Hz clock: 3 one-minute matches of Hard CPU against
+Hard CPU per preset, with input delay 2 and rollback window 8. Rates are
+per player per second. Machine: Intel Xeon @ 2.80 GHz (4 threads), 16 GB,
+Linux 6.18, Node 22.22.0. Run on 2026-10-20.
+
+| Network | Round trip / jitter / loss | Rollbacks/s | Frames re-simulated/s | Longest | Guesses wrong | Stalls/s | Time-sync skips/s | Sent per player | Worst tick resim | Desyncs |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Perfect (LAN) | 0 / 0 / 0% | 0.0 | 0.0 | 0 | 0.0% | 0.0 | 0.0 | 1.20 kB/s, 83.7 pkt/s | 0.00 ms | none |
+| Same city | 20 / 4 / 0% | 0.0 | 0.0 | 0 | 0.0% | 0.0 | 0.0 | 1.26 kB/s, 83.7 pkt/s | 0.00 ms | none |
+| Across the country | 80 / 10 / 0.5% | 3.4 | 3.4 | 2 | 5.6% | 0.0 | 0.0 | 1.50 kB/s, 83.6 pkt/s | 2.99 ms | none |
+| Bad Wi-Fi | 60 / 60 / 8% | 2.5 | 5.4 | 5 | 6.6% | 0.0 | 0.0 | 1.61 kB/s, 83.4 pkt/s | 1.55 ms | none |
+| Another continent | 180 / 20 / 1% | 3.0 | 13.6 | 6 | 6.2% | 0.0 | 0.0 | 1.91 kB/s, 83.6 pkt/s | 1.64 ms | none |
+
+Delay-based netcode on the same networks, from the same run (the lab's
+"Delay-based" mode):
+
+| Network | Rollback: stalls/s | Delay-based at 2 frames: stalls/s | Delay needed to rarely stall | Delay-based at that delay: stalls/s |
+|---|---|---|---|---|
+| Perfect (LAN) | 0.0 | 0.0 | 1 frame (17 ms) | 0.0 |
+| Same city | 0.0 | 0.0 | 1 frame (17 ms) | 0.0 |
+| Across the country | 0.0 | 20.2 | 3 frames (50 ms) | 0.6 |
+| Bad Wi-Fi | 0.0 | 32.2 | 5 frames (83 ms) | 3.5 |
+| Another continent | 0.0 | 41.8 | 7 frames (117 ms) | 0.7 |
+
+**Bandwidth per player: 1.2–1.9 kB/s of payload, about 84 packets a
+second.**
+- Of those packets, 60 are input packets: 16 bytes of header plus one byte
+  per unacknowledged input, so more inputs ride along when the round trip
+  is longer or packets are lost. The rest are checksums and pings.
+- This is the game's own bytes. WebRTC adds its headers (SCTP, DTLS, UDP
+  and IP) on every packet, and the relay adds WebSocket framing. Neither
+  was measured here.
+- An estimate, not a measurement: those headers come to roughly 60–80
+  bytes a packet, about 5–7 kB/s in total.
+
+**Re-simulation cost for the maximum window.** The same command times the
+worst case on its own: load a state, then re-simulate 8 frames, saving and
+hashing each.
+- The median is **233 µs, 1.4% of a 16.7 ms frame**, over 20 rounds of
+  172 rollbacks from a real match.
+- The "Worst tick resim" column above is the slowest single tick seen in
+  the matches, including JIT warm-up and GC.
+- This costs more than session 1's 65–85 µs "load + 8 steps" because the
+  session also saves and hashes every re-simulated frame.
+
+**In the browser.** In the lab in headless Chromium (Bad Wi-Fi, about
+6 s of play), the session reported 9 rollbacks, the longest 3 frames, and
+a worst re-simulation of 0.3 ms. That's from a Playwright script that
+reads `window.__game.scene.session.stats`; the e2e test
+`tests/e2e/netplay.spec.js` checks that it stays under 16 ms.
+
+### Matchmaking server under load
+
+```sh
+npm run load-test              # 0, 10, 25, 50, 100 rooms
+npm run load-test -- 0 50 150  # or choose
+```
+
+**Setup.**
+- N rooms of two players, every player relaying a realistic stream
+  through the server: 60 input packets a second, plus checksums and pings,
+  as `RollbackSession` sends them.
+- That's the worst case. A match on the direct WebRTC path costs the
+  server nothing per frame.
+- The server runs in its own process with the production configuration
+  (`tools/load-server.mjs`). The per-IP caps are raised there, because
+  every client comes from 127.0.0.1.
+- Each step settles for 5 s, then is measured for 15 s. CPU is the server
+  process's user plus system time over wall time (100% = one core).
+- Same machine as above, 2026-10-20.
+
+| Rooms (2 players, all relayed) | Packets relayed/s | Server CPU | Server memory (RSS) | JS heap |
+|---|---|---|---|---|
+| 0 | 0 | 0.5% | 73 MB | 13.8 MB |
+| 10 | 1,315 | 14.6% | 79 MB | 16.6 MB |
+| 25 | 3,275 | 27.7% | 84 MB | 16.7 MB |
+| 50 | 6,440 | 48.5% | 105 MB | 19.0 MB |
+| 100 | 12,876 | 78.2% | 112 MB | 26.3 MB |
+
+**About 0.8% of a core and 0.4 MB per fully relayed room** at 100 rooms
+(1.5% per room at 10 rooms: there's a fixed cost, then it amortises). The
+packet rate scaled linearly, so the clients kept up.
+
+What it means for Render's free tier:
+- The tier has 0.1 CPU and 512 MB
+  ([Render's compute plans](https://render.com/docs/compute-plans); not
+  measured here), so it could relay roughly a dozen matches at once.
+- A free service also sleeps after 15 minutes without traffic, and the
+  next visitor waits about a minute for it to wake
+  ([Render: Deploy for Free](https://render.com/docs/free)). The online
+  lobby says so while it connects.
+- It could pair and signal far more, since direct matches cost nothing
+  per frame.
+- The 300-room cap (`MAX_ROOMS`) is a memory guard, not a CPU guarantee.
+  On a free instance, CPU runs out first if many matches fall back to
+  the relay.
 
 ## Measuring on real devices (Robert)
 

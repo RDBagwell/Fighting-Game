@@ -2,11 +2,12 @@
   "name": "fighting-game",
   "private": true,
   "version": "2.0.0",
-  "description": "Dusk Duel: a small 2D fighting game on its own deterministic engine, with frame data and a training mode.",
+  "description": "Dusk Duel: a 2D fighting game with rollback netcode, frame data and a training mode, on its own deterministic engine.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:e2e": "node tools/build-e2e.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "test": "npm run typecheck && vitest run",
@@ -14,15 +15,30 @@
     "test:e2e": "playwright test --grep-invert @screenshots",
     "screenshots": "playwright test --grep @screenshots",
     "bench": "node tools/bench.mjs",
-    "framedata": "node tools/frame-data-table.mjs"
+    "framedata": "node tools/frame-data-table.mjs",
+    "desync": "node tools/desync.mjs",
+    "netplay-stats": "node tools/netplay-stats.mjs",
+    "load-test": "node tools/load-test.mjs",
+    "capture-media": "node tools/capture-media.mjs",
+    "start": "node server/index.js",
+    "dev:server": "node --watch-path=server --watch-path=shared server/index.js"
   },
   "engines": {
-    "node": ">=20.19"
+    "node": ">=22.12"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
+    "@types/express": "5.0.6",
+    "@types/node": "22.20.5",
     "typescript": "7.0.2",
-    "vite": "8.3.1",
+    "vite": "8.3.4",
     "vitest": "5.0.3"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "helmet": "8.3.0",
+    "socket.io": "4.8.4",
+    "socket.io-client": "4.8.4",
+    "zod": "4.6.5"
   }
 }

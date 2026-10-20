@@ -37,13 +37,24 @@ describe('assets', () => {
     }
   });
 
+  it('music: only the four expected tracks, as .ogg, in public/music/ (docs/AUDIO.md)', () => {
+    const dir = path.join(root, 'public/music');
+    const found = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => !f.startsWith('.')) : [];
+    for (const f of found) expect(['title.ogg', 'select.ogg', 'stage.ogg', 'results.ogg', 'README.md'], `public/music/${f}`).toContain(f);
+    const audioMd = fs.readFileSync(path.join(root, 'docs/AUDIO.md'), 'utf8');
+    for (const t of ['title', 'select', 'stage', 'results']) expect(audioMd).toContain(`public/music/${t}.ogg`);
+  });
+
   it('every non-code file in the repository is listed in ASSETS.md', () => {
-    const skip = /^(node_modules|\.git|dist|coverage|test-results|playwright-report|art\/licensed)\//;
+    const skip = /^(node_modules|\.git|dist|dist-e2e|coverage|test-results|playwright-report|art\/licensed)\//;
     const binary = /\.(png|jpe?g|webp|gif|ico|svg|wav|mp3|ogg|m4a|ttf|otf|woff2?)$/i;
     const all = files(root).map((f) => path.relative(root, f).split(path.sep).join('/')).filter((f) => !skip.test(f) && binary.test(f));
     for (const rel of all) {
       // Screenshots are listed as a group ("docs/screenshots/*.png").
-      const listed = assetsMd.includes(`\`${rel}\``) || (rel.startsWith('docs/screenshots/') && assetsMd.includes('`docs/screenshots/*.png`'));
+      // Music is Robert's own and listed as a group too (docs/AUDIO.md).
+      const listed = assetsMd.includes(`\`${rel}\``) || (rel.startsWith('docs/screenshots/') && assetsMd.includes('`docs/screenshots/*.png`'))
+        || (rel.startsWith('public/music/') && assetsMd.includes('`public/music/*.ogg`'))
+        || (rel.startsWith('docs/media/') && assetsMd.includes('`docs/media/*`'));
       expect(listed, `${rel} is not in ASSETS.md`).toBe(true);
     }
   });

@@ -1,11 +1,15 @@
 # Tests, builds and deploys the game to GitHub Pages.
 #
-#   every push and pull request: type check + unit tests (Ubuntu and
-#   Windows), then a build and the Playwright smoke tests in headless
-#   Chromium.
+#   every push and pull request: type check + unit tests, including the
+#   server's security tests and the netplay harness (Ubuntu and Windows),
+#   a dependency audit, then a build and the Playwright tests in headless
+#   Chromium (online tests run two browsers against a local server).
 #   pushes to master: the build is published to GitHub Pages.
 #
-# One-time setup (see the README): Settings > Pages > Source: "GitHub Actions".
+# One-time setup (see the README): Settings > Pages > Source: "GitHub Actions",
+# and the repository variable GAME_SERVER_URL (Settings > Secrets and
+# variables > Actions > Variables) set to the Render service's https URL.
+# Without it the site builds and everything but online play works.
 # The site is https://rdbagwell.github.io/Fighting-Game/ (the build uses
 # relative paths, so a rename only changes the URL; see site.config.js).
 name: Test, build and deploy
@@ -36,6 +40,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      # All dependencies, dev tools included: the Vite dev server runs on
+      # contributors' machines, so its advisories matter too.
+      - name: Audit dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: npm audit --audit-level=high
 
   build:
     needs: test
@@ -48,6 +57,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          VITE_SERVER_URL: ${{ vars.GAME_SERVER_URL }}
+      - run: npm run build:e2e
       - name: Smoke tests (Playwright, headless Chromium)
         run: |
           npx playwright install --with-deps chromium

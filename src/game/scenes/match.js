@@ -14,17 +14,12 @@ import { openMoveList, openSettings } from './menus.js';
 import { ResultsScene } from './results.js';
 import { TitleScene } from './title.js';
 import { SelectScene } from './select.js';
+import { saveReplay, makeReplay } from '../replay/replays.js';
 
 /** Frames after the match is decided before the results screen. */
 const RESULTS_DELAY = 150;
 
 /** Simulation events to sounds. */
-const SOUNDS = /** @type {Record<string, import('../../engine/audio/Sfx.js').SoundName>} */ ({
-  hit: 'hit', block: 'block', swing: 'swing', special: 'special', super: 'super', throw: 'throw', tech: 'tech',
-  ko: 'ko', round: 'round', fight: 'fight', jump: 'jump', land: 'land', dash: 'dash', projectile: 'projectile',
-  clash: 'clash', knockdown: 'knockdown',
-});
-
 export class MatchScene {
   /**
    * @param {import('../App.js').App} app
@@ -39,7 +34,11 @@ export class MatchScene {
     /** @type {HTMLElement | null} */
     this.pauseMenu = null;
     const training = config.mode === 'training';
-    this.state = app.sim.createMatch({ chars: config.chars, training, stage: config.stage, seed: (Math.random() * 2 ** 31) | 0 });
+    this.seed = ((Math.random() * 2 ** 31) | 0) >>> 0;
+    this.state = app.sim.createMatch({ chars: config.chars, training, stage: config.stage, seed: this.seed });
+    /** Both players' inputs, frame by frame: the replay (not recorded in training). */
+    /** @type {Array<[number, number]>} */
+    this.log = [];
     this.renderer = new FightRenderer(/** @type {NonNullable<typeof app.assets>} */ (app.assets), app.sim);
     this.effects = new Effects();
     this.hud = new Hud();
@@ -90,18 +89,23 @@ export class MatchScene {
     this.app.input.endFrame();
     const frozen = s.freeze > 0;
     this.app.sim.step(s, [p1, p2]);
+    if (!this.training) this.log.push([p1, p2]);
 
     this.effects.reducedMotion = this.app.settings.reducedMotion;
     this.effects.onEvents(s.events, s);
-    for (const e of s.events) {
-      const sound = SOUNDS[e.type];
-      if (sound) this.app.sfx.play(sound, e.strength);
-    }
+    this.app.presentSounds(s.events);
     this.effects.update();
     this.training?.record(s, frozen);
 
     if (s.phase === 'intro' && s.phaseFrame === 1) this.hud.reset();
     if (s.phase === 'matchEnd' && s.phaseFrame >= RESULTS_DELAY) {
+      if (!this.training) {
+        try {
+          saveReplay(makeReplay(this.app.sim, { chars: this.config.chars, seed: this.seed, stage: this.config.stage }, this.log, { mode: this.config.mode === 'versus' ? 'versus' : 'cpu', names: this.names }));
+        } catch {
+          // Never block the results on storage.
+        }
+      }
       this.app.setScene(new ResultsScene(this.app, this.config, s.matchWinner, [s.wins[0], s.wins[1]]));
     }
   }

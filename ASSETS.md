@@ -86,6 +86,8 @@ Luiz Melo pack (see "Other packs considered" below).
 | Hit sparks, guard sparks, screen flash | Particles and shapes | Drawn at runtime (`src/game/render/effects.js`) | Project's own | keep |
 | `public/favicon.svg` | Two crossed blades | Written by hand for this project | Project's own | keep |
 | UI font | The system font (`system-ui`, monospace for numbers) | The player's operating system | Not shipped with the game | keep |
+| `public/music/*.ogg` | Music: `title`, `select`, `stage`, `results` (optional; none are committed yet) | Robert's own tracks, added by him ([docs/AUDIO.md](docs/AUDIO.md)) | Robert's own | to add |
+| `docs/media/*` | The README's GIF and screenshots of the lab and online play | Captured with Playwright from the real build (`tools/capture-media.mjs`) | Project's own | keep |
 | `docs/screenshots/*.png` | Screenshots of this game | Captured by `npm run screenshots` (Playwright) from the real build | Project's own (they show the CC0 sprites) | keep |
 
 ## Removed in the rebuild
