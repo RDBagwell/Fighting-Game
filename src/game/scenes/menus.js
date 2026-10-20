@@ -122,6 +122,9 @@ export function openSettings(app, onClose) {
   };
   const volume = /** @type {HTMLInputElement} */ (h('input', { type: 'range', min: 0, max: 10, step: 1, value: Math.round(s.volume * 10), 'aria-label': 'Volume',
     oninput: () => { s.volume = Number(volume.value) / 10; save(); app.click('menu'); } }));
+  const musicVolume = /** @type {HTMLInputElement} */ (h('input', { type: 'range', min: 0, max: 10, step: 1, value: Math.round(s.musicVolume * 10), 'aria-label': 'Music volume',
+    oninput: () => { s.musicVolume = Number(musicVolume.value) / 10; save(); } }));
+  const tracks = app.music.available();
 
   const controls = h('div', { class: 'controls' });
   const renderControls = () => {
@@ -178,9 +181,12 @@ export function openSettings(app, onClose) {
   const body = h('div', { class: 'settings' },
     h('section', {}, h('h3', {}, 'Sound'),
       h('label', { class: 'row' }, h('span', {}, 'Volume'), volume),
+      h('label', { class: 'row' }, h('span', {}, 'Music'), musicVolume),
+      tracks.length ? null : h('p', { class: 'fine' }, 'This build has no music files (docs/AUDIO.md), so only sound effects play.'),
       toggle('Mute', s.muted, (v) => (s.muted = v))),
     h('section', {}, h('h3', {}, 'Accessibility'),
-      toggle('Reduced motion', s.reducedMotion, (v) => (s.reducedMotion = v), 'No screen shake, flashes or drifting petals.')),
+      toggle('Reduced motion', s.reducedMotion, (v) => (s.reducedMotion = v), 'No screen shake, flashes or drifting petals.'),
+      toggle('Captions for sounds', s.captions, (v) => (s.captions = v), 'Text for the sounds that matter: round start, K.O., throws and escapes, supers, fireballs, clashes, knockdowns.')),
     h('section', {}, h('h3', {}, 'Touch'),
       choice('Touch controls', [['auto', 'Automatic (touch screens)'], ['on', 'Always on'], ['off', 'Off']], s.touch, (v) => (s.touch = /** @type {'auto'} */ (v))),
       toggle('Easy specials', s.easySpecials, (v) => (s.easySpecials = v), 'A Special button: specials without the motions (80% damage).')),

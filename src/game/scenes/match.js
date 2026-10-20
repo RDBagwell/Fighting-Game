@@ -20,12 +20,6 @@ import { saveReplay, makeReplay } from '../replay/replays.js';
 const RESULTS_DELAY = 150;
 
 /** Simulation events to sounds. */
-export const SOUNDS = /** @type {Record<string, import('../../engine/audio/Sfx.js').SoundName>} */ ({
-  hit: 'hit', block: 'block', swing: 'swing', special: 'special', super: 'super', throw: 'throw', tech: 'tech',
-  ko: 'ko', round: 'round', fight: 'fight', jump: 'jump', land: 'land', dash: 'dash', projectile: 'projectile',
-  clash: 'clash', knockdown: 'knockdown',
-});
-
 export class MatchScene {
   /**
    * @param {import('../App.js').App} app
@@ -99,10 +93,7 @@ export class MatchScene {
 
     this.effects.reducedMotion = this.app.settings.reducedMotion;
     this.effects.onEvents(s.events, s);
-    for (const e of s.events) {
-      const sound = SOUNDS[e.type];
-      if (sound) this.app.sfx.play(sound, e.strength);
-    }
+    this.app.presentSounds(s.events);
     this.effects.update();
     this.training?.record(s, frozen);
 

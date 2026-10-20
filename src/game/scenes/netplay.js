@@ -27,7 +27,6 @@ import { SUB } from '../../engine/sim/fixed.js';
 import { WIDTH, HEIGHT } from '../../engine/render/Screen.js';
 import { LabPanel } from '../online/LabPanel.js';
 import { drawRollbackMeter, drawInputTimeline, drawStatsLine, autoInputDelay } from '../online/labOverlay.js';
-import { SOUNDS } from './match.js';
 import { TitleScene } from './title.js';
 import { saveReplay, replayFromSession } from '../replay/replays.js';
 
@@ -176,10 +175,7 @@ export class NetplayScene {
 
     this.effects.reducedMotion = app.settings.reducedMotion;
     this.effects.onEvents(r.events, s.state);
-    for (const e of r.events) {
-      const sound = SOUNDS[e.type];
-      if (sound) app.sfx.play(sound, e.strength);
-    }
+    app.presentSounds(r.events);
     this.effects.update();
 
     // The ghost: where the prediction had the opponent before the correction.

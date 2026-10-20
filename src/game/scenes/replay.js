@@ -18,7 +18,6 @@ import { InputHistory } from '../training/InputHistory.js';
 import { drawBoxes, drawLegend } from '../training/overlays.js';
 import { WIDTH } from '../../engine/render/Screen.js';
 import { drawBackdrop } from './backdrop.js';
-import { SOUNDS } from './match.js';
 import { TitleScene } from './title.js';
 import { decodeReplay, encodeReplay, listReplays, deleteReplay, snapshotReplay, seekState } from '../replay/replays.js';
 
@@ -227,10 +226,7 @@ export class ReplayViewerScene {
     const frozen = s.freeze > 0;
     this.app.sim.step(s, this.replay.inputs[s.frame]);
     this.effects.onEvents(s.events, s);
-    for (const e of s.events) {
-      const sound = SOUNDS[e.type];
-      if (sound) this.app.sfx.play(sound, e.strength);
-    }
+    this.app.presentSounds(s.events);
     this.effects.update();
     this.meter.record(s, frozen);
     if (!frozen) this.inputs.record(s, this.app.sim.motions);

@@ -404,3 +404,25 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Captions for important sounds (Settings > Accessibility). */
+.captions {
+  position: fixed;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 30;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  pointer-events: none;
+  font-size: clamp(12px, 2vmin, 18px);
+}
+.captions p {
+  margin: 0;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: rgba(8, 5, 12, 0.85);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
