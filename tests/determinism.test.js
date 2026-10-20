@@ -7,6 +7,10 @@
 import { describe, it, expect } from 'vitest';
 import { sim } from './helpers/harness.js';
 import { saveState, loadState, hashState } from '../src/engine/sim/state.js';
+import { ENGINE_VERSION } from '../src/game/replay/replays.js';
+
+/** The final state hash of the recorded match below (seed 99, 8000 frames of seeded random inputs). */
+const GOLDEN = 719425085;
 
 /**
  * A recorded input log: a reproducible stream of plausible inputs (held
@@ -58,6 +62,14 @@ describe('determinism', () => {
     expect(hashState(a)).toBe(hashState(b));
     // The log actually exercised the game.
     expect(a.round + a.wins[0] + a.wins[1]).toBeGreaterThan(2);
+  });
+
+  it('golden hash: the simulation still plays this recorded match exactly as it did', () => {
+    // If this fails, a change altered how matches play out. If that was
+    // intended, bump ENGINE_VERSION in src/game/replay/replays.js (old
+    // replays would no longer play back the same) and update the hash.
+    const end = play(sim.createMatch({ chars: ['mack', 'kenji'], seed: 99 }), log, 0, log.length);
+    expect({ engine: ENGINE_VERSION, hash: hashState(end) }).toEqual({ engine: 1, hash: GOLDEN });
   });
 
   it('a state saved mid-match and loaded again carries on identically', () => {

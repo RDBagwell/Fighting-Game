@@ -32,12 +32,20 @@ const KEEP = 12;
 const MAX_FRAMES = 60 * 60 * 20;
 
 /**
- * The version of the rules a replay needs: a hash of every character's
- * data, the shared rules and the motion table. Any balance change changes it.
+ * The simulation code's version. Bump it whenever a change to the engine
+ * (not the data) changes how a match plays out; the golden-hash test in
+ * tests/determinism.test.js fails until you do.
+ */
+export const ENGINE_VERSION = 1;
+
+/**
+ * The version of the rules a replay needs: a hash of the engine version,
+ * every character's data, the shared rules and the motion table. Any
+ * balance change changes it.
  * @param {import('../../engine/sim/step.js').Simulation} sim
  */
 export function gameVersion(sim) {
-  return hashState({ characters: sim.characters, config: sim.config, motions: sim.motions }).toString(16).padStart(8, '0');
+  return hashState({ engine: ENGINE_VERSION, characters: sim.characters, config: sim.config, motions: sim.motions }).toString(16).padStart(8, '0');
 }
 
 const headerSchema = z.strictObject({
