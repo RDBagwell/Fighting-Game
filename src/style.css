@@ -332,7 +332,7 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
   position: absolute;
   top: 0.4em;
   right: 0.6em;
-  transform: translateY(4.2em);
+  transform: translateY(6.4em);
   font: inherit;
   font-size: 0.8em;
   color: var(--ink);

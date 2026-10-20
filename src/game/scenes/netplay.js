@@ -152,6 +152,11 @@ export class NetplayScene {
   }
 
   /** The path the packets take, for the badge and the stats. */
+  /** The lab's overlays: always in the lab, in an online match only while the panel is open. */
+  overlays() {
+    return this.options.kind === 'lab' || this.panel.open;
+  }
+
   path() {
     if (this.options.kind === 'lab') return 'Simulated network (in this browser)';
     return this.options.link.kind === 'direct' ? 'Direct (WebRTC)' : 'Relay (through the server)';
@@ -308,16 +313,16 @@ export class NetplayScene {
       reducedMotion: this.app.settings.reducedMotion,
       effects: this.effects,
       overlay: (c, camX) => {
-        if (this.show.ghost && this.ghost) this.renderer.drawGhost(c, this.ghost.snapshot, camX, 0.25 + 0.4 * (this.ghost.ticks / 30));
+        if (this.overlays() && this.show.ghost && this.ghost) this.renderer.drawGhost(c, this.ghost.snapshot, camX, 0.25 + 0.4 * (this.ghost.ticks / 30));
       },
       hud: (c) => {
         this.hud.draw(c, state, { names: this.names, tags: this.tags, characters: this.app.sim.characters, roundsToWin: this.app.sim.config.roundsToWin });
-        if (this.show.timeline) drawInputTimeline(c, s, 84);
-        if (this.show.meter) drawRollbackMeter(c, s, 124);
+        if (this.overlays() && this.show.timeline) drawInputTimeline(c, s, 84);
+        if (this.overlays() && this.show.meter) drawRollbackMeter(c, s, 124);
         if (!this.panel.open) drawStatsLine(c, s, { path: this.path(), rate: this.rate });
         const badge = this.options.kind === 'lab' ? 'LAB · simulated online' : this.options.link.kind === 'direct' ? 'ONLINE · direct' : 'ONLINE · relay';
         outlined(c, badge, WIDTH / 2, 52, { size: 9, align: 'center', color: '#c7f4ff' });
-        if (this.ghost && this.show.ghost) outlined(c, 'Ghost: where the guess had the opponent', WIDTH / 2, HEIGHT - 44, { size: 8, align: 'center', color: '#e7a6ff' });
+        if (this.overlays() && this.ghost && this.show.ghost) outlined(c, 'Ghost: where the guess had the opponent', WIDTH / 2, HEIGHT - 44, { size: 8, align: 'center', color: '#e7a6ff' });
         if (this.stalledTicks > 20) outlined(c, 'Waiting for your opponent’s inputs…', WIDTH / 2, HEIGHT / 2 + 40, { size: 14, align: 'center', color: '#ffe08a' });
         const r = this.room;
         if (r && r.status === 'paused' && r.pause) {
