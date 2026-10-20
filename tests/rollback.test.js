@@ -103,6 +103,9 @@ describe('prediction and the rollback window', () => {
 
   it('a rollback of the full window costs well under a frame', () => {
     const { a } = runPair({ log: match.log, frames: 900, conditions: PRESETS.anotherContinent.conditions });
+    // Measured on the real clock (the session's own clock here is virtual).
+    expect(a.stats.longestRollback).toBeGreaterThan(4);
+    expect(a.stats.maxResimMs).toBeGreaterThan(0);
     expect(a.stats.maxResimMs).toBeLessThan(16);
   });
 });

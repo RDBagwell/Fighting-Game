@@ -54,7 +54,7 @@ const HISTORY = 180;
  * @property {boolean} advanced
  * @property {boolean} stalled  Waited for the peer (beyond the rollback window, or delay mode).
  * @property {boolean} skipped  Time sync gave a frame back.
- * @property {number} resimMs  Time spent re-simulating.
+ * @property {number} resimMs  Wall-clock time spent re-simulating (always the real clock, even when `now` is virtual).
  */
 
 /**
@@ -197,9 +197,9 @@ export class RollbackSession {
     let rolledBack = 0;
     let resimMs = 0;
     if (this.rollbackFrom <= this.state.frame) {
-      const t0 = this.now();
+      const t0 = performance.now();
       rolledBack = this.rollback(events);
-      resimMs = this.now() - t0;
+      resimMs = performance.now() - t0;
       this.stats.lastResimMs = resimMs;
       this.stats.maxResimMs = Math.max(this.stats.maxResimMs, resimMs);
     }
