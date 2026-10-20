@@ -108,6 +108,11 @@ hostile message
   - Reconnecting with the token within 30 s resumes it. After that the
     match is forfeited.
   - Leaving on purpose forfeits at once and invalidates the token.
+- **Game versions.** Each client reports its game version (a hash of the
+  rules and data) when it connects. A private room refuses a joiner or a
+  resumed seat on a different version, and quick match pairs only players
+  of the same version (tested), because two builds would desync on the
+  first frame.
 - **Seeds.** Each match's seed comes from `crypto.randomInt`. It only seeds
   the (cosmetic) RNG in the shared simulation.
 

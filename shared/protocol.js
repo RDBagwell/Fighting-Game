@@ -29,6 +29,23 @@ const ROOM_CODE_PATTERN = new RegExp(`^[${ROOM_CODE_ALPHABET}]{${ROOM_CODE_LENGT
 export const CHARACTERS = /** @type {const} */ (['mack', 'kenji']);
 export const STAGES = /** @type {const} */ (['dusk-shrine']);
 
+/**
+ * The game version a client reports when it connects (socket.io `auth`):
+ * a hash of the rules and character data (src/game/replay/replays.js
+ * gameVersion). Two different versions would desync on the first frame,
+ * so the server only puts players of the same version together.
+ */
+export const GAME_VERSION_PATTERN = /^[0-9a-f]{8}$/;
+
+/**
+ * @param {unknown} auth  The handshake's `auth` object.
+ * @returns {string}  The version, or 'unknown' (old clients, tests).
+ */
+export function readGameVersion(auth) {
+  const v = auth && typeof auth === 'object' ? /** @type {Record<string, unknown>} */ (auth).version : undefined;
+  return typeof v === 'string' && GAME_VERSION_PATTERN.test(v) ? v : 'unknown';
+}
+
 /** Largest relayed input packet (packets.js: 16 bytes + up to 64 inputs). */
 export const MAX_RELAY_BYTES = 80;
 /** Largest signalling payload (an SDP offer is typically 1–4 KB). */

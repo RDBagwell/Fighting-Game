@@ -31,8 +31,9 @@ export function serverUrl() {
 export class OnlineClient extends EventTarget {
   /**
    * @param {string} url
+   * @param {{ version?: string }} [o]  The game version (gameVersion in replays.js): the server only pairs players of the same one.
    */
-  constructor(url) {
+  constructor(url, { version } = {}) {
     super();
     this.url = url;
     /** @type {RoomInfo | null} */
@@ -48,7 +49,7 @@ export class OnlineClient extends EventTarget {
     this.onRelay = null;
     /** @type {((signal: { kind: string, data: string }) => void) | null} */
     this.onSignal = null;
-    this.socket = io(url, { transports: ['websocket'], reconnectionDelay: 500, reconnectionDelayMax: 3000, timeout: 8000 });
+    this.socket = io(url, { transports: ['websocket'], reconnectionDelay: 500, reconnectionDelayMax: 3000, timeout: 8000, auth: { version } });
     this.socket.on('connect', () => this.connected());
     this.socket.on('disconnect', () => this.setStatus('offline'));
     this.socket.on('connect_error', () => this.setStatus('offline'));

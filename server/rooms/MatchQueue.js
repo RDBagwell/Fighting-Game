@@ -13,6 +13,7 @@
  * @typedef {object} QueueEntry
  * @property {import('./Room.js').Member} member
  * @property {() => boolean} isAlive
+ * @property {string} version  Only entries of the same game version are paired.
  * @property {string} ticketHash
  * @property {number | null} [lostAt]
  */
@@ -96,22 +97,26 @@ export class MatchQueue {
   }
 
   /**
-   * Takes the two longest-waiting live entries, or null if there aren't two.
+   * Takes the longest-waiting live entry that has a live partner of the
+   * same game version, and that partner; or null if there's no such pair.
    * @returns {[E, E] | null}
    */
   takePair() {
-    /** @type {E[]} */
-    const live = [];
+    /** @type {Map<string, E>} the first live entry seen of each version */
+    const waiting = new Map();
     for (const entry of this.entries.values()) {
       if (entry.lostAt !== null && entry.lostAt !== undefined) continue;
       if (!entry.isAlive()) continue;
-      live.push(entry);
-      if (live.length === 2) break;
+      const first = waiting.get(entry.version);
+      if (!first) {
+        waiting.set(entry.version, entry);
+        continue;
+      }
+      this.entries.delete(first.member.id);
+      this.entries.delete(entry.member.id);
+      return [first, entry];
     }
-    if (live.length < 2) return null;
-    this.entries.delete(live[0].member.id);
-    this.entries.delete(live[1].member.id);
-    return [live[0], live[1]];
+    return null;
   }
 
   /**

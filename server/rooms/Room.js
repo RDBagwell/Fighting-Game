@@ -48,6 +48,8 @@ export class Room {
     this.mode = mode;
     this.config = config;
     this.createdAt = now;
+    /** The game version of its players (they must all match; see readGameVersion). */
+    this.version = 'unknown';
     /** @type {import('../../shared/protocol.js').RoomInfo['status']} */
     this.status = 'waiting';
     /** @type {[SeatSlot, SeatSlot]} */

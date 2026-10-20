@@ -117,10 +117,10 @@ export async function startServer({ config } = {}) {
   const clients = [];
 
   /**
-   * @param {{ origin?: string | null, transports?: string[] }} [o]
+   * @param {{ origin?: string | null, transports?: string[], version?: string }} [o]
    */
-  function connect({ origin = ORIGIN, transports = ['websocket'] } = {}) {
-    const socket = ioClient(url, { transports, forceNew: true, reconnection: false, extraHeaders: origin ? { origin } : {} });
+  function connect({ origin = ORIGIN, transports = ['websocket'], version } = {}) {
+    const socket = ioClient(url, { transports, forceNew: true, reconnection: false, extraHeaders: origin ? { origin } : {}, auth: version ? { version } : {} });
     const client = new TestClient(socket);
     clients.push(client);
     return client;

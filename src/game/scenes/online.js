@@ -11,6 +11,7 @@ import { NetplayScene } from './netplay.js';
 import { TitleScene } from './title.js';
 import { roster } from '../data/characters/index.js';
 import { normalizeRoomCode } from '../../../shared/protocol.js';
+import { gameVersion } from '../replay/replays.js';
 
 export const PRIVACY_NOTE = 'Online play has no accounts and stores nothing about you. To find a direct path between the two players, your browser asks public STUN servers (Google and Cloudflare) for its public address, which the other player’s browser then sees, as with any peer-to-peer connection. If no direct path works, inputs go through the matchmaking server instead. The server sees your IP address and your inputs while relaying, and keeps neither.';
 
@@ -20,7 +21,7 @@ export const PRIVACY_NOTE = 'Online play has no accounts and stores nothing abou
  */
 function client(app) {
   const a = /** @type {any} */ (app);
-  if (!a.online) a.online = new OnlineClient(serverUrl());
+  if (!a.online) a.online = new OnlineClient(serverUrl(), { version: gameVersion(app.sim) });
   return /** @type {OnlineClient} */ (a.online);
 }
 

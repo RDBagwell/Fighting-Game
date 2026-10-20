@@ -10,7 +10,7 @@
  * room, nothing more.
  */
 import crypto from 'node:crypto';
-import { clientEventSchemas, validateClientEvent, validateRelay, normalizeRoomCode } from '../../shared/protocol.js';
+import { clientEventSchemas, validateClientEvent, validateRelay, normalizeRoomCode, readGameVersion } from '../../shared/protocol.js';
 import { KeyedRateLimiter, TokenBucket } from '../security/rateLimit.js';
 
 /** Every error a client can see. A small fixed set, so errors never reveal internals. */
@@ -22,6 +22,7 @@ export const ERRORS = {
   expired: 'That session has expired.',
   notAllowed: "That's not possible right now.",
   replaced: 'This seat was opened in another tab.',
+  version: 'That room is on a different version of the game. Reload the page (both of you) and try again.',
   generic: 'Something went wrong.',
 };
 
@@ -38,6 +39,7 @@ const KNOWN_EVENTS = new Set([...Object.keys(clientEventSchemas), 'relay']);
  * @property {TokenBucket} signalBucket
  * @property {import('../rooms/Room.js').Member} member
  * @property {{ code: string, seat: 0 | 1 } | null} membership
+ * @property {string} version  The game version the client reported (readGameVersion).
  *
  * @typedef {import('socket.io').Socket & { data: SocketData }} GameSocket
  * @typedef {import('../rooms/MatchQueue.js').QueueEntry & { socket: GameSocket }} QuickEntry
@@ -105,6 +107,7 @@ export class SocketController {
   admit(socket, next) {
     const ip = this.clientIp(socket);
     socket.data.ip = ip;
+    socket.data.version = readGameVersion(socket.handshake.auth);
     const open = this.connectionsPerIp.get(ip) || 0;
     if (open >= this.config.limits.maxConcurrentPerIp || !this.connectLimiter.take(ip)) return next(new Error('Too many connections'));
     this.connectionsPerIp.set(ip, open + 1);
@@ -236,6 +239,7 @@ export class SocketController {
     this.release(socket);
     const room = this.manager.create('private');
     if (!room) return { ok: false, error: ERRORS.serverFull };
+    room.version = socket.data.version;
     const token = this.seat(socket, room, 0);
     this.log('info', 'private room created');
     return { ok: true, code: room.code, seat: /** @type {0} */ (0), token };
@@ -250,6 +254,7 @@ export class SocketController {
     const room = this.findRoom(code);
     const seat = room ? room.openSeat() : -1;
     if (!room || seat === -1) return { ok: false, error: ERRORS.notFound };
+    if (room.version !== socket.data.version) return { ok: false, error: ERRORS.version };
     this.release(socket);
     const token = this.seat(socket, room, seat);
     return { ok: true, code: room.code, seat, token };
@@ -260,7 +265,7 @@ export class SocketController {
    * @param {string | undefined} ticket
    */
   quickMatch(socket, ticket) {
-    const entry = { member: socket.data.member, socket, isAlive: () => socket.connected };
+    const entry = { member: socket.data.member, socket, version: socket.data.version, isAlive: () => socket.connected };
     if (ticket) {
       // Taking back a place in line after a dropped connection.
       if (!this.joinLimiter.take(socket.data.ip)) return { ok: false, error: ERRORS.rateLimited };
@@ -278,6 +283,7 @@ export class SocketController {
   pairQueue() {
     for (let pair = this.manager.queue.takePair(); pair; pair = this.manager.queue.takePair()) {
       const room = this.manager.create('quick');
+      if (room) room.version = pair[0].version;
       if (!room) {
         this.manager.queue.requeueFront(pair);
         for (const entry of pair) entry.socket.emit('serverError', { message: ERRORS.serverFull });
@@ -302,6 +308,8 @@ export class SocketController {
     const room = this.findRoom(code);
     const seat = room ? room.seatForToken(token) : -1;
     if (!room || seat === -1) return { ok: false, error: ERRORS.expired };
+    // A reload that picked up a new build can't rejoin a match the old build was playing.
+    if (room.version !== socket.data.version) return { ok: false, error: ERRORS.version };
     const current = socket.data.membership;
     if (!(current?.code === room.code && current.seat === seat)) this.release(socket);
     const previous = room.reattach(seat, socket.data.member, this.now());

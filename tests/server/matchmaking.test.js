@@ -67,6 +67,27 @@ describe('private rooms', () => {
   });
 });
 
+describe('game versions', () => {
+  it('a private room refuses a player on a different version, and so does resuming a seat', async () => {
+    env = await startServer();
+    const a = env.connect({ version: '11111111' });
+    const other = env.connect({ version: '22222222' });
+    const junk = env.connect({ version: 'not-a-version' });
+    await Promise.all([a.connected, other.connected, junk.connected]);
+    const { code, token } = await a.request('createRoom');
+    expect(await other.request('joinRoom', { code })).toEqual({ ok: false, error: 'That room is on a different version of the game. Reload the page (both of you) and try again.' });
+    // An invalid version is read as "unknown", which matches no real one.
+    expect((await junk.request('joinRoom', { code })).ok).toBe(false);
+    a.socket.disconnect();
+    const reloaded = env.connect({ version: '22222222' });
+    await reloaded.connected;
+    expect((await reloaded.request('resume', { code, token })).ok).toBe(false);
+    const same = env.connect({ version: '11111111' });
+    await same.connected;
+    expect((await same.request('resume', { code, token })).ok).toBe(true);
+  });
+});
+
 describe('quick match', () => {
   it('pairs two players into a fresh room with different seats', async () => {
     env = await startServer();
@@ -79,6 +100,24 @@ describe('quick match', () => {
     expect(a.seated[0].code).toBe(b.seated[0].code);
     expect(a.seated[0].seat).not.toBe(b.seated[0].seat);
     await a.waitForRoom((r) => r.status === 'select' && r.mode === 'quick');
+  });
+
+  it('only pairs players of the same game version (two builds would desync on the first frame)', async () => {
+    env = await startServer();
+    const old = env.connect({ version: 'aaaaaaaa' });
+    const a = env.connect({ version: 'bbbbbbbb' });
+    const b = env.connect({ version: 'bbbbbbbb' });
+    await Promise.all([old.connected, a.connected, b.connected]);
+    await old.request('quickMatch');
+    await a.request('quickMatch');
+    await sleep(50);
+    expect(old.seated).toHaveLength(0);
+    expect(a.seated).toHaveLength(0);
+    await b.request('quickMatch');
+    await waitFor(() => a.seated.length === 1 && b.seated.length === 1, 2000, 'a and b seated');
+    expect(a.seated[0].code).toBe(b.seated[0].code);
+    expect(old.seated).toHaveLength(0);
+    expect(env.server.manager.queue.size).toBe(1);
   });
 
   it('never pairs a player with themselves', async () => {
