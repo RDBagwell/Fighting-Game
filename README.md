@@ -291,7 +291,7 @@ invite link in the other.
 
 ### Tests
 
-**`npm test`** runs 248 tests, in 16 files. The main ones:
+**`npm test`** runs 250 tests, in 16 files. The main ones:
 
 - **Rollback** ([`tests/rollback.test.js`](tests/rollback.test.js)):
   - two sessions under every network preset, with late, reordered,

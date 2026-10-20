@@ -2,7 +2,7 @@
   "name": "fighting-game",
   "private": true,
   "version": "2.0.0",
-  "description": "Dusk Duel: a small 2D fighting game on its own deterministic engine, with frame data and a training mode.",
+  "description": "Dusk Duel: a 2D fighting game with rollback netcode, frame data and a training mode, on its own deterministic engine.",
   "type": "module",
   "scripts": {
     "dev": "vite",
