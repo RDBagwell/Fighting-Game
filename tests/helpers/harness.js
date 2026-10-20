@@ -38,16 +38,18 @@ export function script(script, facing) {
 }
 
 /**
- * A match (training mode unless told otherwise) with the fighters at the
- * given x positions in pixels.
+ * A match, already in the fight (no round intro), with the fighters at the
+ * given x positions in pixels. Not training mode unless asked, so health
+ * doesn't refill in the middle of a test.
  * @param {object} [o]
  * @param {[string, string]} [o.chars]
  * @param {[number, number]} [o.x]
  * @param {boolean} [o.training]
  * @param {boolean} [o.infiniteMeter]
  */
-export function setup({ chars = ['mack', 'mack'], x = [480, 520], training = true, infiniteMeter = false } = {}) {
+export function setup({ chars = ['mack', 'mack'], x = [480, 520], training = false, infiniteMeter = false } = {}) {
   const s = sim.createMatch({ chars, training, infiniteMeter, seed: 7 });
+  s.phase = 'fight';
   s.fighters[0].x = x[0] * SUB;
   s.fighters[1].x = x[1] * SUB;
   s.fighters[0].facing = x[0] < x[1] ? 1 : -1;

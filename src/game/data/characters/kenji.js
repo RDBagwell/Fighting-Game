@@ -196,21 +196,21 @@ export const kenji = deepFreeze(/** @type {CharacterData} */ ({
     'j.L': {
       name: 'Air Needle', kind: 'normal', notation: 'j.L', stance: 'air', button: 'L',
       startup: 6, active: 4, recovery: 9, landing: 3,
-      anim: [['attack1', 0, 5], ['attack1', 1, 4], ['attack1', 2, 10]],
+      anim: [['attack1', 0, 5], ['attack1', 1, 4], ['attack1', 2, 9]],
       hits: [hit([6, 9], [[4, -72, 60, 18]], { damage: 32, hitstun: 12, blockstun: 9, hitstop: 8, push: 6, guard: 'high' })],
       description: 'Air-to-air poke.',
     },
     'j.M': {
       name: 'Falling Thrust', kind: 'normal', notation: 'j.M', stance: 'air', button: 'M',
       startup: 8, active: 5, recovery: 11, landing: 3,
-      anim: [['attack1', 0, 7], ['attack1', 1, 5], ['attack1', 2, 12]],
+      anim: [['attack1', 0, 7], ['attack1', 1, 5], ['attack1', 2, 11]],
       hits: [hit([8, 12], [[6, -48, 84, 30]], { damage: 55, hitstun: 16, blockstun: 12, hitstop: 10, push: 7, guard: 'high' })],
       description: 'Angled down-forward: a long-range jump-in.',
     },
     'j.H': {
       name: 'Moon Drop', kind: 'normal', notation: 'j.H', stance: 'air', button: 'H',
       startup: 11, active: 4, recovery: 15, landing: 4,
-      anim: [['attack2', 0, 10], ['attack2', 1, 4], ['attack2', 2, 16]],
+      anim: [['attack2', 0, 10], ['attack2', 1, 4], ['attack2', 2, 15]],
       hits: [hit([11, 14], [[0, -84, 90, 76]], { damage: 80, hitstun: 20, blockstun: 15, hitstop: 12, push: 8, guard: 'high' })],
       description: 'Big jump-in.',
     },
@@ -236,7 +236,7 @@ export const kenji = deepFreeze(/** @type {CharacterData} */ ({
       easy: 'H', meterCost: 1000,
       startup: 10, active: 1, recovery: 34,
       invuln: [{ frames: [1, 9], kind: 'all' }],
-      anim: [['attack2', 0, 9], ['attack2', 1, 6], ['attack2', 2, 15], ['attack2', 3, 15]],
+      anim: [['attack2', 0, 9], ['attack2', 1, 6], ['attack2', 2, 15], ['attack2', 3, 14]],
       projectile: {
         frame: 10,
         x: 50,

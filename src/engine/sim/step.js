@@ -546,6 +546,12 @@ export function createSimulation({ characters, config: cfg, motions }) {
         f.push = 0;
       }
     }
+    // `| 0` turns -0 (from e.g. -1 * 0) into 0. They behave the same in
+    // arithmetic, but JSON writes both as 0, and a loaded state must equal
+    // the saved one exactly.
+    f.vx |= 0;
+    f.vy |= 0;
+    f.push |= 0;
   }
 
   /**
