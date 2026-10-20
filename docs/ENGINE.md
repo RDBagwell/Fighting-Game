@@ -52,52 +52,36 @@ FixedStepLoop ── every display refresh ──► MatchScene.render()
     FightRenderer: stage, fighters (sprite frame from frame data), effects, HUD, overlays
 ```
 
-## Notes for session 2: rollback, replays and online play
+## Rollback, replays and online play
 
-Everything rollback needs is already a function of plain data:
+Session 2 built these on the engine without changing the simulation:
+everything they need is already a function of plain data.
 
 - **Inputs** are one byte per player per frame (`bits.js`). That byte is
-  what goes over the network. Facing-relative directions are resolved
-  inside the simulation, so the byte means the same on both machines.
-- **The step** is `sim.step(state, [p1, p2])`. It's deterministic, uses
-  integer maths only, reads nothing but its arguments and frozen data,
-  and is tested to give identical states run twice, after save/load, after
-  a JSON round trip, and under repeated rollback-and-resimulate.
-- **Saving and loading** are `saveState` / `loadState` (a deep copy of
-  ~1.4 KB of plain data). **Desync detection** is `hashState` (32-bit
-  FNV-1a over the state in a fixed key order).
-- **The budget**: a step is about 4.5 µs, a save or load about 9 µs, and
-  re-simulating 8 frames from a loaded state 65–85 µs (Node and headless
-  Chromium on a 2.8 GHz cloud Xeon; [PERFORMANCE.md](PERFORMANCE.md)). A
-  rollback of 8 frames costs under 1% of a 16.7 ms frame there.
+  what goes over the network and into a replay. Facing-relative directions
+  are resolved inside the simulation, so the byte means the same on both
+  machines.
+- **The step** is `sim.step(state, [p1, p2])`. It's deterministic and
+  integer-only, it reads nothing but its arguments and frozen data, and a
+  golden-hash test pins how a recorded match plays out.
+- **`saveState` / `loadState` / `hashState`** are a deep copy of about
+  1.4 KB of plain data, and a 32-bit FNV-1a checksum.
 
-Where it plugs in:
+How each feature uses them:
 
-1. **Input layer.** Replace the P2 branch of `MatchScene.update()` with a
-   `Session` that returns the confirmed remote byte for a frame or a
-   prediction (the usual "repeat the last input"). Local input should be
-   delayed by a configurable 0–3 frames (input delay) before it's sent.
-2. **Simulation layer.** Keep a ring of `saveState` snapshots, one per
-   frame. When a remote input arrives for frame *f* and differs from the
-   prediction, `loadState(snapshot[f])` and re-run `step` with the corrected
-   inputs up to the present. Nothing else changes: the scene keeps
-   rendering `state`.
-3. **Events.** `state.events` holds only the current frame's events. During
-   re-simulation, sound and effects must be suppressed (or deduplicated by
-   frame and type) so a rolled-back hit doesn't play twice. The renderer's
-   effects are already outside the state, so dropping them is safe.
-4. **Non-simulation state** that must not roll back: the HUD's red-bar
-   drain, effects, the training meter. All already live outside
-   `MatchState`.
-5. **Things to make deterministic across machines** before going online:
-   the match seed (exchange it at connection), the stage, the characters,
-   and the game version (put a data hash in the handshake: two builds with
-   different frame data would desync instantly). The CPU uses its own RNG
-   and isn't involved online.
-6. **Replays** need no new engine code: store the seed, the characters and
-   the input log, and run `step` over it (exactly what
-   `tests/determinism.test.js` does).
+| What | How | Where |
+|---|---|---|
+| Rollback | A ring of `saveState` snapshots. On a wrong guess, `loadState` the frame before and re-run `step` up to the present, in the same tick | [`src/engine/rollback/`](../src/engine/rollback/), [ROLLBACK.md](ROLLBACK.md) |
+| Sounds and effects | `state.events` holds only the current frame's events. The `EventPresenter` drops repeats from re-simulated frames | [`EventPresenter.js`](../src/engine/rollback/EventPresenter.js) |
+| Desync detection | `hashState` of every confirmed frame, compared every 30 frames | [`RollbackSession.js`](../src/engine/rollback/RollbackSession.js), [`desync.js`](../src/engine/rollback/desync.js) |
+| Replays | The match options and the input log, re-run through `step`, with snapshots every 3 s for seeking | [`src/game/replay/`](../src/game/replay/) |
+| The same game on both machines | The server picks the seed. Both clients report their **game version** (a hash of the engine version and all data) when they connect, and the server only puts players of the same version together | [`shared/protocol.js`](../shared/protocol.js), `gameVersion` in [`replays.js`](../src/game/replay/replays.js) |
 
-Not done yet, and worth knowing: the simulation runs on the main thread;
-at these costs that's fine, but rollback of many frames on a slow phone
-should be measured there first.
+Non-simulation state never rolls back, because it was never in
+`MatchState`: the HUD's red-bar drain, effects, the training meter and the
+CPU's thinking. The CPU plays through inputs, so in the lab it sits on
+the far side of the simulated network like a remote player.
+
+The simulation runs on the main thread. At these costs that's fine on a
+desktop ([PERFORMANCE.md](PERFORMANCE.md)), but a long rollback on a slow
+phone hasn't been measured on a real device yet.

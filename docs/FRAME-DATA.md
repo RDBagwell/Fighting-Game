@@ -41,15 +41,14 @@ Contents:
 
 ## 1. Why the simulation must be deterministic
 
-**The problem.** Three things this game needs, or will need in session 2,
-all rest on one property:
+**The problem.** Three things this game needs all rest on one property:
 
 - **Replays and training recordings** store only the inputs (one byte per
   player per frame) and replay them. That only works if the same inputs
   always produce the same fight.
 - **Saving and loading state** (training-mode resets, rewinding) needs the
   whole game to be a value that can be copied and restored.
-- **Rollback netcode** (session 2) predicts the remote player's input,
+- **Rollback netcode** ([ROLLBACK.md](ROLLBACK.md)) predicts the remote player's input,
   carries on, and when the real input arrives and differs, *loads the state
   from that frame and re-simulates* up to the present, inside one display
   frame. Two machines that start from the same state and feed in the same
@@ -78,8 +77,8 @@ frame. Its rules:
 
 `saveState` and `loadState` ([state.js](../src/engine/sim/state.js)) are a
 fast deep copy of that plain object; `hashState` is a 32-bit checksum for
-comparing two states cheaply. Session 2 will hash confirmed frames on both
-machines to detect a desync on the exact frame it happens.
+comparing two states cheaply. Online, both machines hash every confirmed
+frame to detect a desync on the exact frame it happens.
 
 The step works **in place** (it mutates the state it's given and returns
 it): that keeps an ordinary frame free of allocation. Anything that needs

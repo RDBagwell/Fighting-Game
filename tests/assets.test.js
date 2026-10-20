@@ -53,7 +53,8 @@ describe('assets', () => {
       // Screenshots are listed as a group ("docs/screenshots/*.png").
       // Music is Robert's own and listed as a group too (docs/AUDIO.md).
       const listed = assetsMd.includes(`\`${rel}\``) || (rel.startsWith('docs/screenshots/') && assetsMd.includes('`docs/screenshots/*.png`'))
-        || (rel.startsWith('public/music/') && assetsMd.includes('`public/music/*.ogg`'));
+        || (rel.startsWith('public/music/') && assetsMd.includes('`public/music/*.ogg`'))
+        || (rel.startsWith('docs/media/') && assetsMd.includes('`docs/media/*`'));
       expect(listed, `${rel} is not in ASSETS.md`).toBe(true);
     }
   });
