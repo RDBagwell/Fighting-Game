@@ -205,7 +205,7 @@ hostile message
   - `.env` is gitignored, and only `.env.example` is committed.
   - There are no secrets: the server has no keys, no database and no
     accounts.
-- CI runs `npm audit --omit=dev --audit-level=high`.
+- CI runs `npm audit --audit-level=high` over every dependency, dev tools included.
 
 ## Offline modes
 
