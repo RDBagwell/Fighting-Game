@@ -62,7 +62,7 @@ const HISTORY = 180;
  * @property {number} tick  `state.frame` when it happened.
  * @property {number} from  First frame re-simulated.
  * @property {number} frames
- * @property {{ x: number, y: number, facing: number, char: string, state: string, move: string, moveFrame: number, stateFrame: number, vy: number, crouching: boolean }} predicted
+ * @property {{ x: number, y: number, facing: 1 | -1, char: string, state: string, move: string, moveFrame: number, stateFrame: number, vy: number, crouching: boolean }} predicted
  *   The opponent as the prediction had them, just before the correction.
  */
 

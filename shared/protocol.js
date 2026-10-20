@@ -145,6 +145,13 @@ export const seatedSchema = z.strictObject({ code: z.string(), seat: z.union([z.
 export const signalSchema = clientEventSchemas.signal;
 export const serverErrorSchema = z.strictObject({ message: z.string() });
 
-/** @typedef {z.infer<typeof roomInfoSchema>} RoomInfo */
-/** @typedef {z.infer<typeof matchInfoSchema>} MatchInfo */
-/** @typedef {z.infer<typeof ackSchema>} Ack */
+// The types the schemas produce, written out (zod's inferred tuples don't
+// survive JSDoc checking without strict mode).
+/**
+ * @typedef {{ id: number, seed: number, chars: [string, string], stage: string }} MatchInfo
+ * @typedef {{ taken: boolean, connected: boolean, char: string, ready: boolean, rematch: boolean }} SeatInfo
+ * @typedef {{ code: string, mode: 'private' | 'quick', status: (typeof ROOM_STATUSES)[number], you: 0 | 1,
+ *   seats: [SeatInfo, SeatInfo], match: MatchInfo | null, pause: { seat: 0 | 1, forfeitInMs: number } | null,
+ *   forfeited: -1 | 0 | 1, reason?: string }} RoomInfo
+ * @typedef {{ ok: boolean, error?: string, code?: string, seat?: 0 | 1, token?: string, queued?: boolean, ticket?: string }} Ack
+ */

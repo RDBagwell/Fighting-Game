@@ -107,8 +107,11 @@ export class App {
     this.assets = { sheets, shrine: buildDuskShrine(sim.config.stage.width), licensed: { background, shop } };
   }
 
-  start() {
-    this.setScene(new TitleScene(this));
+  /**
+   * @param {Scene} [first]  Where to start (an invite link opens the online lobby).
+   */
+  start(first) {
+    this.setScene(first ?? new TitleScene(this));
     this.loop.start();
   }
 

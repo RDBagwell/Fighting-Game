@@ -30,6 +30,8 @@ export class Screen {
     this.container = container;
     this.ctx = /** @type {CanvasRenderingContext2D} */ (canvas.getContext('2d', { alpha: false }));
     this.scale = 1;
+    /** CSS pixels kept free on the right (a side panel that sits beside the game). */
+    this.reserveRight = 0;
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize);
     this.resize();
@@ -37,7 +39,7 @@ export class Screen {
 
   resize() {
     const dpr = window.devicePixelRatio || 1;
-    const w = Math.max(1, this.container.clientWidth);
+    const w = Math.max(1, this.container.clientWidth - this.reserveRight);
     const h = Math.max(1, this.container.clientHeight);
     const fit = Math.min((w * dpr) / WIDTH, (h * dpr) / HEIGHT);
     const dense = dpr >= 2 && fit > Math.floor(fit) + 0.05;
@@ -54,6 +56,7 @@ export class Screen {
     this.cssHeight = HEIGHT * cssScale;
     this.container.style.setProperty('--game-w', `${Math.round(WIDTH * cssScale)}px`);
     this.container.style.setProperty('--game-h', `${Math.round(HEIGHT * cssScale)}px`);
+    this.container.style.setProperty('--reserve', `${this.reserveRight}px`);
   }
 
   /** Starts a frame: logical-pixel transform, smoothing off. */

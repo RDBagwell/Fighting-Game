@@ -6,6 +6,8 @@ import { h, focusFirst } from '../ui/dom.js';
 import { drawBackdrop } from './backdrop.js';
 import { openSettings, openCredits, openMoveList, openHowToPlay } from './menus.js';
 import { SelectScene } from './select.js';
+import { OnlineLobbyScene, LabSetupScene } from './online.js';
+import { ReplayListScene } from './replay.js';
 
 export class TitleScene {
   /** @param {import('../App.js').App} app */
@@ -25,11 +27,14 @@ export class TitleScene {
     const screen = h('div', { class: 'screen title menu-active' },
       h('div', { class: 'title-block' },
         h('h1', { class: 'logo' }, 'Dusk ', h('span', {}, 'Duel')),
-        h('p', { class: 'tagline' }, 'A 2D fighting game on a deterministic engine, with real frame data and a training mode.')),
+        h('p', { class: 'tagline' }, 'A 2D fighting game with rollback netcode, real frame data and a training mode.')),
       h('nav', { class: 'menu', 'aria-label': 'Main menu' },
         h('button', { class: 'btn primary', 'data-autofocus': true, onclick: () => go('cpu') }, 'Versus CPU'),
+        h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new OnlineLobbyScene(app)); } }, 'Online'),
+        h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new LabSetupScene(app)); } }, 'Rollback lab'),
         h('button', { class: 'btn', onclick: () => go('versus') }, 'Versus (2 players)'),
         h('button', { class: 'btn', onclick: () => go('training') }, 'Training mode'),
+        h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new ReplayListScene(app)); } }, 'Replays'),
         h('button', { class: 'btn', onclick: () => openMoveList(app) }, 'Move list'),
         h('button', { class: 'btn', onclick: () => openHowToPlay(app) }, 'How to play'),
         h('button', { class: 'btn', onclick: () => openSettings(app) }, 'Settings'),
