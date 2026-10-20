@@ -1,29 +1,24 @@
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Fighting Game</title>
-</head>
-<body>
-    <div class="game-container">
-        <div class="bars-ui">
-            <div class="health-bar-container player">
-                <div class="player-health-bar" ></div>
-                <div class="player-bar" ></div>
-            </div>
-            <div class="timer"></div>
-            <div class="health-bar-container">
-                <div class="enemy-health-bar" ></div>
-                <div class="enemy-bar" ></div>
-            </div>
-        </div>
-        <div class="game-msg"></div>
-        <canvas></canvas>
-    </div>
-    <script src="./js/utils.js"></script>
-    <script src="./js/Classes.js"></script>
-    <script src="./index.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="description" content="Dusk Duel: a small 2D fighting game on a deterministic engine, with frame data, a training mode and a CPU opponent." />
+    <meta name="theme-color" content="#140d1c" />
+    <title>Dusk Duel: a 2D fighting game with frame data and a training mode</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  </head>
+  <body>
+    <main id="game">
+      <canvas aria-label="The fight"></canvas>
+      <div id="ui"></div>
+      <div class="loading" role="status">
+        <h1 class="logo">Dusk <span>Duel</span></h1>
+        <div class="loading-bar"><span></span></div>
+        <p class="loading-label">Loading…</p>
+      </div>
+    </main>
+    <noscript>This game needs JavaScript.</noscript>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>
