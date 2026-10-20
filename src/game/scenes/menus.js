@@ -154,7 +154,8 @@ export function openSettings(app, onClose) {
             return;
           }
           btn.textContent = 'Press a button… (Start cancels)';
-          const index = await app.input.capturePadButton(0);
+          // Stop listening if the settings are closed before a button is pressed.
+          const index = await app.input.capturePadButton(0, () => !btn.isConnected);
           if (index !== null) {
             for (const a of ACTIONS) s.controls.pad[a] = s.controls.pad[a].filter((i) => i !== index);
             s.controls.pad[action] = [index];

@@ -36,6 +36,8 @@ export class Hud {
     /** Health shown by the red bars, per side (drains towards the real value). */
     this.lag = [1, 1];
     this.lagHold = [0, 0];
+    /** The simulation frame the drain last advanced on (it drains per frame, not per redraw). */
+    this.lastFrame = -1;
   }
 
   reset() {
@@ -56,13 +58,17 @@ export class Hud {
     const barW = 250;
     const barH = 12;
     const top = 14;
+    const newFrame = s.frame !== this.lastFrame;
+    this.lastFrame = s.frame;
     for (let side = 0; side < 2; side++) {
       const f = s.fighters[side];
       const max = characters[f.char].stats.health;
       const ratio = f.health / max;
       // The red bar holds while a combo is going on, then drains.
       if (ratio < this.lag[side]) {
-        if (f.health > 0 && (f.combo > 0 || f.state === 'hitstun' || f.state === 'airHit')) this.lagHold[side] = 20;
+        if (!newFrame) {
+          // Same frame redrawn (a 144 Hz screen, a paused game): no drain.
+        } else if (f.health > 0 && (f.combo > 0 || f.state === 'hitstun' || f.state === 'airHit')) this.lagHold[side] = 20;
         else if (this.lagHold[side] > 0) this.lagHold[side]--;
         else this.lag[side] = Math.max(ratio, this.lag[side] - 0.01);
       } else this.lag[side] = ratio;
