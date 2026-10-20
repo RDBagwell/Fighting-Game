@@ -14,6 +14,18 @@ import { outlined } from '../hud/Hud.js';
 import { WIDTH } from '../../engine/render/Screen.js';
 import { SUB } from '../../engine/sim/fixed.js';
 import { saveState, loadState } from '../../engine/sim/state.js';
+
+/**
+ * A coloured legend key. Set through the CSSOM, not a style attribute, so
+ * the page's CSP (style-src 'self') allows it.
+ * @param {string} color
+ * @param {string} mark
+ */
+function swatch(color, mark) {
+  const el = h('i', {}, mark);
+  el.style.background = color;
+  return el;
+}
 import { openModal, openMoveList } from '../scenes/menus.js';
 
 /** One line each, for someone who has never played a fighting game. */
@@ -279,7 +291,7 @@ export class Training {
       recStatus.textContent = this.dummy.recording.length ? `Recording: ${(this.dummy.recording.length / 60).toFixed(1)} s` : 'Nothing recorded yet.';
     };
     refreshRec();
-    const legend = h('div', { class: 'legend' }, ...Object.values(FRAME_STYLE).map((st) => h('span', {}, h('i', { style: `background:${st.color}` }, st.mark), st.label)));
+    const legend = h('div', { class: 'legend' }, ...Object.values(FRAME_STYLE).map((st) => h('span', {}, swatch(st.color, st.mark), st.label)));
 
     const body = h('div', { class: 'training-panel' },
       h('section', {}, h('h3', {}, 'Dummy'),

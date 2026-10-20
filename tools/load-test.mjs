@@ -42,7 +42,7 @@ async function room() {
   const make = () => io(url, { transports: ['websocket'], extraHeaders: { origin: 'http://load.test' }, reconnection: false });
   const a = make();
   const b = make();
-  await Promise.all([a, b].map((s) => new Promise((r) => s.once('connect', r))));
+  await Promise.all([a, b].map((s) => new Promise((r) => s.once('connect', () => r(undefined)))));
   const created = /** @type {any} */ (await ask(a, 'createRoom'));
   await ask(b, 'joinRoom', { code: created.code });
   await ask(a, 'select', { char: 'mack', ready: true });

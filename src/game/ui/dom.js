@@ -18,7 +18,6 @@ export function h(tag, attrs = {}, ...children) {
     if (value === undefined || value === null || value === false) continue;
     if (key.startsWith('on') && typeof value === 'function') el.addEventListener(key.slice(2), value);
     else if (key === 'class') el.className = value;
-    else if (key === 'html') el.innerHTML = value;
     else if (value === true) el.setAttribute(key, '');
     else el.setAttribute(key, String(value));
   }
