@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.vite/
+coverage/
+test-results/
+playwright-report/
+# Art bought by Robert under a licence that forbids redistribution (e.g.
+# brullov's Oak Woods). Loaded by the game only when present; never committed.
+art/licensed/

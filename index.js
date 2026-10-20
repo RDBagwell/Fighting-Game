@@ -5,8 +5,6 @@ const enemyBar = document.querySelector('.enemy-health-bar');
 const playerBar = document.querySelector('.player-health-bar');
 const gameTimer = document.querySelector('.timer');
 const gameMessage = document.querySelector('.game-msg');
-const background = new Sprite({ imageSRC: './assets/background.png', position: {x: 0, y: 0} });
-const shop = new Sprite({ imageSRC: './assets/shop.png', position: {x: 600, y: 128}, scale: 2.75, frames: 6, currentFrame: 1 });
 
 let timer = 99;
 let timerID;
@@ -25,7 +23,7 @@ const player = new Fighter({
         x: 0,
         y: 10 
     },
-    imageSRC: './assets/samuraiMack/Idle.png',
+    imageSRC: './public/sprites/mack/idle.png',
     scale: 2.75, 
     frames: 8, 
     currentFrame: 0,
@@ -35,35 +33,35 @@ const player = new Fighter({
     },
     sprites: {
         idle:{
-            imageSRC: './assets/samuraiMack/Idle.png',
+            imageSRC: './public/sprites/mack/idle.png',
             frames: 8
         },
         run:{
-            imageSRC: './assets/samuraiMack/Run.png',
+            imageSRC: './public/sprites/mack/run.png',
             frames: 8
         },
         attack1:{
-            imageSRC: './assets/samuraiMack/Attack1.png',
+            imageSRC: './public/sprites/mack/attack1.png',
             frames: 6
         },
         attack2:{
-            imageSRC: './assets/samuraiMack/Attack2.png',
+            imageSRC: './public/sprites/mack/attack2.png',
             frames: 6
         },
         death:{
-            imageSRC: './assets/samuraiMack/Death.png',
+            imageSRC: './public/sprites/mack/death.png',
             frames: 6
         },
         fall:{
-            imageSRC: './assets/samuraiMack/Fall.png',
+            imageSRC: './public/sprites/mack/fall.png',
             frames: 2
         },
         jump:{
-            imageSRC: './assets/samuraiMack/Jump.png',
+            imageSRC: './public/sprites/mack/jump.png',
             frames: 2
         },
         take_hit:{
-            imageSRC: './assets/samuraiMack/Take Hit.png',
+            imageSRC: './public/sprites/mack/take-hit.png',
             frames: 4
         }
     },
@@ -86,7 +84,7 @@ const enemy = new Fighter({
         x: 0,
         y: 10 
     },
-    imageSRC: './assets/kenji/Idle.png',
+    imageSRC: './public/sprites/kenji/idle.png',
     scale: 2.75, 
     frames: 4, 
     currentFrame: 0,
@@ -96,35 +94,35 @@ const enemy = new Fighter({
     },
     sprites: {
         idle:{
-            imageSRC: './assets/kenji/Idle.png',
+            imageSRC: './public/sprites/kenji/idle.png',
             frames: 4
         },
         run:{
-            imageSRC: './assets/kenji/Run.png',
+            imageSRC: './public/sprites/kenji/run.png',
             frames: 8
         },
         attack1:{
-            imageSRC: './assets/kenji/Attack1.png',
+            imageSRC: './public/sprites/kenji/attack1.png',
             frames: 4
         },
         attack2:{
-            imageSRC: './assets/kenji/Attack2.png',
+            imageSRC: './public/sprites/kenji/attack2.png',
             frames: 4
         },
         death:{
-            imageSRC: './assets/kenji/Death.png',
+            imageSRC: './public/sprites/kenji/death.png',
             frames: 7
         },
         fall:{
-            imageSRC: './assets/kenji/Fall.png',
+            imageSRC: './public/sprites/kenji/fall.png',
             frames: 2
         },
         jump:{
-            imageSRC: './assets/kenji/Jump.png',
+            imageSRC: './public/sprites/kenji/jump.png',
             frames: 2
         },
         take_hit:{
-            imageSRC: './assets/kenji/Take hit.png',
+            imageSRC: './public/sprites/kenji/take-hit.png',
             frames: 3
         }
     },
@@ -162,8 +160,11 @@ function animate(){
     window.requestAnimationFrame(animate);
     canvasContext.fillStyle = 'black'
     canvasContext.fillRect(0,0, canvas.width, canvas.height);
-    background.update();
-    shop.update();
+    // Oak Woods background and shop removed (licence: no redistribution); see ASSETS.md.
+    canvasContext.fillStyle = '#2a2140';
+    canvasContext.fillRect(0, 0, canvas.width, canvas.height - 96);
+    canvasContext.fillStyle = '#3b2b25';
+    canvasContext.fillRect(0, canvas.height - 96, canvas.width, 96);
     player.update();
     enemy.update();
 
