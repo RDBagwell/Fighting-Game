@@ -30,6 +30,10 @@ app
     const replay = location.hash.startsWith('#replay=') ? location.hash.slice(8) : null;
     if (replay) app.start(ReplayViewerScene.fromText(app, decodeURIComponent(replay)));
     else app.start(room ? new OnlineLobbyScene(app, { join: room.slice(0, 16) }) : undefined);
+    // A replay link opened while the game is already running.
+    window.addEventListener('hashchange', () => {
+      if (location.hash.startsWith('#replay=')) app.setScene(ReplayViewerScene.fromText(app, decodeURIComponent(location.hash.slice(8))));
+    });
   })
   .catch((err) => {
     label.textContent = `Couldn't load the game: ${err.message}`;

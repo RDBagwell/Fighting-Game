@@ -22,7 +22,7 @@
  * never on a server.
  */
 import { z } from 'zod';
-import { hashState } from '../../engine/sim/state.js';
+import { hashState, saveState, loadState } from '../../engine/sim/state.js';
 
 export const REPLAY_FORMAT = 1;
 const PREFIX = `DD${REPLAY_FORMAT}.`;
@@ -105,6 +105,46 @@ export function initialState(sim, replay) {
   return sim.createMatch({ chars: h.chars, seed: h.seed, stage: h.stage });
 }
 
+/** Frames between seek snapshots: three seconds, a few milliseconds to replay. */
+export const SNAPSHOT_EVERY = 180;
+
+/**
+ * Plays a replay straight through once, keeping a snapshot every
+ * SNAPSHOT_EVERY frames (the state *before* that frame) for seeking.
+ * @param {import('../../engine/sim/step.js').Simulation} sim
+ * @param {Replay} replay
+ */
+export function snapshotReplay(sim, replay) {
+  /** @type {import('../../engine/sim/types.js').MatchState[]} */
+  const snapshots = [];
+  const s = initialState(sim, replay);
+  for (let i = 0; i < replay.inputs.length; i++) {
+    if (i % SNAPSHOT_EVERY === 0) snapshots.push(saveState(s));
+    sim.step(s, replay.inputs[i]);
+  }
+  return { snapshots, final: s };
+}
+
+/**
+ * The state at `frame` (after that many steps): the nearest snapshot at or
+ * before it, then forward. `onStep` sees each state stepped on the way.
+ * @param {import('../../engine/sim/step.js').Simulation} sim
+ * @param {Replay} replay
+ * @param {import('../../engine/sim/types.js').MatchState[]} snapshots
+ * @param {number} frame
+ * @param {(s: import('../../engine/sim/types.js').MatchState, frozen: boolean, target: number) => void} [onStep]
+ */
+export function seekState(sim, replay, snapshots, frame, onStep) {
+  const target = Math.max(0, Math.min(replay.inputs.length, Math.round(frame)));
+  const s = loadState(snapshots[Math.floor(target / SNAPSHOT_EVERY)]);
+  while (s.frame < target) {
+    const frozen = s.freeze > 0;
+    sim.step(s, replay.inputs[s.frame]);
+    onStep?.(s, frozen, target);
+  }
+  return s;
+}
+
 // ─── encoding ──────────────────────────────────────────────────────
 
 /** @param {Uint8Array} bytes */
@@ -167,7 +207,7 @@ export function decodeReplay(text, sim) {
   if (!parsed.success) throw new Error('That replay is damaged.');
   const header = /** @type {ReplayHeader} */ (parsed.data);
   if (header.game !== gameVersion(sim)) throw new Error('That replay was recorded with a different version of the game (the moves or rules have changed since), so it would not play back the same.');
-  for (const c of header.chars) if (!sim.characters[c]) throw new Error('That replay uses a character this version doesn’t have.');
+  for (const c of header.chars) if (!Object.hasOwn(sim.characters, c)) throw new Error('That replay uses a character this version doesn’t have.');
   if (!['dusk-shrine', 'oak-woods'].includes(header.stage)) throw new Error('That replay is damaged.');
   /** @type {Uint8Array} */
   let rle;

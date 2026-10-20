@@ -114,11 +114,19 @@ export class NetplayScene {
       if (!r || options.kind !== 'online') return;
       if (r.status === 'over' && r.forfeited !== -1 && !this.finished) this.finish(r.forfeited === options.seat ? 1 - options.seat : options.seat, true);
       if (r.status === 'closed' && !this.finished) this.finish(-1, true);
+      // Said aloud too (the countdown itself is drawn on the canvas).
+      if (this.live) this.live.textContent = r.status === 'paused' && r.pause
+        ? (r.pause.seat === options.seat ? 'You were disconnected. Reconnecting…' : 'Your opponent disconnected. The match is paused while they reconnect.')
+        : '';
     };
+    /** @type {HTMLElement | null} */
+    this.live = null;
   }
 
   enter() {
     this.panel.mount(this.options.kind === 'lab');
+    this.live = h('p', { class: 'sr-only', 'aria-live': 'polite' });
+    this.app.ui.append(this.live);
     this.app.ui.append(h('button', { class: 'pause-btn', 'aria-label': 'Menu', tabindex: '-1', onclick: (/** @type {Event} */ e) => { /** @type {HTMLElement} */ (e.currentTarget).blur(); this.onPause(); } }, 'II'),
       h('button', { class: 'lab-btn', tabindex: '-1', onclick: (/** @type {Event} */ e) => { /** @type {HTMLElement} */ (e.currentTarget).blur(); this.panel.toggle(); } }, 'Rollback lab'));
     this.onKey = (/** @type {KeyboardEvent} */ e) => {

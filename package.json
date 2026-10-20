@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:e2e": "node tools/build-e2e.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "test": "npm run typecheck && vitest run",

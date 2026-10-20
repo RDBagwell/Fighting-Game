@@ -12,7 +12,7 @@ import { h, focusFirst } from '../ui/dom.js';
 import { FightRenderer } from '../render/FightRenderer.js';
 import { Effects } from '../render/effects.js';
 import { Hud, outlined } from '../hud/Hud.js';
-import { saveState, loadState } from '../../engine/sim/state.js';
+import { loadState } from '../../engine/sim/state.js';
 import { FrameMeter } from '../training/FrameMeter.js';
 import { InputHistory } from '../training/InputHistory.js';
 import { drawBoxes, drawLegend } from '../training/overlays.js';
@@ -20,10 +20,9 @@ import { WIDTH } from '../../engine/render/Screen.js';
 import { drawBackdrop } from './backdrop.js';
 import { SOUNDS } from './match.js';
 import { TitleScene } from './title.js';
-import { decodeReplay, encodeReplay, initialState, listReplays, deleteReplay } from '../replay/replays.js';
+import { decodeReplay, encodeReplay, listReplays, deleteReplay, snapshotReplay, seekState } from '../replay/replays.js';
 
 /** Snapshot every 3 seconds of play. */
-const SNAPSHOT_EVERY = 180;
 /** A replay this short fits in a link. */
 const MAX_URL_CHARS = 6000;
 const SPEEDS = [1, 0.5, 0.25, 2];
@@ -146,15 +145,10 @@ export class ReplayViewerScene {
     this.playing = true;
     this.speed = 0;
     this.carry = 0;
-    // Snapshots for seeking: one every SNAPSHOT_EVERY frames.
-    /** @type {import('../../engine/sim/types.js').MatchState[]} */
-    this.snapshots = [];
-    const s = initialState(app.sim, replay);
-    for (let i = 0; i < replay.inputs.length; i++) {
-      if (i % SNAPSHOT_EVERY === 0) this.snapshots.push(saveState(s));
-      app.sim.step(s, replay.inputs[i]);
-    }
-    this.final = s;
+    // Snapshots for seeking: one every three seconds.
+    const { snapshots, final } = snapshotReplay(app.sim, replay);
+    this.snapshots = snapshots;
+    this.final = final;
     this.state = loadState(this.snapshots[0]);
     /** @type {HTMLInputElement | null} */
     this.seekBar = null;
@@ -247,22 +241,16 @@ export class ReplayViewerScene {
    * @param {number} frame
    */
   seek(frame) {
-    const target = Math.max(0, Math.min(this.frames, Math.round(frame)));
-    const snap = this.snapshots[Math.floor(target / SNAPSHOT_EVERY)];
-    this.state = loadState(snap);
     // Rebuild the last couple of seconds of the overlays' history on the way.
     this.meter.reset();
     this.inputs.reset();
     this.effects.clear();
-    while (this.state.frame < target) {
-      const s = this.state;
-      const frozen = s.freeze > 0;
-      this.app.sim.step(s, this.replay.inputs[s.frame]);
+    this.state = seekState(this.app.sim, this.replay, this.snapshots, frame, (s, frozen, target) => {
       if (target - s.frame < 120) {
         this.meter.record(s, frozen);
         if (!frozen) this.inputs.record(s, this.app.sim.motions);
       }
-    }
+    });
     this.playing = false;
     this.refresh();
   }

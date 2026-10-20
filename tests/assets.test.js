@@ -38,7 +38,7 @@ describe('assets', () => {
   });
 
   it('every non-code file in the repository is listed in ASSETS.md', () => {
-    const skip = /^(node_modules|\.git|dist|coverage|test-results|playwright-report|art\/licensed)\//;
+    const skip = /^(node_modules|\.git|dist|dist-e2e|coverage|test-results|playwright-report|art\/licensed)\//;
     const binary = /\.(png|jpe?g|webp|gif|ico|svg|wav|mp3|ogg|m4a|ttf|otf|woff2?)$/i;
     const all = files(root).map((f) => path.relative(root, f).split(path.sep).join('/')).filter((f) => !skip.test(f) && binary.test(f));
     for (const rel of all) {

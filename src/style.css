@@ -394,3 +394,13 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
 @media (max-width: 700px), (max-height: 420px) {
   .title .menu { display: grid; grid-template-columns: 1fr 1fr; min-width: 0; width: min(100%, 30em); }
 }
+
+/* Read by screen readers, not shown. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
