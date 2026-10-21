@@ -51,7 +51,8 @@ test('local versus: each keyboard set drives its own player', async ({ page }) =
 
 test('training mode: overlays toggle, frame step advances one frame, the menu opens', async ({ page }) => {
   const errors = await openGame(page);
-  await page.getByRole('button', { name: 'Training mode' }).click();
+  await page.getByRole('button', { name: 'Training', exact: true }).click();
+  await page.getByRole('button', { name: /Free training/ }).click();
   await page.getByRole('button', { name: 'Start training' }).click();
   await waitForScene(page, 'match');
   const show = () => page.evaluate(() => ({ ...window.__game.scene.training.show }));

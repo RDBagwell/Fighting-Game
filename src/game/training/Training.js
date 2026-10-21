@@ -14,6 +14,8 @@ import { outlined } from '../hud/Hud.js';
 import { WIDTH } from '../../engine/render/Screen.js';
 import { SUB } from '../../engine/sim/fixed.js';
 import { saveState, loadState } from '../../engine/sim/state.js';
+import { TrialActivity } from './TrialActivity.js';
+import { LessonActivity } from './LessonActivity.js';
 
 /**
  * A coloured legend key. Set through the CSSOM, not a style attribute, so
@@ -64,6 +66,18 @@ export class Training {
     /** @type {HTMLElement | null} */
     this.toolbar = null;
     this.onKey = (/** @type {KeyboardEvent} */ e) => this.key(e);
+    /**
+     * A combo trial or tutorial lesson running in this training session:
+     * it sets the start position, may drive player 1 (demonstrations) or
+     * the dummy, and watches every step.
+     * @type {TrialActivity | LessonActivity | null}
+     */
+    this.activity = host.config.trial ? new TrialActivity(app, this, host.config.trial)
+      : host.config.lesson ? new LessonActivity(app, this, host.config.lesson)
+      : null;
+    // Trials show your inputs (did the motion register?); lessons keep the screen clear,
+    // since some start with you in the corner, where the input display sits.
+    if (this.activity) this.show = { boxes: false, frameMeter: false, inputs: !!host.config.trial, frameData: false };
   }
 
   mount() {
@@ -83,9 +97,11 @@ export class Training {
     this.app.root.classList.add('training-on');
     window.addEventListener('keydown', this.onKey);
     this.refreshToolbar();
+    this.activity?.mount();
   }
 
   unmount() {
+    this.activity?.unmount();
     window.removeEventListener('keydown', this.onKey);
     this.toolbar?.remove();
     this.app.root.classList.remove('training-on');
@@ -170,6 +186,11 @@ export class Training {
    * @param {'mid'|'left'|'right'} where
    */
   reset(where) {
+    if (this.activity) {
+      this.activity.restart();
+      this.app.sfx.play('back');
+      return;
+    }
     this.position = where;
     const old = this.host.getState();
     const s = this.sim.createMatch({ chars: this.host.config.chars, training: true, infiniteMeter: old.options.infiniteMeter, stage: old.options.stage, seed: 1 });
@@ -203,7 +224,7 @@ export class Training {
    * @param {number} p1Bits
    */
   dummyInput(s, p1Bits) {
-    return this.dummy.think(s, p1Bits);
+    return this.activity ? this.activity.dummyInput(s, p1Bits) : this.dummy.think(s, p1Bits);
   }
 
   /**
@@ -211,6 +232,7 @@ export class Training {
    * @param {number} bits
    */
   p1Input(bits) {
+    if (this.activity) return this.activity.p1Input(bits);
     return this.dummy.mode === 'recording' ? 0 : bits;
   }
 
@@ -225,6 +247,7 @@ export class Training {
     const p1 = s.fighters[0];
     if (p1.state === 'move') this.lastMove = p1.move;
     if (this.dummy.mode === 'recording' && this.toolbar && this.dummy.recording.length % 30 === 0) this.refreshToolbar();
+    this.activity?.observe(s);
   }
 
   /**
@@ -247,7 +270,8 @@ export class Training {
     if (this.show.boxes) drawLegend(ctx, WIDTH - 142, 92);
     if (this.show.inputs) {
       this.inputs.draw(ctx, 0, 4, 160);
-      this.inputs.draw(ctx, 1, WIDTH - 4, 160);
+      // In a trial or lesson the right side holds the coach panel, and the dummy's inputs don't matter.
+      if (!this.activity) this.inputs.draw(ctx, 1, WIDTH - 4, 160);
     }
     const status = [];
     if (this.app.loop.frozen) status.push('PAUSED: N = next frame');

@@ -184,3 +184,23 @@ export function howTo(mv, motions, controls) {
   }
   return text;
 }
+
+/**
+ * Short labels for lesson texts: a direction or a button, with the
+ * player's keyboard key and controller button. dir('6') → "→ (D / d-pad →)",
+ * button('M') → "Medium (K / Y / △)".
+ * @param {{ kbA: KeyBinding, pad: PadBinding }} controls
+ */
+export function keyLabels(controls) {
+  return {
+    /** @param {string} d */
+    dir: (d) => `${ARROWS[d]} (${dirKeys(d, controls.kbA)} / d-pad ${ARROWS[d]})`,
+    /** @param {'L'|'M'|'H'|'throw'|'SP'} b */
+    button: (b) => `${b === 'throw' ? 'Throw' : b === 'SP' ? 'Special' : BUTTON_WORDS[b]} (${key(b, controls.kbA)} / ${padButton(b, controls.pad)})`,
+    /** @param {MoveData} mv @param {Record<string, import('../../engine/sim/types.js').MotionData>} motions */
+    move: (mv, motions) => {
+      const r = recipe(mv, motions);
+      return `${arrowsText(r)}: on the keyboard ${keyboardText(r, controls.kbA)}; on a controller ${padText(r, controls.pad)}`;
+    },
+  };
+}

@@ -19,6 +19,8 @@ import { TitleScene } from './title.js';
  * @property {[string, string]} chars
  * @property {'easy'|'normal'|'hard'} cpu
  * @property {string} stage
+ * @property {{ char: string, index: number }} [trial]  Training: run this combo trial.
+ * @property {{ index: number }} [lesson]  Training: run this tutorial lesson.
  */
 
 export class SelectScene {
@@ -41,7 +43,7 @@ export class SelectScene {
   enter() {
     const app = this.app;
     const labels = { cpu: ['Player 1', 'CPU'], versus: ['Player 1', 'Player 2'], training: ['You', 'Training dummy'] }[this.mode];
-    const titles = { cpu: 'Versus CPU', versus: 'Versus: two players', training: 'Training mode' };
+    const titles = { cpu: 'Versus CPU', versus: 'Versus: two players', training: 'Free training' };
 
     /** @param {number} side */
     const sideBlock = (side) => {

@@ -119,6 +119,28 @@ const scene = (/** @type {import('@playwright/test').Page} */ p, /** @type {stri
   await cb.close();
 }
 
+// ── 2b. Training: a combo trial and a tutorial lesson ────────────────
+{
+  const page = await browser.newPage({ viewport: VIEW });
+  await page.goto('http://localhost:4173/');
+  await scene(page, 'title');
+  await page.getByRole('button', { name: 'Training', exact: true }).click();
+  await page.getByRole('button', { name: /Combo trials/ }).click();
+  await page.getByRole('button', { name: /3\. Chain lights/ }).click();
+  await scene(page, 'match');
+  await sleep(400);
+  await page.screenshot({ path: `${OUT}/trial.png` });
+  await page.goto('http://localhost:4173/');
+  await scene(page, 'title');
+  await page.getByRole('button', { name: 'Training', exact: true }).click();
+  await page.getByRole('button', { name: /^Tutorial/ }).click();
+  await page.getByRole('button', { name: /4\. High and low/ }).click();
+  await scene(page, 'match');
+  await sleep(2500);
+  await page.screenshot({ path: `${OUT}/lesson.png` });
+  await page.close();
+}
+
 // ── 3. The replay viewer, from a replay recorded in the lab ─────────
 {
   const ctx = await browser.newContext({ viewport: VIEW });

@@ -8,6 +8,7 @@ import { openSettings, openCredits, openMoveList, openHowToPlay } from './menus.
 import { SelectScene } from './select.js';
 import { OnlineLobbyScene, LabSetupScene } from './online.js';
 import { ReplayListScene } from './replay.js';
+import { LearnScene } from './learn.js';
 
 export class TitleScene {
   /** @param {import('../App.js').App} app */
@@ -33,7 +34,7 @@ export class TitleScene {
         h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new OnlineLobbyScene(app)); } }, 'Online'),
         h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new LabSetupScene(app)); } }, 'Rollback lab'),
         h('button', { class: 'btn', onclick: () => go('versus') }, 'Versus (2 players)'),
-        h('button', { class: 'btn', onclick: () => go('training') }, 'Training mode'),
+        h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new LearnScene(app)); } }, 'Training'),
         h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new ReplayListScene(app)); } }, 'Replays'),
         h('button', { class: 'btn', onclick: () => openMoveList(app) }, 'Move list'),
         h('button', { class: 'btn', onclick: () => openHowToPlay(app) }, 'How to play'),

@@ -15,7 +15,7 @@ someone who has will find the numbers honest: **every number below comes
 from the same data the game runs on, and the tests measure each one in
 the real simulation.**
 
-**See it for yourself.** Open the game, choose **Training mode**, walk up
+**See it for yourself.** Open the game, choose **Training → Free training**, walk up
 to the dummy and press **M** (K on the keyboard). The frame meter at the
 top fills in frame by frame; the panel below it gives the move's numbers;
 the green and red boxes show what can hit and be hit. Press **P** to pause
@@ -417,6 +417,11 @@ Long combos still pay, but a short combo with a big ender isn't dwarfed.
 land. Without it, a well-timed loop could keep someone in the air forever.
 
 ---
+
+**Try it:** the combo trials (Title → Training → Combo trials) are this
+section put to use. Each one is a cancel route from the move data, and a
+test plays every trial through the real simulation to prove the combo
+connects ([`tests/trials.test.js`](../tests/trials.test.js)).
 
 ## 11. The training mode: showing the invisible
 
