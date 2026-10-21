@@ -12,7 +12,7 @@ Two samurai, a CPU opponent, local versus, **online play** (peer to peer
 over WebRTC), **replays**, and touch controls for phones. It's plain
 JavaScript on a canvas.
 
-**Play it:** <https://rdbagwell.github.io/Fighting-Game/>
+**Play it:** <https://rdbagwell.github.io/dusk-duel/>
 
 ## The rollback lab
 
