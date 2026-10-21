@@ -8,6 +8,7 @@ import { ACTIONS, ACTION_LABELS, PAD_BUTTON_NAMES, keyName, DEFAULT_KEYS, DEFAUL
 import { summarise, formatAdvantage } from '../../engine/sim/frameData.js';
 import { CREDITS } from '../data/credits.js';
 import { roster } from '../data/characters/index.js';
+import { howTo } from '../ui/howTo.js';
 
 /**
  * Opens a modal over the current screen. Back (Escape, the gamepad's B,
@@ -73,8 +74,14 @@ export function openMoveList(app, first = roster[0]) {
         .map(([, m]) => {
           const d = summarise(m, sim.config);
           const air = m.stance === 'air';
+          const how = howTo(m, sim.motions, app.settings.controls);
           return h('tr', {},
-            h('td', { class: 'notation' }, m.notation),
+            h('td', { class: 'how' },
+              h('div', { class: 'how-arrows' }, how.arrows),
+              h('div', {}, h('span', { class: 'how-label' }, 'Keys '), how.keyboard),
+              h('div', {}, h('span', { class: 'how-label' }, 'Pad '), how.pad),
+              how.easy ? h('div', { class: 'how-easy' }, h('span', { class: 'how-label' }, 'Easy '), `${how.easy.keyboard} · ${how.easy.pad} (80% damage)`) : null,
+              h('div', { class: 'notation', title: 'Numpad notation, as fighting-game players write it' }, m.notation)),
             h('td', {}, h('strong', {}, m.name), h('div', { class: 'desc' }, m.description ?? '')),
             h('td', { class: 'num' }, String(d.startup)),
             h('td', { class: 'num' }, m.projectile && !m.hits ? '—' : String(d.active)),
@@ -86,11 +93,15 @@ export function openMoveList(app, first = roster[0]) {
         });
     panel.replaceChildren(
       h('p', { class: 'char-blurb' }, h('strong', {}, `${ch.name}, ${ch.title}. `), `${ch.style}. ${ch.blurb}`),
-      h('p', { class: 'fine' }, 'Inputs in numpad notation, facing right: 6 = forward, 4 = back, 2 = down, 236 = down, down-forward, forward. [4]6 = hold back, then forward. On touch, the Special button does specials without the motion.'),
+      h('p', { class: 'fine' }, 'How to read the inputs: they are written for facing right, so → means toward your opponent. When you face left, swap left and right. ',
+        '"↓ ↘ →" means roll the stick (or the keys) from down, through down-forward, to forward in one smooth motion, then press the button right at the end. ',
+        '"Keys" are your Player 1 keyboard keys and "Pad" your controller buttons, as set in Settings. ',
+        '"Easy" is the Special-button shortcut: the same move without the motion, at 80% damage (on touch screens, the Special button). ',
+        'The small code under each (like 236M) is numpad notation, the way fighting-game players write inputs.'),
       ...groups.map(([title, kind]) => h('section', {},
         h('h3', {}, title),
         h('table', {},
-          h('thead', {}, h('tr', {}, ...['Input', 'Move', 'Startup', 'Active', 'Recovery', 'On hit', 'On block', 'Damage', 'Guard'].map((t) => h('th', { scope: 'col' }, t)))),
+          h('thead', {}, h('tr', {}, ...['How to do it', 'Move', 'Startup', 'Active', 'Recovery', 'On hit', 'On block', 'Damage', 'Guard'].map((t) => h('th', { scope: 'col' }, t)))),
           h('tbody', {}, ...rows(kind))))),
       h('p', { class: 'fine' }, 'Frame data is computed from the move data; tests measure every grounded move in the simulation and check it matches. Air moves’ advantage depends on how high they hit. "KD" = knocks down; the number includes the opponent getting up.'),
     );
@@ -222,7 +233,7 @@ export function openHowToPlay(app) {
     h('ul', {},
       h('li', {}, 'Block by holding back (away from the opponent). Hold down-back to block lows; stand to block overheads and jump-ins.'),
       h('li', {}, 'Dash: tap forward twice. Throw: L+M close up; press L+M as you get grabbed to escape.'),
-      h('li', {}, 'Specials: 236 = down, down-forward, forward + a button. 623 = forward, down, down-forward. [4]6 = hold back, then forward. Super: 236236 + H with a full meter.'),
+      h('li', {}, 'Specials are a direction motion, then a button. ↓ ↘ → + button: roll from down to forward (facing right: S, S+D, D on the keyboard), pressing the button at the end. → ↓ ↘ + button: forward, down, down-forward. Hold ← then → + button: hold back for about ⅔ of a second, then forward. Super, with a full meter: ↓ ↘ → twice, then Heavy. The move list shows the exact keys and buttons for each move, and the Easy shortcut (Special + a direction) for doing them without the motion.'),
       h('li', {}, 'Training mode shows hitboxes, frame data, a frame meter and your inputs: the best way to see how it all works.')));
   return openModal(app, 'How to play', body, undefined, 'wide');
 }

@@ -17,6 +17,7 @@ import { SUB } from '../../engine/sim/fixed.js';
 import { summarise, formatAdvantage } from '../../engine/sim/frameData.js';
 import { GROUND_Y } from '../stage/duskShrine.js';
 import { outlined } from '../hud/Hud.js';
+import { recipe, arrowsText } from '../ui/howTo.js';
 
 export const BOX_STYLE = {
   hurt: { color: '#3fd17f', label: 'Hurtbox: can be hit here', line: 'solid' },
@@ -154,7 +155,7 @@ export function drawFrameData(ctx, sim, char, moveId, x, y, measured) {
   }
   const mv = sim.characters[char].moves[moveId];
   const d = summarise(mv, sim.config);
-  outlined(ctx, `${mv.notation.split(' ')[0]}  ${mv.name}`, x + 6, y + 12, { size: 9, color: '#fff3c4' });
+  outlined(ctx, `${mv.name}: ${arrowsText(recipe(mv, sim.motions))}`, x + 6, y + 12, { size: 9, color: '#fff3c4' });
   const timing = mv.projectile && !mv.hits ? `Fires on frame ${d.startup} · Total ${d.total}` : `Startup ${d.startup} · Active ${d.active} · Recovery ${d.recovery}`;
   outlined(ctx, timing, x + 6, y + 23, { size: 9 });
   const hit = formatAdvantage(d.onHit.value, d.onHit.tag);

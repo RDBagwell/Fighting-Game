@@ -183,7 +183,7 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
   text-align: left;
 }
 .modal.wide .modal-card { max-width: 60em; }
-.modal-head { display: flex; justify-content: space-between; align-items: center; position: sticky; top: -0.8em; background: var(--panel); padding: 0.3em 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; position: sticky; top: -0.8em; z-index: 1; background: rgb(24, 16, 34); padding: 0.3em 0; margin: 0 -1em; padding-left: 1em; padding-right: 1em; }
 .modal-head h2 { margin: 0; font-size: 1.5em; }
 .modal h3 { margin: 0.6em 0 0.3em; color: var(--accent); font-size: 1.05em; }
 .settings, .training-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.4em; }
@@ -206,7 +206,11 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
 .movelist th, .movelist td { border-bottom: 1px solid var(--line); padding: 0.25em 0.35em; text-align: left; vertical-align: top; }
 .movelist th { color: var(--muted); font-weight: 600; }
 .movelist .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.movelist .notation { font-family: ui-monospace, monospace; white-space: nowrap; color: var(--accent-2); }
+.movelist .notation { font-family: ui-monospace, monospace; white-space: nowrap; color: var(--muted); font-size: 0.85em; }
+.movelist .how { min-width: 15em; }
+.movelist .how-arrows { font-weight: 800; font-size: 1.1em; color: var(--accent-2); white-space: nowrap; }
+.movelist .how-label { color: var(--muted); font-size: 0.85em; }
+.movelist .how-easy { color: var(--muted); }
 .movelist .desc { color: var(--muted); font-size: 0.9em; }
 
 /* Training */
