@@ -10,7 +10,7 @@
  */
 export const site = {
   owner: 'RDBagwell',
-  repo: 'Fighting-Game',
+  repo: 'dusk-duel',
   /** Vite's base path. './' = relative, works under any folder. */
   base: './',
 };
