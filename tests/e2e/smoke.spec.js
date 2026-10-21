@@ -130,3 +130,16 @@ test('captions for important sounds appear when turned on', async ({ page }) => 
   await expect(page.locator('.captions')).toContainText('Fight!');
   expectNoErrors(errors);
 });
+
+test('the title menu fits above the footer on common laptop screens', async ({ browser }) => {
+  for (const viewport of [{ width: 1000, height: 565 }, { width: 1366, height: 640 }, { width: 1280, height: 720 }]) {
+    const page = await browser.newPage({ viewport });
+    await openGame(page);
+    const { lastBottom, footerTop } = await page.evaluate(() => ({
+      lastBottom: Math.max(...[...document.querySelectorAll('.title .menu button')].map((b) => b.getBoundingClientRect().bottom)),
+      footerTop: /** @type {HTMLElement} */ (document.querySelector('.title .footer')).getBoundingClientRect().top,
+    }));
+    expect(lastBottom, `${viewport.width}×${viewport.height}`).toBeLessThanOrEqual(footerTop);
+    await page.close();
+  }
+});

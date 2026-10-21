@@ -391,9 +391,8 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
 .replay-bar { flex-wrap: wrap; justify-content: center; width: min(96%, 46em); }
 .replay-bar .seek { flex: 1 1 100%; }
 
-@media (max-width: 700px), (max-height: 420px) {
-  .title .menu { display: grid; grid-template-columns: 1fr 1fr; min-width: 0; width: min(100%, 30em); }
-}
+/* Ten buttons: two columns at every size, so the menu and the footer fit on a laptop screen too. */
+.title .menu { display: grid; grid-template-columns: 1fr 1fr; min-width: 0; width: min(100%, 30em); }
 
 /* Read by screen readers, not shown. */
 .sr-only {
