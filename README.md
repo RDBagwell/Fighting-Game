@@ -8,7 +8,7 @@ fighting games are actually built:
 - an **input buffer with motion inputs**;
 - a real **training mode** that shows all of it.
 
-Two samurai, a CPU opponent, local versus, **online play** (peer to peer
+Six fighters, a CPU opponent, local versus, **online play** (peer to peer
 over WebRTC), **replays**, and touch controls for phones. It's plain
 JavaScript on a canvas.
 
@@ -193,11 +193,14 @@ diagrams.
 The lab's overlays never rely on colour alone: wrong guesses are marked,
 guesses not yet confirmed are hollow, and stalls are full height.
 
-| | Mack, the Crimson Gale | Kenji, the Patient Blade |
-| --- | --- | --- |
-| Style | Rushdown: fast buttons, plus on block | Footsies and zoning: long reach, a thrown kunai |
-| Specials | Shippū (236 + attack): a dashing slash. Tenkū (623 + attack): an invincible rising slash | Kunai (236 + attack). Iai Rush ([4]6 + attack): a charge dash-thrust |
-| Super (full meter) | 236236 + H: a five-hit rush | 236236 + H: a crescent that crosses the screen |
+| Fighter | Style | Specials | Super (full meter, 236236 + H) |
+| --- | --- | --- | --- |
+| **Mack**, the Crimson Gale | Rushdown: fast buttons, plus on block | Shippū (236 + attack): a dashing slash. Tenkū (623 + attack): an invincible rising slash | A five-hit rush |
+| **Kenji**, the Patient Blade | Footsies and zoning: long reach, a thrown kunai | Kunai (236 + attack). Iai Rush ([4]6 + attack): a charge dash-thrust | A crescent that crosses the screen |
+| **Deka**, the Wild Crescent | Brawler: slow, wide slashes that hit hardest | Crescent Rush (236 + attack): a lunging sweep. Rising Crescent (623 + attack): an invincible rising slash | Four crescents in a rush |
+| **Elumlur**, the Storm Blade | All-rounder: a projectile, reach and an anti-air | Storm Wave (236 + attack): a projectile. Thunder Rise (623 + attack): an invincible rising slash | Four lightning arcs all around him |
+| **Mav**, the Iron King | Heavy grappler: slow, the most health | Royal Decree (214 + attack): a command grab that can't be escaped. Crown Cleave (236 + attack): a stepping cleave | Three royal strikes |
+| **Reroe**, the Huntress | Spear zoner: the longest reach, quick feet | Hunting Spear (236 + attack): a thrown spear. Fading Sweep (214 + attack): a poke that hops back | A huge spear that hits four times |
 
 ## Architecture
 
@@ -448,8 +451,7 @@ visitor after that waits about a minute (the lobby says so).
 - **Pixel art / character assets by Luiz Melo**: "Martial Hero",
   "Martial Hero 2", "Martial Hero 3", "Fantasy Warrior", "Medieval King
   Pack 2" and "Huntress" (CC0), <https://luizmelo.itch.io/>. The licence
-  doesn't require credit; it's given with thanks. (The last four are for
-  characters still being added.)
+  doesn't require credit; it's given with thanks.
 - **Game, engine, netcode, stage and synthesised sound:** Robert Bagwell,
   with Claude.
 - **Music:** Robert's own, when added ([docs/AUDIO.md](docs/AUDIO.md)).

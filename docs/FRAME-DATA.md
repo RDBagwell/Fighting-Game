@@ -244,7 +244,7 @@ them from there.
 trust the formula: after every hit or block, it counts the frames until
 each fighter can act and reports the difference ("P1 5M: +2 on hit").
 [tests/frameData.test.js](../tests/frameData.test.js) does the same for
-every grounded move of both characters, on hit and on block, in the real
+every grounded move of every character, on hit and on block, in the real
 simulation, and fails if measured and derived differ by a single frame.
 Writing that test found two mistakes in the first version of the formula
 (see [section 12](#12-how-the-numbers-are-kept-honest)).
@@ -484,7 +484,8 @@ Startup is the first active frame; advantage assumes the move connects on
 its first active frame (for a multi-hit move, its last hit on that hit's
 first frame). Air attacks' advantage depends on how high they hit, and a
 projectile's on how far it travelled, so they're marked "—". Hit-stop is
-not counted (it freezes both fighters equally).
+not counted (it freezes both fighters equally). Command grabs, like
+throws, can't be blocked, so they have no block advantage.
 
 #### Mack (Rushdown)
 
@@ -531,6 +532,98 @@ not counted (it freezes both fighters equally).
 | `[4]6+M` | Iai Rush (M) | 10 | 4 | 20 | -1 | -7 | 90 | mid |
 | `[4]6+H` | Iai Rush (H) | 11 | 4 | 20 | KD +22 | -7 | 100 | mid |
 | `236236+H` | Tsukiotoshi: Falling Moon | 10 | — | 34 | — | — | 280 | mid |
+
+#### Deka (Brawler)
+
+| Input | Move | Startup | Active | Recovery | On hit | On block | Damage | Guard |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `5L` | Short Arc | 6 | 2 | 10 | +3 | ±0 | 35 | mid |
+| `5M` | Crescent Cut | 9 | 3 | 15 | +1 | -3 | 65 | mid |
+| `5H` | Moon Splitter | 13 | 4 | 22 | -3 | -9 | 105 | mid |
+| `2L` | Shin Cut | 6 | 2 | 10 | +2 | -1 | 30 | low |
+| `2M` | Low Crescent | 9 | 3 | 16 | -1 | -5 | 55 | low |
+| `2H` | Rising Moon | 10 | 4 | 25 | KD +49 | -14 | 80 | mid |
+| `6M` | Crashing Moon | 19 | 3 | 14 | +4 | -2 | 75 | high |
+| `j.L` | Air Arc | 5 | 4 | 10 | — | — | 40 | high |
+| `j.M` | Diving Crescent | 7 | 5 | 12 | — | — | 60 | high |
+| `j.H` | Falling Moon | 10 | 4 | 16 | — | — | 90 | high |
+| `L+M (4L+M: back)` | Headbutt Toss | 5 | 2 | 22 | KD +47 | — | 120 | throw |
+| `236+L` | Crescent Rush (L) | 13 | 4 | 19 | -1 | -8 | 85 | mid |
+| `236+M` | Crescent Rush (M) | 13 | 4 | 19 | -1 | -8 | 95 | mid |
+| `236+H` | Crescent Rush (H) | 13 | 4 | 19 | KD +23 | -8 | 110 | mid |
+| `623+L` | Rising Crescent (L) | 6 | 6 | 25 | KD +43 | -14 | 95 | mid |
+| `623+M` | Rising Crescent (M) | 6 | 8 | 27 | KD +41 | -18 | 115 | mid |
+| `623+H` | Rising Crescent (H) | 7 | 8 | 29 | KD +43 | -17 | 140 | mid |
+| `236236+H` | Thousand Crescents | 7 | 16 | 31 | KD +43 | -18 | 325 | mid |
+
+#### Elumlur (All-rounder)
+
+| Input | Move | Startup | Active | Recovery | On hit | On block | Damage | Guard |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `5L` | Spark Cut | 5 | 2 | 10 | +3 | ±0 | 32 | mid |
+| `5M` | Arc Slash | 9 | 3 | 15 | +1 | -3 | 64 | mid |
+| `5H` | Cyclone Edge | 12 | 4 | 21 | -2 | -8 | 95 | mid |
+| `2L` | Low Spark | 5 | 2 | 10 | +2 | -1 | 27 | low |
+| `2M` | Ground Current | 9 | 3 | 16 | -1 | -5 | 50 | low |
+| `2H` | Updraft | 9 | 4 | 24 | KD +50 | -13 | 72 | mid |
+| `6M` | Thunderclap | 18 | 3 | 14 | +4 | -2 | 62 | high |
+| `j.L` | Air Spark | 5 | 4 | 10 | — | — | 35 | high |
+| `j.M` | Gale Turn | 7 | 5 | 12 | — | — | 55 | high |
+| `j.H` | Falling Storm | 10 | 4 | 16 | — | — | 82 | high |
+| `L+M (4L+M: back)` | Storm Grip | 5 | 2 | 22 | KD +47 | — | 110 | throw |
+| `236+L` | Storm Wave (L) | 14 | — | 26 | — | — | 70 | mid |
+| `236+M` | Storm Wave (M) | 14 | — | 26 | — | — | 70 | mid |
+| `236+H` | Storm Wave (H) | 14 | — | 26 | — | — | 70 | mid |
+| `623+L` | Thunder Rise (L) | 5 | 6 | 24 | KD +44 | -13 | 85 | mid |
+| `623+M` | Thunder Rise (M) | 5 | 8 | 26 | KD +42 | -17 | 105 | mid |
+| `623+H` | Thunder Rise (H) | 6 | 8 | 28 | KD +44 | -16 | 125 | mid |
+| `236236+H` | Storm Arc | 8 | 18 | 30 | KD +49 | -16 | 300 | mid |
+
+#### Mav (Heavy grappler)
+
+| Input | Move | Startup | Active | Recovery | On hit | On block | Damage | Guard |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `5L` | Pommel Strike | 7 | 2 | 11 | +3 | -1 | 40 | mid |
+| `5M` | Kingsguard Sweep | 11 | 3 | 17 | ±0 | -5 | 75 | mid |
+| `5H` | Sovereign’s Arc | 15 | 4 | 24 | -4 | -10 | 110 | mid |
+| `2L` | Low Pommel | 7 | 2 | 11 | +2 | -2 | 35 | low |
+| `2M` | Royal Reap | 11 | 3 | 18 | -2 | -7 | 65 | low |
+| `2H` | Rising Crown | 11 | 4 | 27 | KD +47 | -16 | 90 | mid |
+| `6M` | Royal Chop | 21 | 3 | 15 | +3 | -3 | 90 | high |
+| `j.L` | Air Pommel | 6 | 4 | 11 | — | — | 45 | high |
+| `j.M` | Descending Sweep | 8 | 5 | 13 | — | — | 65 | high |
+| `j.H` | Throne Breaker | 11 | 4 | 17 | — | — | 100 | high |
+| `L+M (4L+M: back)` | Royal Toss | 5 | 2 | 22 | KD +47 | — | 125 | throw |
+| `214+L` | Royal Decree (L) | 8 | 2 | 34 | KD +47 | — | 120 | throw |
+| `214+M` | Royal Decree (M) | 9 | 2 | 34 | KD +47 | — | 130 | throw |
+| `214+H` | Royal Decree (H) | 10 | 2 | 34 | KD +47 | — | 140 | throw |
+| `236+L` | Crown Cleave (L) | 14 | 4 | 22 | -3 | -10 | 90 | mid |
+| `236+M` | Crown Cleave (M) | 15 | 4 | 22 | -3 | -10 | 100 | mid |
+| `236+H` | Crown Cleave (H) | 16 | 4 | 22 | KD +20 | -10 | 115 | mid |
+| `236236+H` | Regicide | 9 | 14 | 32 | KD +42 | -19 | 320 | mid |
+
+#### Reroe (Spear zoner)
+
+| Input | Move | Startup | Active | Recovery | On hit | On block | Damage | Guard |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `5L` | Quick Jab | 6 | 2 | 10 | +3 | ±0 | 28 | mid |
+| `5M` | Long Thrust | 10 | 3 | 15 | +1 | -3 | 62 | mid |
+| `5H` | Hunter’s Arc | 13 | 4 | 22 | -3 | -9 | 85 | mid |
+| `2L` | Low Jab | 6 | 2 | 10 | +2 | -1 | 24 | low |
+| `2M` | Ground Thrust | 10 | 3 | 16 | -1 | -5 | 54 | low |
+| `2H` | Skyward Spear | 9 | 4 | 24 | KD +50 | -13 | 66 | mid |
+| `6M` | Falling Spear | 18 | 3 | 14 | +4 | -2 | 55 | high |
+| `j.L` | Air Jab | 5 | 4 | 10 | — | — | 32 | high |
+| `j.M` | Diving Sweep | 7 | 5 | 12 | — | — | 50 | high |
+| `j.H` | Plunging Spear | 10 | 4 | 16 | — | — | 75 | high |
+| `L+M (4L+M: back)` | Hunter’s Trip | 5 | 2 | 22 | KD +47 | — | 100 | throw |
+| `236+L` | Hunting Spear (L) | 15 | — | 27 | — | — | 75 | mid |
+| `236+M` | Hunting Spear (M) | 15 | — | 27 | — | — | 75 | mid |
+| `236+H` | Hunting Spear (H) | 15 | — | 27 | — | — | 75 | mid |
+| `214+L` | Fading Sweep (L) | 10 | 3 | 18 | -1 | -5 | 60 | mid |
+| `214+M` | Fading Sweep (M) | 10 | 3 | 18 | -1 | -5 | 65 | mid |
+| `214+H` | Fading Sweep (H) | 10 | 3 | 18 | -1 | -5 | 70 | mid |
+| `236236+H` | Hunter’s Volley | 11 | — | 34 | — | — | 280 | mid |
 
 The supers' damage is before scaling; Kazekiri's five hits are scaled as a
 combo (330 listed, 253 dealt from a clean start).

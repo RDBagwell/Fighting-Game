@@ -1,7 +1,7 @@
 /**
  * Reroe, the spear zoner: the longest pokes in the game, a thrown spear,
  * a retreating sweep that pokes while backing away, and a volley of spears
- * for a super. Fast on her feet but the least health: keep the opponent at
+ * for a super. Fast on her feet but tied for the least health: keep the opponent at
  * the end of the spear. Sprites: "Huntress" by Luiz Melo (CC0), drawn
  * facing right; the thrown spear is the pack's own spear art.
  *
