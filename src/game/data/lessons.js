@@ -8,7 +8,7 @@
  * tests/lessons.test.js plays every step with scripted inputs and checks
  * that doing it right passes and doing nothing doesn't.
  *
- * @typedef {{ dir: (d: string) => string, button: (b: 'L'|'M'|'H'|'throw'|'SP') => string, move: (id: string) => string }} Labels  Key names for the texts (howTo.js keyLabels); `move` takes a move id.
+ * @typedef {{ dir: (d: string) => string, button: (b: 'L'|'M'|'H'|'throw'|'parry'|'burst'|'SP') => string, move: (id: string) => string }} Labels  Key names for the texts (howTo.js keyLabels); `move` takes a move id.
  * @typedef {import('../../engine/sim/types.js').MatchState} MatchState
  *
  * @typedef {object} DummyAttacks  The dummy walks in until it's within `range` pixels, then does the next attack every `every` frames.
@@ -240,6 +240,44 @@ export const LESSONS = [
         goal: 'Combo into the super', count: 1, gap: 50, meter: true,
         check: (s) => s.events.some((e) => e.type === 'hit' && e.side === 0 && e.move === '236236H' && s.fighters[1].combo >= 3) ? 1 : 0,
         demo: '5+M 5*9 2 3 6+M 5*10 2 3 6 2 3 6+H 5*80',
+      },
+    ],
+  },
+  {
+    id: 'defence', name: 'Parry, guard cancel, burst', summary: 'Three ways out of trouble.',
+    steps: [
+      {
+        text: (c) => `Parry: press ${c.button('parry')} (Medium and Heavy together) just before Kenji’s Heavy lands. The hit does nothing. Too early or too late and you are open for a moment, so watch for the swing.`,
+        goal: 'Parry 2 attacks', count: 2, gap: 90,
+        attacks: { attacks: ['5+H'], range: 70, every: 70 },
+        check: (s) => mine(s, 'parry'),
+      },
+      {
+        text: (c) => `Lows need a crouching parry: hold ${c.dir('2')} as you press ${c.button('parry')}.`,
+        goal: 'Parry 2 lows', count: 2, gap: 90,
+        attacks: { attacks: ['2+M'], range: 70, every: 70 },
+        check: (s) => mine(s, 'parry'),
+      },
+      {
+        text: (c) => `After a parry you act first, while Kenji finishes his swing. Parry, then hit him straight away with ${c.button('L')}.`,
+        goal: 'Parry, then punish', count: 1, gap: 90,
+        attacks: { attacks: ['5+H'], range: 70, every: 70 },
+        check: (s, mem) => {
+          if (mine(s, 'parry')) mem.parried = s.frame;
+          return mem.parried && s.frame - mem.parried < 40 && mine(s, 'hit') ? 1 : 0;
+        },
+      },
+      {
+        text: (c) => `Guard cancel: while blocking (hold ${c.dir('4')}), press ${c.button('parry')} to strike back out of the block. It costs half your meter (full for this lesson) and is invincible as it starts.`,
+        goal: 'Guard cancel once', count: 1, gap: 90, meter: true,
+        attacks: { attacks: ['5+H'], range: 70, every: 70 },
+        check: (s) => mine(s, 'guard-cancel'),
+      },
+      {
+        text: (c) => `Burst: while you are being hit, press ${c.button('burst')} (all three attack buttons) to knock Kenji away. Once a round in a match (here it comes back). It can be blocked, so it’s a guess.`,
+        goal: 'Burst out', count: 1, gap: 90,
+        attacks: { attacks: ['5+M'], range: 70, every: 60 },
+        check: (s) => mine(s, 'burst'),
       },
     ],
   },
