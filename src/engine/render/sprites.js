@@ -89,13 +89,17 @@ export function drawFrame(ctx, sheet, frame, x, y, o) {
 }
 
 /**
- * Where a character's sheet is anchored: the character's feet point, plus
- * that sheet's correction for art drawn higher or lower in its frames.
+ * Where a character's frame is anchored: the character's feet point, plus
+ * that sheet's correction for art drawn higher or lower in its frames, plus
+ * that frame's correction where the art steps the feet sideways.
  * @param {import('../sim/types.js').SpriteData} sprites
  * @param {string} sheet
+ * @param {number} [frame]
  * @returns {[number, number]}
  */
-export function anchorFor(sprites, sheet) {
-  const off = sprites.offsets?.[sheet];
-  return off ? [sprites.anchor[0] + off[0], sprites.anchor[1] + off[1]] : sprites.anchor;
+export function anchorFor(sprites, sheet, frame) {
+  const off = sprites.offsets?.[sheet] ?? [0, 0];
+  const shift = frame === undefined ? 0 : (sprites.frameShift?.[`${sheet}:${frame}`] ?? 0);
+  if (!off[0] && !off[1] && !shift) return sprites.anchor;
+  return [sprites.anchor[0] + off[0] + shift, sprites.anchor[1] + off[1]];
 }

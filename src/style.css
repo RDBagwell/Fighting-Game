@@ -131,7 +131,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .btn:focus {
 .side.p1 h3 { color: var(--p1); }
 .side.p2 h3 { color: var(--p2); }
 .vs-mark { align-self: center; font-size: 2.2em; font-weight: 900; color: var(--accent-2); text-shadow: 0 3px 0 #000; }
-.cards { display: flex; gap: 0.5em; justify-content: center; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35em; justify-content: center; }
 .card {
   font: inherit;
   color: var(--ink);
@@ -144,9 +144,9 @@ button:focus-visible, select:focus-visible, input:focus-visible, .btn:focus {
   cursor: pointer;
 }
 .card[aria-checked="true"] { border-color: var(--accent-2); background: #3a2a44; box-shadow: 0 0 0 2px var(--accent-2) inset; }
-.portrait { width: 6em; height: 6em; image-rendering: pixelated; }
+.portrait { width: 3.8em; height: 3.8em; image-rendering: pixelated; }
 .card-name { font-weight: 800; }
-.card-style { font-size: 0.8em; color: var(--muted); }
+.card-style { font-size: 0.72em; color: var(--muted); }
 .char-info { font-size: 0.9em; color: var(--muted); min-height: 4.5em; margin: 0.5em 0 0; text-align: left; }
 .char-info strong { display: block; color: var(--ink); }
 .char-info .style { display: block; color: var(--accent); font-size: 0.9em; }

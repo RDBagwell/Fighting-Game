@@ -141,7 +141,7 @@ export class FightRenderer {
     const sheet = this.assets.sheets[f.char]?.[choice.sheet];
     if (!sheet) return;
     drawFrame(ctx, sheet, choice.frame, Math.round(f.x / SUB - camX), Math.round(GROUND_Y + f.y / SUB), {
-      anchor: anchorFor(ch.sprites, choice.sheet),
+      anchor: anchorFor(ch.sprites, choice.sheet, choice.frame),
       scale: ch.sprites.scale,
       flip: f.facing !== ch.nativeFacing,
       squash: choice.squash,
@@ -169,7 +169,7 @@ export class FightRenderer {
     if (choice.tint === 'flash') source = sheet.variant('flash', '#ffffff', 0.55);
     else if (choice.tint === 'guard') source = sheet.variant('guard', '#5aa8ff', 0.35);
     drawFrame(ctx, sheet, choice.frame, x + jitter, y, {
-      anchor: anchorFor(ch.sprites, choice.sheet),
+      anchor: anchorFor(ch.sprites, choice.sheet, choice.frame),
       scale: ch.sprites.scale,
       flip: f.facing !== ch.nativeFacing,
       squash: choice.squash,

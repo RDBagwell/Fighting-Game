@@ -19,6 +19,17 @@ describe.each(Object.entries(sim.characters))('%s', (id, ch) => {
     for (const [, frames] of Object.entries(ch.sprites.sheets)) expect(frames).toBeGreaterThan(0);
   });
 
+  it('sprite corrections and projectile art refer to real sheets and frames', () => {
+    for (const sheet of Object.keys(ch.sprites.offsets ?? {})) expect(ch.sprites.sheets[sheet], `offset for ${sheet}`).toBeDefined();
+    for (const key of Object.keys(ch.sprites.frameShift ?? {})) {
+      const [sheet, frame] = key.split(':');
+      expect(ch.sprites.sheets[sheet], `frameShift ${key}`).toBeDefined();
+      expect(Number(frame), `frameShift ${key}`).toBeLessThan(ch.sprites.sheets[sheet]);
+    }
+    const looks = Object.values(ch.moves).map((m) => m.projectile?.look).filter(Boolean);
+    for (const look of Object.keys(ch.sprites.projectiles ?? {})) expect(looks, `projectile art "${look}" is used`).toContain(look);
+  });
+
   it('every animation loop uses a real sheet and frame', () => {
     for (const [name, a] of Object.entries(ch.anims)) {
       expect(ch.sprites.sheets[a.sheet], `${name}: sheet ${a.sheet}`).toBeDefined();

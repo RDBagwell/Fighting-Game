@@ -37,7 +37,8 @@ function measure(charId, moveId, block) {
     if (s.fighters[0].state === 'move' || s.fighters[0].state === 'throwHold') started = true;
     for (const e of s.events) {
       if (e.side === 0 && (e.type === 'hit' || e.type === 'block' || e.type === 'throw')) {
-        if (e.type !== 'hit' || mv.kind !== 'throw') contactMoveFrame = e.type === 'throw' ? moveFrame + 1 : s.fighters[0].moveFrame || moveFrame + 1;
+        // A throw (or command grab) connects on its 'throw' event; the 'hit' as it lands comes later.
+        if (e.type !== 'hit' || !mv.throw) contactMoveFrame = e.type === 'throw' ? moveFrame + 1 : s.fighters[0].moveFrame || moveFrame + 1;
         attackerFree = -1;
         defenderFree = -1;
       }

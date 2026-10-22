@@ -95,6 +95,8 @@
  * @property {number} scale  Screen pixels per sheet pixel (need not be whole).
  * @property {Record<string, number>} sheets  Sheet name → frame count; the file is `${dir}${name}.png`.
  * @property {Record<string, [number, number]>} [offsets]  Per-sheet anchor corrections, for sheets drawn higher or lower in their frames.
+ * @property {Record<string, number>} [frameShift]  Per-frame horizontal corrections ("attack2:3": -15), where the art steps the
+ *   character's feet away from the frame's centre; measured from the feet, so they stay on the fighter's position.
  * @property {Record<string, { file: string, w: number, h: number, frames: number, anchor: [number, number], scale: number }>} [projectiles]
  *   Projectile art by `look` (a sprite instead of the shapes drawn in code).
  * @property {string} color

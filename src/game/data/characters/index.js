@@ -4,9 +4,13 @@
  */
 import { mack } from './mack.js';
 import { kenji } from './kenji.js';
+import { deka } from './deka.js';
+import { elumlur } from './elumlur.js';
+import { mav } from './mav.js';
+import { reroe } from './reroe.js';
 
 /** @type {Record<string, import('../../../engine/sim/types.js').CharacterData>} */
-export const characters = { mack, kenji };
+export const characters = { mack, kenji, deka, elumlur, mav, reroe };
 
 /** Display order on the character select screen. */
-export const roster = ['mack', 'kenji'];
+export const roster = ['mack', 'kenji', 'deka', 'elumlur', 'mav', 'reroe'];
