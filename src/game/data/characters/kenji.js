@@ -7,7 +7,7 @@
  * Units as in mack.js: boxes in pixels relative to the feet, facing right.
  */
 import { px } from '../../../engine/sim/fixed.js';
-import { hit, deepFreeze } from './build.js';
+import { hit, deepFreeze, strike, frames, guardCancel, burst } from './build.js';
 
 /** @typedef {import('../../../engine/sim/types.js').MoveData} MoveData */
 
@@ -130,6 +130,7 @@ export const kenji = deepFreeze(/** @type {CharacterData} */ ({
     throwHold: { sheet: 'attack1', len: 1, frame: 0 },
     thrown: { sheet: 'take-hit', len: 1, frame: 1 },
     recover: { sheet: 'idle', len: 1, frame: 0 },
+    parry: { sheet: 'attack1', len: 1, frame: 0 },
     win: { sheet: 'idle', len: 12 },
   },
   moves: {
@@ -251,5 +252,9 @@ export const kenji = deepFreeze(/** @type {CharacterData} */ ({
       },
       description: 'A crescent of light that crosses the screen and hits four times. Invincible as it starts.',
     },
+
+    // ── Universal (the same frames for everyone, config.js) ─────────
+    GC: guardCancel({ windup: [['attack2', 0], ['attack2', 1]], impact: [['attack2', 2]], recover: [['attack2', 3]] }, [0, -124, 128, 96], 'A quick draw out of a block. Costs half the meter.'),
+    burst: burst({ windup: [['take-hit', 0], ['idle', 0]], impact: [['attack1', 2]], recover: [['attack1', 3], ['idle', 0]] }),
   },
 }));

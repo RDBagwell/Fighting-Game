@@ -3,6 +3,9 @@
  * defaults; the result is plain data (`MoveData`, `HitData`), frozen.
  */
 
+import { config } from '../config.js';
+import { px } from '../../../engine/sim/fixed.js';
+
 /** @typedef {import('../../../engine/sim/types.js').HitData} HitData */
 /** @typedef {import('../../../engine/sim/types.js').MoveData} MoveData */
 /** @typedef {import('../../../engine/sim/types.js').Box} Box */
@@ -77,4 +80,49 @@ export function frames(sheet, from, to) {
   const out = [];
   for (let i = from; i <= to; i++) out.push([sheet, i]);
   return out;
+}
+
+/**
+ * A character's guard cancel (M+H while blocking): the same frames and
+ * damage for everyone (config.guardCancel), invincible until its last
+ * active frame, a knockdown on hit, very punishable on block. Only the
+ * animation and the hitbox are the character's own.
+ * @param {{ windup: Array<[string, number]>, impact: Array<[string, number]>, recover: Array<[string, number]> }} art
+ * @param {Box} box
+ * @param {string} description
+ * @returns {MoveData}
+ */
+export function guardCancel(art, box, description) {
+  const { startup, active, recovery, damage } = config.guardCancel;
+  const last = startup + active - 1;
+  return {
+    name: 'Guard Cancel', kind: 'guardCancel', notation: 'M+H (blocking)', stance: 'stand',
+    startup, active, recovery,
+    invuln: [{ frames: [1, last], kind: 'all' }],
+    anim: strike(art, startup, active, recovery),
+    hits: [hit([startup, last], [box], { damage, hitstun: 20, blockstun: 12, hitstop: 10, push: 16, knockdown: true })],
+    description,
+  };
+}
+
+/**
+ * A character's burst (L+M+H while being hit, once a round): the same
+ * frames for everyone (config.burst). Invincible until its last active
+ * frame, a wide hitbox all around (reaching down, for a burst in the air)
+ * that knocks the attacker away without damage. It can be blocked, and
+ * then it's very punishable.
+ * @param {{ windup: Array<[string, number]>, impact: Array<[string, number]>, recover: Array<[string, number]> }} art
+ * @returns {MoveData}
+ */
+export function burst(art) {
+  const { startup, active, recovery } = config.burst;
+  const last = startup + active - 1;
+  return {
+    name: 'Burst', kind: 'burst', notation: 'L+M+H (being hit)', stance: 'stand',
+    startup, active, recovery,
+    invuln: [{ frames: [1, last], kind: 'all' }],
+    anim: strike(art, startup, active, recovery),
+    hits: [hit([startup, last], [[-80, -180, 160, 260]], { damage: 0, hitstun: 20, blockstun: 20, hitstop: 14, push: 40, launch: [px(4), px(-7)], knockdown: true })],
+    description: 'Breaks out of a combo: invincible, and knocks the attacker away. Once a round. It can be blocked, and then you are wide open.',
+  };
 }

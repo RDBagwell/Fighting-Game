@@ -8,7 +8,7 @@
  * Units as in mack.js: boxes in pixels relative to the feet, facing right.
  */
 import { px } from '../../../engine/sim/fixed.js';
-import { hit, deepFreeze, strike, frames } from './build.js';
+import { hit, deepFreeze, strike, frames, guardCancel, burst } from './build.js';
 
 /** @typedef {import('../../../engine/sim/types.js').MoveData} MoveData */
 
@@ -148,6 +148,7 @@ export const deka = deepFreeze(/** @type {CharacterData} */ ({
     throwHold: { sheet: 'attack1', len: 1, frame: 1 },
     thrown: { sheet: 'take-hit', len: 1, frame: 1 },
     recover: { sheet: 'idle', len: 1, frame: 0 },
+    parry: { sheet: 'attack1', len: 1, frame: 0 },
     win: { sheet: 'idle', len: 9 },
   },
   moves: {
@@ -266,5 +267,9 @@ export const deka = deepFreeze(/** @type {CharacterData} */ ({
       ],
       description: 'Four crescents in a rush, the last one huge. Invincible as it starts. Costs the full meter.',
     },
+
+    // ── Universal (the same frames for everyone, config.js) ─────────
+    GC: guardCancel({ windup: frames('attack2', 0, 2), impact: [['attack2', 3]], recover: frames('attack2', 4, 5) }, [6, -122, 96, 92], 'A wild crescent out of a block. Costs half the meter.'),
+    burst: burst({ windup: [['take-hit', 0], ['attack3', 0]], impact: frames('attack3', 3, 5), recover: frames('attack3', 6, 8) }),
   },
 }));

@@ -39,6 +39,19 @@ export const config = {
   meterGain: { hit: 60, block: 30, taken: 40 }, // % of damage dealt/blocked/taken
   superFreeze: 40,
 
+  // Parry (M+H, standing or crouching): for `window` frames it catches a
+  // strike or projectile (standing: highs and mids; crouching: lows and
+  // mids). The hit does nothing, both freeze for `freeze` frames, then the
+  // parrying fighter is free at once while the attacker finishes the move.
+  // A parry that catches nothing stays stuck for `recovery` more frames.
+  parry: { window: 6, recovery: 20, freeze: 12, meter: 50 },
+  // Guard cancel (M+H while blocking): each character's guard-cancel move,
+  // for `cost` meter. Its frames are the same for everyone.
+  guardCancel: { cost: 500, startup: 6, active: 4, recovery: 30, damage: 40 },
+  // Burst (L+M+H while being hit): once per round, each character's burst
+  // move. Invincible until its last active frame; it can be blocked.
+  burst: { startup: 8, active: 6, recovery: 36 },
+
   pushStep: 3, // pushback slides at most this many pixels a frame
   airReset: [px(1.5), px(-4)], // knock-away of a normal hit on an airborne fighter (subpixels/frame)
   proximityGuard: 170,

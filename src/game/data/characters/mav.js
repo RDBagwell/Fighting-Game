@@ -8,7 +8,7 @@
  * Units as in mack.js: boxes in pixels relative to the feet, facing right.
  */
 import { px } from '../../../engine/sim/fixed.js';
-import { hit, deepFreeze, strike, frames } from './build.js';
+import { hit, deepFreeze, strike, frames, guardCancel, burst } from './build.js';
 
 /** @typedef {import('../../../engine/sim/types.js').MoveData} MoveData */
 
@@ -129,6 +129,7 @@ export const mav = deepFreeze(/** @type {CharacterData} */ ({
     throwHold: { sheet: 'attack1', len: 1, frame: 3 },
     thrown: { sheet: 'take-hit', len: 1, frame: 1 },
     recover: { sheet: 'idle', len: 1, frame: 0 },
+    parry: { sheet: 'attack1', len: 1, frame: 0 },
     win: { sheet: 'idle', len: 10 },
   },
   moves: {
@@ -245,5 +246,9 @@ export const mav = deepFreeze(/** @type {CharacterData} */ ({
       ],
       description: 'Three royal strikes, the last one enormous. Invincible as it starts. Costs the full meter.',
     },
+
+    // ── Universal (the same frames for everyone, config.js) ─────────
+    GC: guardCancel({ windup: frames('attack3', 0, 1), impact: [['attack3', 2]], recover: [['attack3', 3]] }, [4, -136, 110, 108], 'A royal backhand out of a block. Costs half the meter.'),
+    burst: burst({ windup: [['take-hit', 0], ['attack2', 0]], impact: frames('attack2', 1, 2), recover: [['attack2', 3]] }),
   },
 }));

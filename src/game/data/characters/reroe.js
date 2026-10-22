@@ -8,7 +8,7 @@
  * Units as in mack.js: boxes in pixels relative to the feet, facing right.
  */
 import { px } from '../../../engine/sim/fixed.js';
-import { hit, deepFreeze, strike, frames } from './build.js';
+import { hit, deepFreeze, strike, frames, guardCancel, burst } from './build.js';
 
 /** @typedef {import('../../../engine/sim/types.js').MoveData} MoveData */
 
@@ -135,6 +135,7 @@ export const reroe = deepFreeze(/** @type {CharacterData} */ ({
     throwHold: { sheet: 'attack3', len: 1, frame: 1 },
     thrown: { sheet: 'take-hit', len: 1, frame: 1 },
     recover: { sheet: 'idle', len: 1, frame: 0 },
+    parry: { sheet: 'attack2', len: 1, frame: 0 },
     win: { sheet: 'idle', len: 10 },
   },
   moves: {
@@ -257,5 +258,9 @@ export const reroe = deepFreeze(/** @type {CharacterData} */ ({
       },
       description: 'A huge spear thrown with everything she has: crosses the screen and hits four times. Invincible as it starts.',
     },
+
+    // ── Universal (the same frames for everyone, config.js) ─────────
+    GC: guardCancel({ windup: frames('attack1', 0, 2), impact: [['attack1', 3]], recover: [['attack1', 4]] }, [0, -124, 106, 100], 'A spear thrust out of a block. Costs half the meter.'),
+    burst: burst({ windup: [['take-hit', 0], ['attack3', 0]], impact: frames('attack3', 2, 4), recover: frames('attack3', 5, 6) }),
   },
 }));

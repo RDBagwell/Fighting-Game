@@ -21,7 +21,7 @@
  *
  * See docs/FRAME-DATA.md, "The input buffer" and "Motion inputs".
  */
-import { toNumpad, BUTTON_BITS, L, M } from '../input/bits.js';
+import { toNumpad, BUTTON_BITS, L, M, H } from '../input/bits.js';
 
 /**
  * Pushes this frame's input onto the front of the history.
@@ -82,26 +82,43 @@ export function findButtonPress(f, frame, buttons, buffer) {
 }
 
 /**
- * A throw: L and M both down on some frame within the buffer, with at least
- * one of them pressed on that frame and the other pressed no more than 3
- * frames earlier (pressing them "together" by human standards).
- * Returns the age, or -1.
+ * Buttons pressed "together" (by human standards): every button in `need`
+ * down on some frame within the buffer, at least one of them pressed on
+ * that frame, and each of the others pressed no more than 3 frames
+ * earlier. Buttons in `without` must not be down on that frame (so M+H
+ * isn't read out of L+M+H). Returns the age, or -1.
+ * @param {import('./types.js').FighterState} f
+ * @param {number} frame
+ * @param {number} need  Button bits
+ * @param {number} buffer
+ * @param {number} [without]  Button bits
+ */
+export function findChordPress(f, frame, need, buffer, without = 0) {
+  for (let a = 0; a <= buffer && a < f.hist.length - 4; a++) {
+    if (frame - a <= f.used) return -1;
+    if ((f.hist[a] & need) !== need || (f.hist[a] & without) !== 0) continue;
+    let pressedNow = false;
+    let all = true;
+    for (const bit of [L, M, H]) {
+      if (!(need & bit)) continue;
+      if (pressedAt(f.hist, a, bit)) pressedNow = true;
+      let found = false;
+      for (let b = a; b <= a + 3 && !found; b++) found = pressedAt(f.hist, b, bit);
+      if (!found) all = false;
+    }
+    if (pressedNow && all) return a;
+  }
+  return -1;
+}
+
+/**
+ * A throw: L and M pressed together (findChordPress). Returns the age, or -1.
  * @param {import('./types.js').FighterState} f
  * @param {number} frame
  * @param {number} buffer
  */
 export function findThrowPress(f, frame, buffer) {
-  const both = L | M;
-  for (let a = 0; a <= buffer && a < f.hist.length - 4; a++) {
-    if (frame - a <= f.used) return -1;
-    if ((f.hist[a] & both) !== both) continue;
-    const lAt = pressedAt(f.hist, a, L);
-    const mAt = pressedAt(f.hist, a, M);
-    if (!lAt && !mAt) continue;
-    const other = lAt ? M : L;
-    for (let b = a; b <= a + 3; b++) if (pressedAt(f.hist, b, other)) return a;
-  }
-  return -1;
+  return findChordPress(f, frame, L | M, buffer);
 }
 
 /**

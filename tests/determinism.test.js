@@ -10,7 +10,7 @@ import { saveState, loadState, hashState } from '../src/engine/sim/state.js';
 import { ENGINE_VERSION } from '../src/game/replay/replays.js';
 
 /** The final state hash of the recorded match below (seed 99, 8000 frames of seeded random inputs). */
-const GOLDEN = 719425085;
+const GOLDEN = 381736348;
 
 /**
  * A recorded input log: a reproducible stream of plausible inputs (held
@@ -69,7 +69,7 @@ describe('determinism', () => {
     // intended, bump ENGINE_VERSION in src/game/replay/replays.js (old
     // replays would no longer play back the same) and update the hash.
     const end = play(sim.createMatch({ chars: ['mack', 'kenji'], seed: 99 }), log, 0, log.length);
-    expect({ engine: ENGINE_VERSION, hash: hashState(end) }).toEqual({ engine: 1, hash: GOLDEN });
+    expect({ engine: ENGINE_VERSION, hash: hashState(end) }).toEqual({ engine: 2, hash: GOLDEN });
   });
 
   it('a state saved mid-match and loaded again carries on identically', () => {

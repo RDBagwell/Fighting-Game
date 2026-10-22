@@ -36,7 +36,7 @@ const MAX_FRAMES = 60 * 60 * 20;
  * (not the data) changes how a match plays out; the golden-hash test in
  * tests/determinism.test.js fails until you do.
  */
-export const ENGINE_VERSION = 1;
+export const ENGINE_VERSION = 2;
 
 /**
  * The version of the rules a replay needs: a hash of the engine version,

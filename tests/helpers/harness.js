@@ -80,6 +80,8 @@ export function run(s, p1, p2, each) {
  */
 export function inputFor(mv) {
   if (mv.kind === 'throw') return '5+LM';
+  if (mv.kind === 'guardCancel') return '5+MH';
+  if (mv.kind === 'burst') return '5+LMH';
   const b = mv.button ?? 'L';
   switch (mv.motion) {
     case 'qcf': return `2 3 6+${b}`;

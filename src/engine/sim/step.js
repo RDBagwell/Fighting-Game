@@ -32,9 +32,9 @@
  * docs/FRAME-DATA.md explains the frame counting this relies on.
  */
 import { SUB, div, clamp } from './fixed.js';
-import { cleanInput, toNumpad, SP, H } from '../input/bits.js';
+import { cleanInput, toNumpad, SP, L, M, H } from '../input/bits.js';
 import {
-  pushHistory, findPress, findButtonPress, findThrowPress, matchMotion, matchCharge, matchDash, updateCharge, currentDir,
+  pushHistory, findPress, findButtonPress, findThrowPress, findChordPress, matchMotion, matchCharge, matchDash, updateCharge, currentDir,
 } from './motion.js';
 import { fighterBoxes, overlaps, overlapCentre, projectileBox, toWorld } from './boxes.js';
 import { createFighter, createMatch } from './state.js';
@@ -53,7 +53,9 @@ const STUNNED = ['hitstun', 'blockstun', 'land', 'recover', 'wakeup'];
 /** States in which a fighter can't be hit at all. */
 const INVULNERABLE = ['knockdown', 'wakeup', 'ko', 'thrown', 'throwHold', 'win'];
 /** States in which a fighter can be thrown. */
-const THROWABLE = ['stand', 'walkF', 'walkB', 'crouch', 'guard', 'jumpSquat', 'dashF', 'dashB', 'move', 'land', 'recover'];
+const THROWABLE = ['stand', 'walkF', 'walkB', 'crouch', 'guard', 'jumpSquat', 'dashF', 'dashB', 'move', 'land', 'recover', 'parry'];
+/** States in which a fighter is being hit and can burst. */
+const BURSTABLE = ['hitstun', 'airHit'];
 
 /**
  * @param {FighterState} f
@@ -84,8 +86,8 @@ export function createSimulation({ characters, config: cfg, motions }) {
   /**
    * Per character: the specials and supers in the order they're tried
    * (supers first, then by priority, then by id, all fixed at load),
-   * the normals by stance and button, and the throw.
-   * @type {Record<string, { specials: string[], normals: Array<{ id: string, stance: string, button: string, dir: number }>, throwMove: string }>}
+   * the normals by stance and button, the throw, the guard cancel and the burst.
+   * @type {Record<string, { specials: string[], normals: Array<{ id: string, stance: string, button: string, dir: number }>, throwMove: string, guardCancel: string, burst: string }>}
    */
   const tables = {};
   for (const id of Object.keys(characters).sort()) {
@@ -108,7 +110,9 @@ export function createSimulation({ characters, config: cfg, motions }) {
       .map((m) => ({ id: m, stance: ch.moves[m].stance, button: ch.moves[m].button ?? '', dir: ch.moves[m].dir ?? 0 }))
       .sort((a, b) => (b.dir ? 1 : 0) - (a.dir ? 1 : 0) || (a.id < b.id ? -1 : 1));
     const throwMove = ids.find((m) => ch.moves[m].kind === 'throw') ?? '';
-    tables[id] = { specials, normals, throwMove };
+    const guardCancel = ids.find((m) => ch.moves[m].kind === 'guardCancel') ?? '';
+    const burst = ids.find((m) => ch.moves[m].kind === 'burst') ?? '';
+    tables[id] = { specials, normals, throwMove, guardCancel, burst };
   }
 
   const wallLeft = cfg.stage.wall * SUB;
@@ -204,6 +208,12 @@ export function createSimulation({ characters, config: cfg, motions }) {
       emit(s, 'super', f.side, { move: id, x: f.x, y: f.y });
     } else if (mv.kind === 'special') {
       emit(s, 'special', f.side, { move: id });
+    } else if (mv.kind === 'guardCancel') {
+      if (!s.options.infiniteMeter) f.meter -= cfg.guardCancel.cost;
+      emit(s, 'guard-cancel', f.side, { move: id, x: f.x, y: f.y });
+    } else if (mv.kind === 'burst') {
+      f.burst = false;
+      emit(s, 'burst', f.side, { move: id, x: f.x, y: f.y });
     }
     applyMoveFrame(s, f, mv);
   }
@@ -306,6 +316,50 @@ export function createSimulation({ characters, config: cfg, motions }) {
     return '';
   }
 
+  /**
+   * Starts a parry (M+H on the ground). Standing or crouching is decided by
+   * the direction held when the buttons were pressed.
+   * @param {MatchState} s
+   * @param {FighterState} f
+   * @param {number} age
+   */
+  function startParry(s, f, age) {
+    setState(f, 'parry');
+    f.stateFrame = 1;
+    f.crouching = toNumpad(f.hist[age], f.facing) <= 3;
+    f.used = s.frame - age;
+    f.vx = 0;
+  }
+
+  /**
+   * Does `d` parry this hit? In the first frames of a parry, standing for
+   * highs and mids, crouching for lows and mids.
+   * @param {FighterState} d
+   * @param {HitData} h
+   */
+  function parries(d, h) {
+    if (d.state !== 'parry' || d.stateFrame > cfg.parry.window || d.y !== 0) return false;
+    if (h.guard === 'unblockable') return false;
+    return d.crouching ? h.guard !== 'high' : h.guard !== 'low';
+  }
+
+  /**
+   * Being hit or blocking: a guard cancel (M+H in blockstun, half the
+   * meter) or a burst (L+M+H in hitstun, once a round).
+   * @param {MatchState} s
+   * @param {FighterState} f
+   */
+  function decideDefence(s, f) {
+    const t = tables[f.char];
+    if (f.state === 'blockstun' && t.guardCancel && (s.options.infiniteMeter || f.meter >= cfg.guardCancel.cost)) {
+      const age = findChordPress(f, s.frame, M | H, cfg.buffer, L);
+      if (age >= 0) startMove(s, f, t.guardCancel, age);
+    } else if (BURSTABLE.includes(f.state) && f.burst && t.burst) {
+      const age = findChordPress(f, s.frame, L | M | H, cfg.buffer);
+      if (age >= 0) startMove(s, f, t.burst, age);
+    }
+  }
+
   // ─── deciding what to do ──────────────────────────────────────────
 
   /**
@@ -317,6 +371,9 @@ export function createSimulation({ characters, config: cfg, motions }) {
   function decideGround(s, f, threat) {
     const special = findSpecial(s, f, 'ground', null);
     if (special) return startMove(s, f, special.id, special.age, special.easy);
+
+    const parry = findChordPress(f, s.frame, M | H, cfg.buffer, L);
+    if (parry >= 0) return startParry(s, f, parry);
 
     const t = tables[f.char];
     if (t.throwMove) {
@@ -471,6 +528,12 @@ export function createSimulation({ characters, config: cfg, motions }) {
           emit(s, 'jump', f.side);
         }
         break;
+      case 'parry':
+        if (f.stateFrame > cfg.parry.window + cfg.parry.recovery) {
+          setState(f, f.crouching ? 'crouch' : 'stand');
+          f.crouching = false;
+        }
+        break;
       case 'dashF':
       case 'dashB': {
         const d = f.state === 'dashF' ? ch.stats.dash : ch.stats.backdash;
@@ -503,7 +566,7 @@ export function createSimulation({ characters, config: cfg, motions }) {
       case 'walkF': f.vx = f.facing * ch.stats.walkForward; break;
       case 'walkB': f.vx = -f.facing * ch.stats.walkBack; break;
       case 'stand': case 'crouch': case 'guard': case 'jumpSquat': case 'land': case 'recover':
-      case 'hitstun': case 'blockstun': case 'knockdown': case 'wakeup': case 'throwHold': case 'thrown': case 'win':
+      case 'hitstun': case 'blockstun': case 'knockdown': case 'wakeup': case 'throwHold': case 'thrown': case 'win': case 'parry':
         if (f.y === 0) f.vx = 0;
         break;
       case 'dashF':
@@ -626,6 +689,7 @@ export function createSimulation({ characters, config: cfg, motions }) {
       if (isNeutral(f)) decideGround(s, f, threat);
       else if (f.state === 'air' && !f.airAttack) decideAir(s, f);
       else if (f.state === 'move') tryCancel(s, f, false);
+      else decideDefence(s, f);
     } else if (isNeutral(f)) {
       setState(f, 'stand');
     }
@@ -771,7 +835,20 @@ export function createSimulation({ characters, config: cfg, motions }) {
   function applyHit(s, side, h, away, point, easy, fromProjectile, moveId) {
     const a = s.fighters[side];
     const d = s.fighters[1 - side];
-    const gain = cfg.meterGain;
+    // Guard cancels and bursts build no meter, for either side.
+    const kind = fromProjectile ? '' : charOf(a).moves[moveId]?.kind;
+    const gain = kind === 'guardCancel' || kind === 'burst' ? { hit: 0, block: 0, taken: 0 } : cfg.meterGain;
+    if (parries(d, h)) {
+      // The hit does nothing; once the freeze ends the parrying fighter is
+      // free while the attacker is still in the move.
+      setState(d, d.crouching ? 'crouch' : 'stand');
+      d.crouching = false;
+      d.vx = 0;
+      d.meter = Math.min(cfg.meterMax, d.meter + cfg.parry.meter);
+      s.freeze = Math.max(s.freeze, cfg.parry.freeze);
+      emit(s, 'parry', d.side, { x: point[0], y: point[1], move: moveId });
+      return;
+    }
     if (canBlock(d, h, away)) {
       const chip = h.chip ?? 0;
       d.health = Math.max(s.options.training ? 1 : 0, d.health - chip);
@@ -790,7 +867,7 @@ export function createSimulation({ characters, config: cfg, motions }) {
       const scaleIndex = Math.min(d.combo, cfg.scaling.length - 1);
       let damage = div(h.damage * cfg.scaling[scaleIndex], 100);
       if (easy) damage = div(damage * cfg.easyScale, 100);
-      damage = Math.max(1, damage);
+      if (h.damage > 0) damage = Math.max(1, damage);
       d.health = Math.max(s.options.training ? 1 : 0, d.health - damage);
       d.combo++;
       d.comboDamage += damage;
@@ -1129,7 +1206,10 @@ export function createSimulation({ characters, config: cfg, motions }) {
       if (!s.options.training) continue;
       if (isNeutral(f) && f.combo === 0) {
         f.refill++;
-        if (f.refill >= cfg.refillDelay) f.health = charOf(f).stats.health;
+        if (f.refill >= cfg.refillDelay) {
+          f.health = charOf(f).stats.health;
+          f.burst = true;
+        }
       }
     }
   }

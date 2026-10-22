@@ -17,7 +17,7 @@
 import { SUB } from './fixed.js';
 import { makeSeed } from './rng.js';
 
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 2;
 
 /**
  * @typedef {object} SimConfig  Rules shared by every character (src/game/data/config.js).
@@ -49,6 +49,9 @@ export const STATE_VERSION = 1;
  * @property {number} proximityGuard  Pixels: holding back this close to an attack blocks instead of walking.
  * @property {number} refillDelay  Training: frames after a combo before health refills.
  * @property {{ hit: number, block: number, taken: number }} meterGain  Percent of damage turned into meter.
+ * @property {{ window: number, recovery: number, freeze: number, meter: number }} parry
+ * @property {{ cost: number, startup: number, active: number, recovery: number, damage: number }} guardCancel
+ * @property {{ startup: number, active: number, recovery: number }} burst
  */
 
 /**
@@ -99,6 +102,7 @@ export function createFighter(ch, side, config, meter = 0) {
     easy: false,
     refill: 0,
     throwBack: false,
+    burst: true,
   };
 }
 

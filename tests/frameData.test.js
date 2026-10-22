@@ -21,6 +21,11 @@ const cfg = sim.config;
 function measure(charId, moveId, block) {
   const mv = sim.characters[charId].moves[moveId];
   const s = setup({ chars: [charId, 'mack'], x: [480, 510], infiniteMeter: true });
+  // A guard cancel comes out of blockstun, a burst out of hitstun.
+  if (mv.kind === 'guardCancel' || mv.kind === 'burst') {
+    s.fighters[0].state = mv.kind === 'burst' ? 'hitstun' : 'blockstun';
+    s.fighters[0].stun = 20;
+  }
   const attack = script(inputFor(mv), 1);
   const last = (mv.hits ?? []).reduce((a, h) => (h.frames[0] > a.frames[0] ? h : a), (mv.hits ?? [])[0]);
   const guard = last ? last.guard : 'mid';
