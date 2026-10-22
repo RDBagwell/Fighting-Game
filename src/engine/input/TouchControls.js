@@ -39,6 +39,8 @@ export class TouchControls {
         <button type="button" data-bits="${M}" class="tb tb-m">M</button>
         <button type="button" data-bits="${H}" class="tb tb-h">H</button>
         <button type="button" data-bits="${L | M}" class="tb tb-throw">Throw</button>
+        <button type="button" data-bits="${M | H}" class="tb tb-parry">Parry</button>
+        <button type="button" data-bits="${L | M | H}" class="tb tb-burst">Burst</button>
         <button type="button" data-bits="${SP}" class="tb tb-sp">Special</button>
       </div>
       <button type="button" class="touch-pause" aria-label="Pause">II</button>`;

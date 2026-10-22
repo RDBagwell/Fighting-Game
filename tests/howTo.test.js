@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { sim } from './helpers/harness.js';
-import { howTo } from '../src/game/ui/howTo.js';
+import { howTo, parryHowTo } from '../src/game/ui/howTo.js';
 import { DEFAULT_KEYS, DEFAULT_PAD } from '../src/engine/input/bindings.js';
 
 const controls = { kbA: DEFAULT_KEYS.kbA, pad: DEFAULT_PAD };
@@ -18,6 +18,14 @@ describe('how to do a move', () => {
     expect(t.pad).toBe('↓ ↘ →, then Y / △');
     expect(t.words).toBe('Roll down, down-forward, forward, then Medium');
     expect(t.easy).toEqual({ keyboard: 'I alone', pad: 'RB / R1 alone' });
+  });
+
+  it('the parry, guard cancel and burst: their own keys, or the buttons together', () => {
+    expect(parryHowTo(controls).keyboard).toBe('H (or K+L together) just before a hit lands (hold down for lows)');
+    expect(how('deka', 'GC').keyboard).toBe('H (or K+L together) while blocking');
+    expect(how('deka', 'GC').pad).toBe('LB / L1 (or Y / △ + B / ○) while blocking');
+    expect(how('reroe', 'burst').keyboard).toBe('E (or J+K+L together) while being hit');
+    expect(how('reroe', 'burst').arrows).toBe('L+M+H while being hit');
   });
 
   it('a dragon-punch motion, a charge move and the super', () => {

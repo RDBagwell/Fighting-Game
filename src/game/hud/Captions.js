@@ -1,7 +1,7 @@
 /**
  * Captions for the sounds that carry information: a short line of text
  * when a round starts, a fighter is knocked out, a throw is escaped, a
- * super or a fireball comes out, and so on. Off by default
+ * super or a fireball comes out, a hit is parried, and so on. Off by default
  * (Settings > Accessibility > Captions for sounds).
  *
  * Shown in the DOM, in a live region, so screen readers announce them too.
@@ -22,6 +22,9 @@ const TEXT = {
   clash: () => '[Clang] Clash',
   projectile: (e) => `[Whoosh] ${side(e)} fireball`,
   knockdown: (e) => `[Thump] ${side(e)} knocked down`,
+  parry: (e) => `[Ring] ${side(e)} parries`,
+  'guard-cancel': (e) => `[Rush] ${side(e)} guard cancel`,
+  burst: (e) => `[Blast] ${side(e)} bursts`,
 };
 
 /** @param {import('../../engine/sim/types.js').SimEvent} e */

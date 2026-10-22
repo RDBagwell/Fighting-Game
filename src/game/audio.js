@@ -7,7 +7,7 @@
 export const EVENT_SOUNDS = /** @type {Record<string, import('../engine/audio/Sfx.js').SoundName>} */ ({
   hit: 'hit', block: 'block', swing: 'swing', special: 'special', super: 'super', throw: 'throw', tech: 'tech',
   ko: 'ko', round: 'round', fight: 'fight', jump: 'jump', land: 'land', dash: 'dash', projectile: 'projectile',
-  clash: 'clash', knockdown: 'knockdown',
+  clash: 'clash', knockdown: 'knockdown', parry: 'parry', 'guard-cancel': 'guardCancel', burst: 'burst',
 });
 
 /**
