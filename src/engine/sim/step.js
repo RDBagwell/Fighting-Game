@@ -967,15 +967,16 @@ export function createSimulation({ characters, config: cfg, motions }) {
       if (a.state !== 'throwHold') continue;
       const d = s.fighters[1 - a.side];
       const since = a.stateFrame; // frames since the throw connected
-      const age = findThrowPress(d, s.frame, Math.min(cfg.buffer + since, cfg.historyLength - 5));
+      const mv = moveOf(a);
+      const th = /** @type {NonNullable<MoveData['throw']>} */ (mv.throw);
+      // A command grab (techable: false) can't be escaped.
+      const age = th.techable ? findThrowPress(d, s.frame, Math.min(cfg.buffer + since, cfg.historyLength - 5)) : -1;
       if (age >= 0 && age <= since + 2) {
         d.used = s.frame - age;
         tech(s);
         return;
       }
       if (a.stun === 0) {
-        const mv = moveOf(a);
-        const th = /** @type {NonNullable<MoveData['throw']>} */ (mv.throw);
         d.health = Math.max(s.options.training ? 1 : 0, d.health - th.damage);
         d.combo = 1;
         d.comboDamage = th.damage;

@@ -89,6 +89,16 @@ All four are drawn facing right. Their frames are smaller than Mack and
 Kenji's 200×200, and Medieval King's are not square (160×111); the game
 scales each character to the same height on screen.
 
+The packs draw some animations higher or lower in the frame than others,
+and some frames step the body sideways (a lunge drawn inside the frame
+rather than as movement). The art is not edited to fix this; each
+character's `sprites` data corrects it when drawing. `offsets` moves a
+whole sheet (Deka's jump and fall are drawn 14 pixels lower in their
+frames than the rest of the pack), and `frameShift` moves single frames
+sideways, measured so the feet stay over the fighter's position.
+tests/characters.test.js checks every correction names a real sheet and
+frame.
+
 ### Martial Hero 3 (https://luizmelo.itch.io/martial-hero-3): `public/sprites/deka/`, frames 126×126
 
 | File | What | Source | Licence | Status |

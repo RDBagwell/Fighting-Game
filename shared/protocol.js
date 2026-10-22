@@ -26,7 +26,7 @@ export const ROOM_CODE_LENGTH = 6;
 const ROOM_CODE_PATTERN = new RegExp(`^[${ROOM_CODE_ALPHABET}]{${ROOM_CODE_LENGTH}}$`);
 
 /** The characters the server lets players pick (must match the game's roster). */
-export const CHARACTERS = /** @type {const} */ (['mack', 'kenji']);
+export const CHARACTERS = /** @type {const} */ (['mack', 'kenji', 'deka', 'elumlur', 'mav', 'reroe']);
 export const STAGES = /** @type {const} */ (['dusk-shrine']);
 
 /**

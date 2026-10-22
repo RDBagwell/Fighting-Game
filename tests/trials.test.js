@@ -44,7 +44,7 @@ describe('combo trials', () => {
   });
 
   for (const char of roster) {
-    for (const trial of TRIALS[char]) {
+    for (const trial of TRIALS[char] ?? []) {
       it(`${trial.id} (${trial.steps.join(' → ')}): the demonstration completes it, from either side, against either character`, () => {
         for (const opponent of roster) {
           for (const mirrored of [false, true]) {

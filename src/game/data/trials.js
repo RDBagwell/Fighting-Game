@@ -89,4 +89,132 @@ export const TRIALS = {
       tip: 'The charge combo, then cancel Iai Rush into the super as it hits. Your meter is full for this trial.',
     },
   ],
+  deka: [
+    {
+      id: 'deka-1', name: 'Cancel into a rush', steps: ['5M', '236M'],
+      demo: '5+M 5*12 2 3 6+M 5*80',
+      tip: 'Press Medium, and while it hits, do Crescent Rush. The rush carries Deka forward, so it reaches even if Medium pushed them back.',
+    },
+    {
+      id: 'deka-2', name: 'From a low', steps: ['2M', '236L'],
+      demo: '2+M 5*11 2 3 6+L 5*80',
+      tip: 'The same cancel from a crouching Medium, which hits low. Roll from down straight into the motion: you are already holding down.',
+    },
+    {
+      id: 'deka-3', name: 'Chain lights', steps: ['2L', '5L', '236M'],
+      demo: '2+L 5*9 5+L 5*9 2 3 6+M 5*80',
+      tip: 'Lights chain into each other, then cancel the second one into Crescent Rush.',
+    },
+    {
+      id: 'deka-4', name: 'Heavy confirm', steps: ['5H', '236H'],
+      demo: '5+H 5*15 2 3 6+H 5*80',
+      tip: 'Heavy is slow but cancels like any normal. Start the motion as soon as it connects.',
+    },
+    {
+      id: 'deka-5', name: 'Rising finish', steps: ['2H', '623M'],
+      demo: '2+H 5*13 6 2 3+M 5*80',
+      tip: 'Crouching Heavy launches, and only cancels on hit. Finish with Rising Crescent: forward, down, down-forward and Medium.',
+    },
+    {
+      id: 'deka-6', name: 'Super finish', steps: ['5M', '236M', '236236H'], meter: true,
+      demo: '5+M 5*12 2 3 6+M 5*16 2 3 6 2 3 6+H 5*80',
+      tip: 'Crescent Rush can be cancelled into the super when it hits. Your meter is full for this trial.',
+    },
+  ],
+  elumlur: [
+    {
+      id: 'elumlur-1', name: 'Cancel into a wave', steps: ['5M', '236M'],
+      demo: '5+M 5*11 2 3 6+M 5*80',
+      tip: 'Press Medium, and while it hits, throw a Storm Wave. Up close the wave hits before the opponent recovers.',
+    },
+    {
+      id: 'elumlur-2', name: 'From a low', steps: ['2M', '236H'],
+      demo: '2+M 5*10 2 3 6+H 5*80',
+      tip: 'Crouching Medium hits low and reaches far. Cancel it into the fast Heavy wave.',
+    },
+    {
+      id: 'elumlur-3', name: 'Chain lights', steps: ['2L', '5L', '236M'],
+      demo: '2+L 5*8 5+L 5*8 2 3 6+M 5*80',
+      tip: 'Lights chain into each other, then cancel the second one into Storm Wave.',
+    },
+    {
+      id: 'elumlur-4', name: 'Heavy confirm', steps: ['5H', '236H'],
+      demo: '5+H 5*14 2 3 6+H 5*80',
+      tip: 'The wide Heavy slash cancels like any normal. Start the motion as soon as it connects.',
+    },
+    {
+      id: 'elumlur-5', name: 'Rising finish', steps: ['2H', '623M'],
+      demo: '2+H 5*12 6 2 3+M 5*80',
+      tip: 'Crouching Heavy launches, and only cancels on hit. Finish with Thunder Rise: forward, down, down-forward and Medium.',
+    },
+    {
+      id: 'elumlur-6', name: 'Super finish', steps: ['5H', '236236H'], meter: true,
+      demo: '5+H 5*13 2 3 6 2 3 6+H 5*80',
+      tip: 'Cancel the Heavy straight into Storm Arc. Your meter is full for this trial.',
+    },
+  ],
+  mav: [
+    {
+      id: 'mav-1', name: 'Cancel into a cleave', steps: ['5M', '236M'],
+      demo: '5+M 5*13 2 3 6+M 5*80',
+      tip: 'Press Medium, and while it hits, do Crown Cleave. Mav is slow, so the cancel window is later than you might expect.',
+    },
+    {
+      id: 'mav-2', name: 'From a low', steps: ['2M', '236L'],
+      demo: '2+M 5*13 2 3 6+L 5*80',
+      tip: 'The same cancel from a crouching Medium, which hits low.',
+    },
+    {
+      id: 'mav-3', name: 'Chain lights', steps: ['2L', '5L', '236M'],
+      demo: '2+L 5*10 5+L 5*11 2 3 6+M 5*80',
+      tip: 'Lights chain into each other, then cancel the second one into Crown Cleave.',
+    },
+    {
+      id: 'mav-4', name: 'Heavy confirm', steps: ['5H', '236H'],
+      demo: '5+H 5*16 2 3 6+H 5*80',
+      tip: 'The slowest Heavy in the game, and the hardest hitting. Start the motion as soon as it connects.',
+    },
+    {
+      id: 'mav-5', name: 'Launch and cleave', steps: ['2H', '236H'],
+      demo: '2+H 5*14 2 3 6+H 5*80',
+      tip: 'Crouching Heavy launches, and only cancels on hit. Catch them in the air with a heavy Crown Cleave.',
+    },
+    {
+      id: 'mav-6', name: 'Super finish', steps: ['5M', '236M', '236236H'], meter: true,
+      demo: '5+M 5*13 2 3 6+M 5*17 2 3 6 2 3 6+H 5*80',
+      tip: 'Crown Cleave can be cancelled into the super when it hits. Your meter is full for this trial.',
+    },
+  ],
+  reroe: [
+    {
+      id: 'reroe-1', name: 'Cancel into a spear', steps: ['5M', '236M'],
+      demo: '5+M 5*11 2 3 6+M 5*80',
+      tip: 'Press Medium, and while it hits, throw a Hunting Spear. Up close the spear hits before the opponent recovers.',
+    },
+    {
+      id: 'reroe-2', name: 'Sweep away', steps: ['2M', '214M'],
+      demo: '2+M 5*13 2 1 4+M 5*80',
+      tip: 'Crouching Medium, then Fading Sweep: down, down-back, back and Medium. Reroe hops back as it hits, back to spear range.',
+    },
+    {
+      id: 'reroe-3', name: 'Chain lights', steps: ['2L', '5L', '214L'],
+      demo: '2+L 5*9 5+L 5*11 2 1 4+L 5*80',
+      tip: 'Lights chain into each other, then cancel the second one into Fading Sweep.',
+    },
+    {
+      id: 'reroe-4', name: 'Heavy confirm', steps: ['5H', '236H'],
+      demo: '5+H 5*15 2 3 6+H 5*80',
+      tip: 'The long Heavy thrust cancels like any normal; follow it with the fastest spear.',
+    },
+    {
+      id: 'reroe-5', name: 'Launch and sweep', steps: ['2H', '214H'],
+      demo: '2+H 5*12 2 1 4+H 5*80',
+      tip: 'Crouching Heavy launches, and only cancels on hit. Catch them with a heavy Fading Sweep.',
+    },
+    {
+      id: 'reroe-6', name: 'Super finish', steps: ['2M', '214M', '236236H'], meter: true,
+      demo: '2+M 5*13 2 1 4+M 5*13 2 3 6 2 3 6+H 5*80',
+      tip: 'Fading Sweep can be cancelled into the super when it hits. Your meter is full for this trial.',
+    },
+  ],
 };

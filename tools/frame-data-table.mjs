@@ -16,7 +16,7 @@ for (const ch of Object.values(sim.characters)) {
     const d = summarise(m, sim.config);
     const air = m.stance === 'air';
     const proj = !!m.projectile;
-    console.log(`| \`${m.notation}\` | ${m.name} | ${d.startup} | ${proj && !m.hits ? '—' : d.active} | ${d.recovery} | ${air || proj ? '—' : formatAdvantage(d.onHit.value, d.onHit.tag)} | ${air || proj || m.kind === 'throw' ? '—' : formatAdvantage(d.onBlock)} | ${d.damage} | ${d.guard} |`);
+    console.log(`| \`${m.notation}\` | ${m.name} | ${d.startup} | ${proj && !m.hits ? '—' : d.active} | ${d.recovery} | ${air || proj ? '—' : formatAdvantage(d.onHit.value, d.onHit.tag)} | ${air || proj || m.kind === 'throw' || m.throw ? '—' : formatAdvantage(d.onBlock)} | ${d.damage} | ${d.guard} |`);
   }
   console.log('');
 }

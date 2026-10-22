@@ -131,7 +131,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .btn:focus {
 .side.p1 h3 { color: var(--p1); }
 .side.p2 h3 { color: var(--p2); }
 .vs-mark { align-self: center; font-size: 2.2em; font-weight: 900; color: var(--accent-2); text-shadow: 0 3px 0 #000; }
-.cards { display: flex; gap: 0.5em; justify-content: center; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35em; justify-content: center; }
 .card {
   font: inherit;
   color: var(--ink);
@@ -140,14 +140,14 @@ button:focus-visible, select:focus-visible, input:focus-visible, .btn:focus {
   align-items: center;
   background: var(--panel-2);
   border: 2px solid var(--line);
-  padding: 0.3em 0.6em 0.5em;
+  padding: 0.2em 0.5em 0.35em;
   cursor: pointer;
 }
 .card[aria-checked="true"] { border-color: var(--accent-2); background: #3a2a44; box-shadow: 0 0 0 2px var(--accent-2) inset; }
-.portrait { width: 6em; height: 6em; image-rendering: pixelated; }
-.card-name { font-weight: 800; }
-.card-style { font-size: 0.8em; color: var(--muted); }
-.char-info { font-size: 0.9em; color: var(--muted); min-height: 4.5em; margin: 0.5em 0 0; text-align: left; }
+.portrait { width: 3.2em; height: 3.2em; image-rendering: pixelated; }
+.card-name { font-weight: 800; line-height: 1.15; }
+.card-style { font-size: 0.72em; line-height: 1.2; color: var(--muted); }
+.char-info { font-size: 0.85em; line-height: 1.3; color: var(--muted); min-height: 4.5em; margin: 0.5em 0 0; text-align: left; }
 .char-info strong { display: block; color: var(--ink); }
 .char-info .style { display: block; color: var(--accent); font-size: 0.9em; }
 .row { display: flex; align-items: center; gap: 0.6em; justify-content: space-between; margin: 0.35em 0; text-align: left; }
@@ -311,7 +311,7 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
 @media (max-width: 700px), (max-height: 420px) {
   .select-grid { grid-template-columns: 1fr 1fr; }
   .vs-mark { display: none; }
-  .portrait { width: 4.2em; height: 4.2em; }
+  .portrait { width: 3em; height: 3em; }
   .char-info { min-height: 0; font-size: 0.8em; }
   .settings, .training-panel { grid-template-columns: 1fr; }
   .screen { justify-content: flex-start; gap: 0.5em; padding: 0.6em; }

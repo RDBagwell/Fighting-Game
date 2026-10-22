@@ -31,3 +31,50 @@ export function deepFreeze(value) {
   }
   return value;
 }
+
+/**
+ * An attack's animation, exactly as long as the move (the validator checks):
+ * the wind-up frames spread over the startup (before the first active
+ * frame), the impact frames over the active frames, the follow-through
+ * over the recovery. Each phase lists [sheet, frame] pairs; when a phase is
+ * shorter than its frames, only the first ones show.
+ * @param {{ windup: Array<[string, number]>, impact: Array<[string, number]>, recover: Array<[string, number]> }} frames
+ * @param {number} startup
+ * @param {number} active
+ * @param {number} recovery
+ * @returns {Array<[string, number, number]>}
+ */
+export function strike(frames, startup, active, recovery) {
+  /** @type {Array<[string, number, number]>} */
+  const out = [];
+  /** @param {Array<[string, number]>} list @param {number} duration */
+  const spread = (list, duration) => {
+    const n = Math.min(list.length, duration);
+    if (n === 0) return;
+    const base = Math.floor(duration / n);
+    let extra = duration - base * n;
+    for (let i = 0; i < n; i++) {
+      const d = base + (extra > 0 ? 1 : 0);
+      if (extra > 0) extra--;
+      out.push([list[i][0], list[i][1], d]);
+    }
+  };
+  spread(frames.windup, startup - 1);
+  spread(frames.impact, active);
+  spread(frames.recover, recovery);
+  return out;
+}
+
+/**
+ * [sheet, frame] pairs for frames `from`..`to` of a sheet.
+ * @param {string} sheet
+ * @param {number} from
+ * @param {number} to
+ * @returns {Array<[string, number]>}
+ */
+export function frames(sheet, from, to) {
+  /** @type {Array<[string, number]>} */
+  const out = [];
+  for (let i = from; i <= to; i++) out.push([sheet, i]);
+  return out;
+}

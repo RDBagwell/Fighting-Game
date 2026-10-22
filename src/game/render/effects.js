@@ -197,7 +197,8 @@ export class Effects {
 }
 
 /**
- * Projectiles, drawn in code: Kenji's kunai and his super's crescent.
+ * Projectiles drawn in code: Kenji's kunai and his super's crescent, and
+ * Elumlur's storm wave. (Reroe's spear is a sprite: FightRenderer.)
  * @param {CanvasRenderingContext2D} ctx
  * @param {import('../../engine/sim/types.js').ProjectileState} p
  * @param {string} look
@@ -222,6 +223,23 @@ export function drawProjectile(ctx, p, look, camX, groundY) {
     ctx.fillRect(d === 1 ? x - 9 : x + 2, y - 1, 7, 2);
     ctx.fillStyle = '#c9a24a';
     ctx.fillRect(d === 1 ? x - 12 : x + 9, y - 2, 3, 4);
+  } else if (look === 'wave') {
+    // A small crescent of cyan storm energy, flickering.
+    const pulse = (p.age % 4) / 4;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(d, 1);
+    ctx.fillStyle = `rgba(63,230,240,${0.35 + 0.15 * pulse})`;
+    ctx.beginPath();
+    ctx.arc(-2, 0, 18, -Math.PI / 2, Math.PI / 2);
+    ctx.arc(-10, 0, 16, Math.PI / 2, -Math.PI / 2, true);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(230,255,255,0.85)';
+    ctx.beginPath();
+    ctx.arc(-2, 0, 14, -Math.PI / 2, Math.PI / 2);
+    ctx.arc(-7, 0, 13, Math.PI / 2, -Math.PI / 2, true);
+    ctx.fill();
+    ctx.restore();
   } else {
     // A crescent of light: an outer glow and a thinner bright core,
     // translucent so the fighters stay visible through it.
