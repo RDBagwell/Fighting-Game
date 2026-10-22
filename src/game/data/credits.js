@@ -5,7 +5,7 @@
 export const CREDITS = [
   {
     heading: 'Pixel art / character assets',
-    lines: ['Pixel art / character assets by Luiz Melo', '"Martial Hero" and "Martial Hero 2" (CC0), luizmelo.itch.io', 'Not required by the licence, given with thanks.'],
+    lines: ['Pixel art / character assets by Luiz Melo', '"Martial Hero", "Martial Hero 2", "Martial Hero 3", "Fantasy Warrior", "Medieval King Pack 2" and "Huntress" (CC0), luizmelo.itch.io', 'Not required by the licence, given with thanks.'],
   },
   {
     heading: 'Game, engine and code',
