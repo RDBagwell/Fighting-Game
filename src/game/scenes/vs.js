@@ -72,7 +72,7 @@ export class VsScene {
       ctx.fillRect(side === 0 ? 0 : WIDTH / 2, 0, WIDTH / 2, HEIGHT);
       const x = side === 0 ? -80 + slide * 240 : WIDTH + 80 - slide * 240;
       drawFrame(ctx, assets.sheets[id].idle, Math.floor(this.time * 8) % assets.sheets[id].idle.frames, Math.round(x), 300, {
-        anchor: ch.sprites.anchor, scale: 4, flip: (side === 0 ? 1 : -1) !== ch.nativeFacing,
+        anchor: ch.sprites.anchor, scale: ch.sprites.scale * 2, flip: (side === 0 ? 1 : -1) !== ch.nativeFacing,
       });
       outlined(ctx, ch.name.toUpperCase(), side === 0 ? 30 : WIDTH - 30, 320, { size: 30, align: side === 0 ? 'left' : 'right', outline: 6 });
       outlined(ctx, ch.title, side === 0 ? 30 : WIDTH - 30, 340, { size: 12, align: side === 0 ? 'left' : 'right' });

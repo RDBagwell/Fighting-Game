@@ -48,7 +48,7 @@ export function portrait(app, id, size = 120) {
   c.height = size;
   const g = /** @type {CanvasRenderingContext2D} */ (c.getContext('2d'));
   g.imageSmoothingEnabled = false;
-  drawFrame(g, assets.sheets[id].idle, 0, size / 2, size - 4, { anchor: ch.sprites.anchor, scale: 2, flip: ch.nativeFacing !== 1 });
+  drawFrame(g, assets.sheets[id].idle, 0, size / 2, size - 4, { anchor: ch.sprites.anchor, scale: ch.sprites.scale, flip: ch.nativeFacing !== 1 });
   c.className = 'portrait';
   c.setAttribute('aria-hidden', 'true');
   return c;

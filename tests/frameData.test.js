@@ -69,7 +69,8 @@ describe('frame advantage: derived from data = measured in the simulation', () =
     expect(m.advantage).toBe(derived.onHit.value);
   });
 
-  it.each(grounded.filter(([c, m]) => sim.characters[c].moves[m].kind !== 'throw'))('%s %s on block', (charId, moveId) => {
+  // Throws (including command grabs) can't be blocked.
+  it.each(grounded.filter(([c, m]) => !sim.characters[c].moves[m].throw))('%s %s on block', (charId, moveId) => {
     const mv = sim.characters[charId].moves[moveId];
     const derived = summarise(mv, cfg);
     const m = measure(charId, moveId, true);

@@ -7,7 +7,7 @@
  * state of its own.
  */
 import { WIDTH, HEIGHT } from '../../engine/render/Screen.js';
-import { drawFrame } from '../../engine/render/sprites.js';
+import { drawFrame, anchorFor } from '../../engine/render/sprites.js';
 import { SUB } from '../../engine/sim/fixed.js';
 import { GROUND_Y, drawDuskShrine, Petals } from '../stage/duskShrine.js';
 import { chooseSprite } from './fighterView.js';
@@ -105,8 +105,18 @@ export class FightRenderer {
     for (const i of order) this.drawFighter(ctx, s, s.fighters[i], camX);
 
     for (const p of s.projectiles) {
-      const look = this.sim.characters[p.char].moves[p.move].projectile?.look ?? 'kunai';
-      drawProjectile(ctx, p, look, camX, GROUND_Y);
+      const owner = this.sim.characters[p.char];
+      const look = owner.moves[p.move].projectile?.look ?? 'kunai';
+      const art = owner.sprites.projectiles?.[look];
+      const sheet = this.assets.sheets[p.char]?.[`projectile:${look}`];
+      if (art && sheet) {
+        // Sprite art, animated by the projectile's age, pointing the way it flies.
+        drawFrame(ctx, sheet, Math.floor(p.age / 4) % sheet.frames, Math.round(p.x / SUB - camX), Math.round(GROUND_Y + p.y / SUB), {
+          anchor: art.anchor, scale: art.scale, flip: p.facing !== 1,
+        });
+      } else {
+        drawProjectile(ctx, p, look, camX, GROUND_Y);
+      }
     }
     effects.draw(ctx, camX, GROUND_Y);
     overlay?.(ctx, camX);
@@ -131,7 +141,7 @@ export class FightRenderer {
     const sheet = this.assets.sheets[f.char]?.[choice.sheet];
     if (!sheet) return;
     drawFrame(ctx, sheet, choice.frame, Math.round(f.x / SUB - camX), Math.round(GROUND_Y + f.y / SUB), {
-      anchor: ch.sprites.anchor,
+      anchor: anchorFor(ch.sprites, choice.sheet),
       scale: ch.sprites.scale,
       flip: f.facing !== ch.nativeFacing,
       squash: choice.squash,
@@ -159,7 +169,7 @@ export class FightRenderer {
     if (choice.tint === 'flash') source = sheet.variant('flash', '#ffffff', 0.55);
     else if (choice.tint === 'guard') source = sheet.variant('guard', '#5aa8ff', 0.35);
     drawFrame(ctx, sheet, choice.frame, x + jitter, y, {
-      anchor: ch.sprites.anchor,
+      anchor: anchorFor(ch.sprites, choice.sheet),
       scale: ch.sprites.scale,
       flip: f.facing !== ch.nativeFacing,
       squash: choice.squash,

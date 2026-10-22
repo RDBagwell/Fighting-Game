@@ -87,6 +87,18 @@
  */
 
 /**
+ * @typedef {object} SpriteData  How a character's art is drawn (rendering only: the simulation never reads it).
+ * @property {string} dir  Folder under public/, e.g. "sprites/mack/".
+ * @property {number} frameSize  Frame width in the sheet's pixels.
+ * @property {number} [frameHeight]  Frame height, when frames aren't square (default: frameSize).
+ * @property {[number, number]} anchor  The feet: the point in a frame placed at the fighter's position.
+ * @property {number} scale  Screen pixels per sheet pixel (need not be whole).
+ * @property {Record<string, number>} sheets  Sheet name → frame count; the file is `${dir}${name}.png`.
+ * @property {Record<string, [number, number]>} [offsets]  Per-sheet anchor corrections, for sheets drawn higher or lower in their frames.
+ * @property {Record<string, { file: string, w: number, h: number, frames: number, anchor: [number, number], scale: number }>} [projectiles]
+ *   Projectile art by `look` (a sprite instead of the shapes drawn in code).
+ * @property {string} color
+ *
  * @typedef {object} CharacterData
  * @property {string} id
  * @property {string} name
@@ -94,7 +106,7 @@
  * @property {string} style
  * @property {string} blurb
  * @property {1|-1} nativeFacing  Which way the sprite sheets face.
- * @property {{ dir: string, frameSize: number, anchor: [number, number], scale: number, sheets: Record<string, number>, color: string }} sprites
+ * @property {SpriteData} sprites
  * @property {{ health: number, walkForward: number, walkBack: number, jumpVx: number, jumpVy: number,
  *   dash: { frames: number, speed: number }, backdash: { frames: number, speed: number, invuln: number } }} stats
  * @property {Record<'stand'|'crouch'|'air'|'down', { push: Box, hurt: Box[] }>} boxes

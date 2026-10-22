@@ -6,9 +6,10 @@
 import { characters } from './characters/index.js';
 
 /** Sprite sheets, from each character's data. */
-export const SPRITE_FILES = Object.values(characters).flatMap((ch) =>
-  Object.keys(ch.sprites.sheets).map((sheet) => `${ch.sprites.dir}${sheet}.png`),
-);
+export const SPRITE_FILES = Object.values(characters).flatMap((ch) => [
+  ...Object.keys(ch.sprites.sheets).map((sheet) => `${ch.sprites.dir}${sheet}.png`),
+  ...Object.values(ch.sprites.projectiles ?? {}).map((p) => `${ch.sprites.dir}${p.file}.png`),
+]);
 
 /** Everything loaded before the title screen. */
 export const ALL_FILES = [...SPRITE_FILES];

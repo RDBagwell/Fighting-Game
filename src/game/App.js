@@ -110,7 +110,12 @@ export class App {
       sheets[ch.id] = {};
       for (const name of Object.keys(ch.sprites.sheets)) {
         const img = /** @type {HTMLImageElement} */ (images.get(`${ch.sprites.dir}${name}.png`));
-        sheets[ch.id][name] = new SpriteSheet(img, ch.sprites.frameSize);
+        sheets[ch.id][name] = new SpriteSheet(img, ch.sprites.frameSize, ch.sprites.frameHeight);
+      }
+      // Projectile art (e.g. Reroe's spear), keyed by its `look`.
+      for (const [look, p] of Object.entries(ch.sprites.projectiles ?? {})) {
+        const img = /** @type {HTMLImageElement} */ (images.get(`${ch.sprites.dir}${p.file}.png`));
+        sheets[ch.id][`projectile:${look}`] = new SpriteSheet(img, p.w, p.h);
       }
     }
     const [background, shop] = await Promise.all([loadOptionalImage(licensedArt.oakWoodsBackground), loadOptionalImage(licensedArt.oakWoodsShop)]);

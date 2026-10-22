@@ -1,5 +1,5 @@
 /**
- * Sprite sheets: horizontal strips of square frames, drawn by frame index
+ * Sprite sheets: horizontal strips of equal frames, drawn by frame index
  * (chosen from the simulation's frame data, never from a timer), mirrored
  * when a fighter faces the other way, optionally squashed (the crouch
  * stand-in) or tinted.
@@ -12,11 +12,13 @@
 export class SpriteSheet {
   /**
    * @param {HTMLImageElement | HTMLCanvasElement} image
-   * @param {number} frameSize
+   * @param {number} frameSize  Frame width
+   * @param {number} [frameHeight]  Frame height (default: square)
    */
-  constructor(image, frameSize) {
+  constructor(image, frameSize, frameHeight = frameSize) {
     this.image = image;
     this.frameSize = frameSize;
+    this.frameHeight = frameHeight;
     this.frames = Math.max(1, Math.floor(image.width / frameSize));
     /** @type {Map<string, HTMLCanvasElement>} */
     this.variants = new Map();
@@ -48,7 +50,7 @@ export class SpriteSheet {
 /**
  * @typedef {object} DrawOptions
  * @property {[number, number]} anchor  The point in the frame placed at (x, y) (the feet).
- * @property {number} scale  Whole-number scale.
+ * @property {number} scale  Screen pixels per sheet pixel (whole numbers keep pixels even).
  * @property {boolean} [flip]  Mirror horizontally.
  * @property {number} [squash]  Vertical scale (crouching), 1 = none.
  * @property {HTMLCanvasElement | HTMLImageElement} [source]  A tinted variant instead of the sheet's image.
@@ -66,10 +68,11 @@ export class SpriteSheet {
  */
 export function drawFrame(ctx, sheet, frame, x, y, o) {
   const size = sheet.frameSize;
+  const fh = sheet.frameHeight;
   const f = Math.max(0, Math.min(sheet.frames - 1, frame));
   const squash = o.squash ?? 1;
-  const w = size * o.scale;
-  const h = Math.round(size * o.scale * squash);
+  const w = Math.round(size * o.scale);
+  const h = Math.round(fh * o.scale * squash);
   const ax = o.flip ? size - o.anchor[0] : o.anchor[0];
   const left = Math.round(x - ax * o.scale);
   const top = Math.round(y - o.anchor[1] * o.scale * squash);
@@ -78,9 +81,21 @@ export function drawFrame(ctx, sheet, frame, x, y, o) {
   if (o.flip) {
     ctx.translate(left + w, top);
     ctx.scale(-1, 1);
-    ctx.drawImage(o.source ?? sheet.image, f * size, 0, size, size, 0, 0, w, h);
+    ctx.drawImage(o.source ?? sheet.image, f * size, 0, size, fh, 0, 0, w, h);
   } else {
-    ctx.drawImage(o.source ?? sheet.image, f * size, 0, size, size, left, top, w, h);
+    ctx.drawImage(o.source ?? sheet.image, f * size, 0, size, fh, left, top, w, h);
   }
   ctx.restore();
+}
+
+/**
+ * Where a character's sheet is anchored: the character's feet point, plus
+ * that sheet's correction for art drawn higher or lower in its frames.
+ * @param {import('../sim/types.js').SpriteData} sprites
+ * @param {string} sheet
+ * @returns {[number, number]}
+ */
+export function anchorFor(sprites, sheet) {
+  const off = sprites.offsets?.[sheet];
+  return off ? [sprites.anchor[0] + off[0], sprites.anchor[1] + off[1]] : sprites.anchor;
 }
