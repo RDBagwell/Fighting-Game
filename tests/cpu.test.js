@@ -8,6 +8,8 @@ import { describe, it, expect } from 'vitest';
 import { sim } from './helpers/harness.js';
 import { Cpu, DIFFICULTIES } from '../src/game/cpu/Cpu.js';
 import { saveState } from '../src/engine/sim/state.js';
+import { roster } from '../src/game/data/characters/index.js';
+import { PROFILES } from '../src/game/cpu/profiles.js';
 
 /** @param {any} v */
 function deepFreeze(v) {
@@ -66,6 +68,19 @@ describe('the CPU', () => {
     expect(total.blocks).toBeGreaterThan(10);
     expect(total.specials).toBeGreaterThan(10);
     expect(total.kos).toBeGreaterThanOrEqual(6);
+  });
+
+  it('every character has a CPU profile whose moves exist, and plays whole matches with its specials', () => {
+    for (const char of roster) {
+      const p = PROFILES[char];
+      expect(p, char).toBeDefined();
+      for (const pun of p.punishes) expect(sim.characters[char].moves[pun.move], `${char} punish ${pun.move}`).toBeDefined();
+      const opponent = char === 'mack' ? 'kenji' : 'mack';
+      const { s, stats } = cpuMatch([char, opponent], ['normal', 'normal'], 5);
+      expect(s.phase, `${char} v ${opponent}`).toBe('matchEnd');
+      expect(stats.hits, `${char}: hits`).toBeGreaterThan(15);
+      expect(stats.specials, `${char}: specials`).toBeGreaterThan(2);
+    }
   });
 
   it('a CPU match is reproducible from its seeds', () => {

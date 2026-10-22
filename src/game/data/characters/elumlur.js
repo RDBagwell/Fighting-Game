@@ -42,7 +42,7 @@ function stormWave(b) {
       box: [-14, -16, 28, 32],
       hits: 1,
       look: 'wave',
-      hit: { damage: 55, chip: 9, hitstun: 18, blockstun: 14, hitstop: 9, guard: 'mid', push: 10 },
+      hit: { damage: 70, chip: 10, hitstun: 18, blockstun: 14, hitstop: 9, guard: 'mid', push: 10 },
     },
     description: 'Throws a wave of storm energy. Only one on screen at a time.',
   };
@@ -115,7 +115,7 @@ export const elumlur = deepFreeze(/** @type {CharacterData} */ ({
     color: '#3fc6d8',
   },
   stats: {
-    health: 1000,
+    health: 1060,
     walkForward: px(2.25),
     walkBack: px(2),
     jumpVx: px(3.1),
@@ -167,7 +167,7 @@ export const elumlur = deepFreeze(/** @type {CharacterData} */ ({
       name: 'Arc Slash', kind: 'normal', notation: '5M', stance: 'stand', button: 'M',
       startup: 9, active: 3, recovery: 15,
       anim: strike({ windup: frames('attack1', 1, 3), impact: [['attack1', 4]], recover: frames('attack1', 5, 6) }, 9, 3, 15),
-      hits: [hit([9, 11], [[12, -88, 90, 28]], { damage: 60, hitstun: 18, blockstun: 14, hitstop: 10, push: 9 })],
+      hits: [hit([9, 11], [[12, -88, 90, 28]], { damage: 64, hitstun: 18, blockstun: 14, hitstop: 10, push: 9 })],
       hurt: [{ frames: [9, 17], boxes: [[14, -86, 50, 20]] }],
       cancel: { on: 'contact', into: ['special', 'super'], frames: [9, 17] },
       description: 'The energy trail gives it long reach. Cancel it into Storm Wave.',

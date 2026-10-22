@@ -20,8 +20,8 @@ import { hit, deepFreeze, strike, frames } from './build.js';
  * @returns {MoveData}
  */
 function royalDecree(b) {
-  const startup = { L: 6, M: 7, H: 8 }[b];
-  const reach = { L: 56, M: 64, H: 72 }[b];
+  const startup = { L: 8, M: 9, H: 10 }[b];
+  const reach = { L: 54, M: 60, H: 66 }[b];
   return {
     name: `Royal Decree (${b})`,
     kind: 'special',
@@ -33,9 +33,9 @@ function royalDecree(b) {
     easy: b === 'M' ? '4' : b === 'L' ? '2' : undefined,
     startup,
     active: 2,
-    recovery: 30,
-    anim: strike({ windup: frames('attack2', 0, 1), impact: [['attack1', 3]], recover: [['attack2', 3], ['idle', 0]] }, startup, 2, 30),
-    throw: { box: [0, -94, reach, 94], damage: { L: 150, M: 165, H: 180 }[b], techable: false, launch: [px(3), px(-5.5)], recovery: 20 },
+    recovery: 34,
+    anim: strike({ windup: frames('attack2', 0, 1), impact: [['attack1', 3]], recover: [['attack2', 3], ['idle', 0]] }, startup, 2, 34),
+    throw: { box: [0, -94, reach, 94], damage: { L: 120, M: 130, H: 140 }[b], techable: false, launch: [px(3), px(-5.5)], recovery: 20 },
     description: 'A command grab that can’t be escaped. Beats blocking; very punishable if it misses.',
   };
 }
@@ -64,7 +64,7 @@ function crownCleave(b) {
     velocity: [[1, speed, 0], [startup, 0, 0]],
     anim: strike({ windup: [...frames('run', 0, 5), ['attack2', 0], ['attack2', 1]], impact: [['attack2', 2]], recover: [['attack2', 3], ['idle', 0]] }, startup, 4, 22),
     hits: [hit([startup, startup + 3], [[0, -104, 100, 74]], {
-      damage: { L: 100, M: 115, H: 130 }[b], chip: 14, hitstun: 22, blockstun: 15, hitstop: 13, push: 13,
+      damage: { L: 90, M: 100, H: 115 }[b], chip: 14, hitstun: 22, blockstun: 15, hitstop: 13, push: 13,
       knockdown: b === 'H',
     })],
     cancel: { on: 'hit', into: ['super'], frames: [startup, startup + 6] },
@@ -94,7 +94,7 @@ export const mav = deepFreeze(/** @type {CharacterData} */ ({
     color: '#d8b13a',
   },
   stats: {
-    health: 1200,
+    health: 1100,
     walkForward: px(1.75),
     walkBack: px(1.5),
     jumpVx: px(2.75),
@@ -155,7 +155,7 @@ export const mav = deepFreeze(/** @type {CharacterData} */ ({
       name: 'Sovereign’s Arc', kind: 'normal', notation: '5H', stance: 'stand', button: 'H',
       startup: 15, active: 4, recovery: 24,
       anim: strike({ windup: frames('attack3', 0, 1), impact: [['attack3', 2]], recover: [['attack3', 3]] }, 15, 4, 24),
-      hits: [hit([15, 18], [[4, -136, 110, 108]], { damage: 125, hitstun: 23, blockstun: 17, hitstop: 14, push: 15 })],
+      hits: [hit([15, 18], [[4, -136, 110, 108]], { damage: 110, hitstun: 23, blockstun: 17, hitstop: 14, push: 15 })],
       hurt: [{ frames: [15, 26], boxes: [[14, -112, 60, 50]] }],
       cancel: { on: 'contact', into: ['special', 'super'], frames: [15, 23] },
       description: 'An enormous crescent. Slow, and -9 on block, but it reaches nearly half a screen.',
@@ -241,7 +241,7 @@ export const mav = deepFreeze(/** @type {CharacterData} */ ({
       hits: [
         hit([9, 10], [[-10, -120, 104, 120]], { damage: 80, chip: 14, hitstun: 30, blockstun: 20, hitstop: 6, push: 1 }),
         hit([14, 15], [[-10, -120, 104, 120]], { damage: 80, chip: 14, hitstun: 30, blockstun: 20, hitstop: 6, push: 1 }),
-        hit([19, 22], [[-10, -150, 120, 150]], { damage: 190, chip: 24, hitstun: 30, blockstun: 16, hitstop: 20, push: 16, launch: [px(3), px(-8)], knockdown: true }),
+        hit([19, 22], [[-10, -150, 120, 150]], { damage: 160, chip: 24, hitstun: 30, blockstun: 16, hitstop: 20, push: 16, launch: [px(3), px(-8)], knockdown: true }),
       ],
       description: 'Three royal strikes, the last one enormous. Invincible as it starts. Costs the full meter.',
     },
