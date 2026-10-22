@@ -445,9 +445,11 @@ visitor after that waits about a minute (the lobby says so).
 
 ## Credits
 
-- **Pixel art / character assets by Luiz Melo**: "Martial Hero" and
-  "Martial Hero 2" (CC0), <https://luizmelo.itch.io/>. The licence doesn't
-  require credit; it's given with thanks.
+- **Pixel art / character assets by Luiz Melo**: "Martial Hero",
+  "Martial Hero 2", "Martial Hero 3", "Fantasy Warrior", "Medieval King
+  Pack 2" and "Huntress" (CC0), <https://luizmelo.itch.io/>. The licence
+  doesn't require credit; it's given with thanks. (The last four are for
+  characters still being added.)
 - **Game, engine, netcode, stage and synthesised sound:** Robert Bagwell,
   with Claude.
 - **Music:** Robert's own, when added ([docs/AUDIO.md](docs/AUDIO.md)).

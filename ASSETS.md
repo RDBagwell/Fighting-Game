@@ -77,6 +77,87 @@ renderer, with no new files:
 A later session could replace these with real frames from another CC0
 Luiz Melo pack (see "Other packs considered" below).
 
+## Luiz Melo's packs for the new characters (`public/sprites/deka`, `elumlur`, `mav`, `reroe`)
+**Pixel art / character assets by Luiz Melo.** Four more packs, added by
+Robert on 2026-10-22 for new characters. Each folder keeps the pack's own
+`license.txt`, which says the pack "is Creative Commons Zero (CC-0). Can be
+used in commercial and non-commercial projects." The files were renamed to
+this repository's convention (lower case, hyphens; Martial Hero 3's "Going
+Up" and "Going Down" became `jump` and `fall`) and are otherwise unchanged.
+
+All four are drawn facing right. Their frames are smaller than Mack and
+Kenji's 200×200, and Medieval King's are not square (160×111); the game
+scales each character to the same height on screen.
+
+### Martial Hero 3 (https://luizmelo.itch.io/martial-hero-3): `public/sprites/deka/`, frames 126×126
+
+| File | What | Source | Licence | Status |
+| --- | --- | --- | --- | --- |
+| `public/sprites/deka/idle.png` | Standing, 10 frames | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/run.png` | Running, 8 frames | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/jump.png` | Rising, 3 frames (the pack's "Going Up") | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/fall.png` | Falling, 3 frames (the pack's "Going Down") | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/attack1.png` | Big overhead-to-low slash with a crescent trail, 7 frames | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/attack2.png` | Rising crescent slash, 6 frames | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/attack3.png` | Long horizontal sweep, 9 frames | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/take-hit.png` | Recoil, 3 frames | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/death.png` | Collapse, 11 frames | Martial Hero 3 | CC0 1.0 | keep |
+| `public/sprites/deka/license.txt` | The pack's licence note | Martial Hero 3 | — | keep |
+
+### Fantasy Warrior (https://luizmelo.itch.io/fantasy-warrior): `public/sprites/elumlur/`, frames 162×162
+
+| File | What | Source | Licence | Status |
+| --- | --- | --- | --- | --- |
+| `public/sprites/elumlur/idle.png` | Standing, 10 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/run.png` | Running, 8 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/jump.png` | Rising, 3 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/fall.png` | Falling, 3 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/attack1.png` | Low slash with a cyan energy arc, 7 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/attack2.png` | Spinning energy slash, 7 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/attack3.png` | Overhead energy slash, 8 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/take-hit.png` | Recoil, 3 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/death.png` | Collapse, 7 frames | Fantasy Warrior | CC0 1.0 | keep |
+| `public/sprites/elumlur/license.txt` | The pack's licence note | Fantasy Warrior | — | keep |
+
+### Medieval King Pack 2 (https://luizmelo.itch.io/medieval-king-pack-2): `public/sprites/mav/`, frames 160×111
+
+| File | What | Source | Licence | Status |
+| --- | --- | --- | --- | --- |
+| `public/sprites/mav/idle.png` | Standing, 8 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/run.png` | Running, 8 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/jump.png` | Rising, 2 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/fall.png` | Falling, 2 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/attack1.png` | Overhead chop, 4 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/attack2.png` | Wide horizontal slash, 4 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/attack3.png` | Rising crescent slash, 4 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/take-hit.png` | Recoil, 4 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/take-hit-white-silhouette.png` | The same with a white flash frame, 4 frames (not used: the game makes its own hit flash) | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/death.png` | Collapse, 6 frames | Medieval King Pack 2 | CC0 1.0 | keep |
+| `public/sprites/mav/license.txt` | The pack's licence note | Medieval King Pack 2 | — | keep |
+
+### Huntress (https://luizmelo.itch.io/huntress): `public/sprites/reroe/`, frames 150×150
+
+| File | What | Source | Licence | Status |
+| --- | --- | --- | --- | --- |
+| `public/sprites/reroe/idle.png` | Standing with a spear, 8 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/run.png` | Running, 8 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/jump.png` | Rising, 2 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/fall.png` | Falling, 2 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/attack1.png` | Spear swing, 5 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/attack2.png` | Overhead spear sweep, 5 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/attack3.png` | Spear throw, 7 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/take-hit.png` | Recoil, 3 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/death.png` | Collapse, 8 frames | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/spear.png` | The thrown spear, 1 frame of 60×20 | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/spear-move.png` | The thrown spear in flight, 4 frames of 60×20 | Huntress | CC0 1.0 | keep |
+| `public/sprites/reroe/license.txt` | The pack's licence note | Huntress | — | keep |
+
+> The pack pages could not be opened from the container this was written
+> in (its network blocks itch.io). The licence above is the text of each
+> pack's own `license.txt`; the page addresses are the packs' names on
+> luizmelo.itch.io. **Robert: check each page once** and fix any address
+> that differs.
+
 ## Made for this project
 
 | File | What | Source | Licence | Status |
@@ -161,12 +242,12 @@ reported on 2026-10-20 (itch.io itself was blocked from the container).
 
 | Pack | Page | Licence as reported | Could supply |
 | --- | --- | --- | --- |
-| Martial Hero 3 | <https://luizmelo.itch.io/martial-hero-3> | CC0 1.0 | A third martial-arts fighter |
+| Martial Hero 3 | <https://luizmelo.itch.io/martial-hero-3> | CC0 1.0 | **Now used** (deka, above) |
 | Medieval Warrior Pack 2 | <https://luizmelo.itch.io/medieval-warrior-pack-2> | CC0 1.0 ("can be used freely and commercially") | A sword-and-shield fighter (has a block-like guard) |
 | Medieval Warrior Pack | <https://luizmelo.itch.io/medieval-warrior-pack> | Free; licence **not confirmed** by the search | |
-| Huntress (and Huntress 2) | <https://luizmelo.itch.io/huntress> | CC0 1.0 | A ranged/zoning character |
+| Huntress (and Huntress 2) | <https://luizmelo.itch.io/huntress> | CC0 1.0 | Huntress is **now used** (reroe, above) |
 | Evil Wizard (2 and 3) | <https://luizmelo.itch.io/evil-wizard> | CC0 1.0 | A boss-style or zoning character |
-| Fantasy Warrior | <https://luizmelo.itch.io/fantasy-warrior> | Free; licence **not confirmed** | |
+| Fantasy Warrior | <https://luizmelo.itch.io/fantasy-warrior> | CC0 (confirmed by the pack's license.txt) | **Now used** (elumlur, above) |
 | Fantasy Martial Characters (1–3) | <https://luizmelo.itch.io/fantasy-martial-characters> | CC0, but **paid** (minimum $5) | |
 
 None of them adds a block or crouch to Mack and Kenji themselves (each pack
