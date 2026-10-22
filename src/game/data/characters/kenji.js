@@ -39,7 +39,7 @@ function kunai(b) {
       box: [-12, -6, 24, 12],
       hits: 1,
       look: 'kunai',
-      hit: { damage: 50, chip: 8, hitstun: 18, blockstun: 14, hitstop: 8, guard: 'mid', push: 10 },
+      hit: { damage: 65, chip: 8, hitstun: 18, blockstun: 14, hitstop: 8, guard: 'mid', push: 10 },
     },
     description: 'Throws a kunai. Only one on screen at a time.',
   };

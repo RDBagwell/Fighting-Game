@@ -59,7 +59,7 @@ describe('rounds', () => {
     idle(s, cfg.koFrames + 30);
     expect(s.wins).toEqual([1, 0]);
     expect(s.round).toBe(2);
-    expect(s.fighters[1].health).toBe(1000);
+    expect(s.fighters[1].health).toBe(sim.characters.mack.stats.health);
     expect(s.fighters[0].meter).toBeGreaterThanOrEqual(300);
   });
 
@@ -117,7 +117,7 @@ describe('training mode', () => {
     expect(s.fighters[1].health).toBe(1);
     expect(s.phase).toBe('fight');
     idle(s, 200);
-    expect(s.fighters[1].health).toBe(1000);
+    expect(s.fighters[1].health).toBe(sim.characters.mack.stats.health);
     expect(s.timer).toBe(cfg.roundFrames);
   });
 
