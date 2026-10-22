@@ -35,8 +35,19 @@ const DIR_WORDS = /** @type {Record<string, string>} */ ({
 /**
  * One step of an input: a sequence of directions rolled through, a held
  * direction (charge), a jump, then a button.
- * @typedef {{ dirs: string[], hold?: { dir: string, frames: number }, jump?: boolean, crouch?: boolean, button: 'L'|'M'|'H'|'throw', backThrow?: boolean }} InputRecipe
+ * @typedef {{ dirs: string[], hold?: { dir: string, frames: number }, jump?: boolean, crouch?: boolean, button: 'L'|'M'|'H'|Chord, when?: string, backThrow?: boolean }} InputRecipe
+ * @typedef {'throw'|'parry'|'burst'} Chord
  */
+
+/** Buttons pressed together, each with its own key (bindings.js). */
+const CHORDS = /** @type {Record<Chord, { buttons: Array<'L'|'M'|'H'>, name: string }>} */ ({
+  throw: { buttons: ['L', 'M'], name: 'throw' },
+  parry: { buttons: ['M', 'H'], name: 'parry' },
+  burst: { buttons: ['L', 'M', 'H'], name: 'burst' },
+});
+
+/** @param {string} b @returns {b is Chord} */
+const isChord = (b) => b in CHORDS;
 
 /**
  * What the move needs, from its data.
@@ -46,6 +57,8 @@ const DIR_WORDS = /** @type {Record<string, string>} */ ({
  */
 export function recipe(mv, motions) {
   if (mv.kind === 'throw') return { dirs: [], button: 'throw' };
+  if (mv.kind === 'guardCancel') return { dirs: [], button: 'parry', when: 'while blocking' };
+  if (mv.kind === 'burst') return { dirs: [], button: 'burst', when: 'while being hit' };
   const button = /** @type {'L'|'M'|'H'} */ (mv.button ?? 'L');
   if (mv.motion) {
     const m = motions[mv.motion];
@@ -77,7 +90,7 @@ function dirKeys(dir, kb) {
 }
 
 /**
- * @param {'L'|'M'|'H'|'throw'|'SP'} action
+ * @param {'L'|'M'|'H'|'SP'|Chord} action
  * @param {KeyBinding} kb
  */
 function key(action, kb) {
@@ -85,7 +98,7 @@ function key(action, kb) {
 }
 
 /**
- * @param {'L'|'M'|'H'|'throw'|'SP'} action
+ * @param {'L'|'M'|'H'|'SP'|Chord} action
  * @param {PadBinding} pad
  */
 function padButton(action, pad) {
@@ -95,6 +108,7 @@ function padButton(action, pad) {
 
 /** @param {InputRecipe} r */
 export function arrowsText(r) {
+  if (isChord(r.button) && r.button !== 'throw') return `${CHORDS[r.button].buttons.join('+')}${r.when ? ` ${r.when}` : ''}`;
   const button = r.button === 'throw' ? 'L+M (throw)' : BUTTON_WORDS[r.button];
   if (r.hold) return `Hold ${ARROWS[r.hold.dir]}, then ${r.dirs.map((d) => ARROWS[d]).join(' ')} + ${button}`;
   if (r.jump) return `Jump, then ${button} in the air`;
@@ -104,6 +118,10 @@ export function arrowsText(r) {
 
 /** @param {InputRecipe} r */
 export function wordsText(r) {
+  if (isChord(r.button) && r.button !== 'throw') {
+    const names = CHORDS[r.button].buttons.map((b) => BUTTON_WORDS[b]);
+    return `${names.slice(0, -1).join(', ')} and ${names.at(-1)} together${r.when ? `, ${r.when}` : ''}`;
+  }
   const button = r.button === 'throw' ? 'Light and Medium together' : BUTTON_WORDS[r.button];
   if (r.hold) return `Hold ${DIR_WORDS[r.hold.dir]} for ${seconds(r.hold.frames)}, then ${r.dirs.map((d) => DIR_WORDS[d]).join(', ')} and ${button}`;
   if (r.jump) return `Jump, then ${button} in the air`;
@@ -118,7 +136,10 @@ export function wordsText(r) {
  * @param {KeyBinding} kb
  */
 export function keyboardText(r, kb) {
-  if (r.button === 'throw') return `${key('throw', kb)} (or ${key('L', kb)}+${key('M', kb)} together)`;
+  if (isChord(r.button)) {
+    const c = r.button;
+    return `${key(c, kb)} (or ${CHORDS[c].buttons.map((b) => key(b, kb)).join('+')} together)${r.when ? ` ${r.when}` : ''}`;
+  }
   const b = key(r.button, kb);
   if (r.hold) return `Hold ${dirKeys(r.hold.dir, kb)} for ${seconds(r.hold.frames)}, then ${r.dirs.map((d) => dirKeys(d, kb)).join(', ')} + ${b}`;
   if (r.jump) return `${dirKeys('8', kb)}, then ${b} in the air`;
@@ -133,7 +154,10 @@ export function keyboardText(r, kb) {
  * @param {PadBinding} pad
  */
 export function padText(r, pad) {
-  if (r.button === 'throw') return `${padButton('throw', pad)} (or ${padButton('L', pad)} + ${padButton('M', pad)})`;
+  if (isChord(r.button)) {
+    const c = r.button;
+    return `${padButton(c, pad)} (or ${CHORDS[c].buttons.map((b) => padButton(b, pad)).join(' + ')})${r.when ? ` ${r.when}` : ''}`;
+  }
   const b = padButton(r.button, pad);
   if (r.hold) return `Hold ${ARROWS[r.hold.dir]} for ${seconds(r.hold.frames)}, then ${r.dirs.map((d) => ARROWS[d]).join(' ')} + ${b}`;
   if (r.jump) return `↑, then ${b} in the air`;
@@ -195,12 +219,23 @@ export function keyLabels(controls) {
   return {
     /** @param {string} d */
     dir: (d) => `${ARROWS[d]} (${dirKeys(d, controls.kbA)} / d-pad ${ARROWS[d]})`,
-    /** @param {'L'|'M'|'H'|'throw'|'SP'} b */
-    button: (b) => `${b === 'throw' ? 'Throw' : b === 'SP' ? 'Special' : BUTTON_WORDS[b]} (${key(b, controls.kbA)} / ${padButton(b, controls.pad)})`,
+    /** @param {'L'|'M'|'H'|'SP'|Chord} b */
+    button: (b) => `${isChord(b) ? b[0].toUpperCase() + b.slice(1) : b === 'SP' ? 'Special' : BUTTON_WORDS[b]} (${key(b, controls.kbA)} / ${padButton(b, controls.pad)})`,
     /** @param {MoveData} mv @param {Record<string, import('../../engine/sim/types.js').MotionData>} motions */
     move: (mv, motions) => {
       const r = recipe(mv, motions);
       return `${arrowsText(r)}: on the keyboard ${keyboardText(r, controls.kbA)}; on a controller ${padText(r, controls.pad)}`;
     },
   };
+}
+
+/**
+ * The parry is a rule, not a move: how to do it, for the move list and
+ * the lessons.
+ * @param {{ kbA: KeyBinding, pad: PadBinding }} controls
+ */
+export function parryHowTo(controls) {
+  /** @type {InputRecipe} */
+  const r = { dirs: [], button: 'parry', when: 'just before a hit lands (hold down for lows)' };
+  return { arrows: arrowsText(r), words: wordsText(r), keyboard: keyboardText(r, controls.kbA), pad: padText(r, controls.pad), easy: null };
 }

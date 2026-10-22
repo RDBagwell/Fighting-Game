@@ -69,6 +69,30 @@ export class Effects {
         case 'clash':
           this.burst(x, y, 10, '#e7f0ff', 'line', 4);
           break;
+        case 'parry':
+          this.parts.push({ x, y, vx: 0, vy: 0, life: 14, max: 14, color: '#7fe8ff', kind: 'ring', size: 26 });
+          this.burst(x, y, 8, '#d9f8ff', 'line', 4);
+          this.text(x, y - 14, 'PARRY', '#9df0ff');
+          if (!this.reducedMotion) {
+            this.flash = 3;
+            this.flashColor = '#bff4ff';
+          }
+          break;
+        case 'guard-cancel':
+          this.parts.push({ x, y: y - 60, vx: 0, vy: 0, life: 16, max: 16, color: '#ffb46a', kind: 'ring', size: 40 });
+          this.text(x, y - 130, 'GUARD CANCEL', '#ffc98a');
+          break;
+        case 'burst':
+          this.parts.push({ x, y: y - 70, vx: 0, vy: 0, life: 22, max: 22, color: '#ffffff', kind: 'ring', size: 80 });
+          this.parts.push({ x, y: y - 70, vx: 0, vy: 0, life: 16, max: 16, color: '#ff8adf', kind: 'ring', size: 50 });
+          this.burst(x, y - 70, 16, '#ffd1f2', 'line', 6);
+          this.text(x, y - 140, 'BURST', '#ffb3ec');
+          if (!this.reducedMotion) {
+            this.flash = 5;
+            this.flashColor = '#ffe3f6';
+            this.shake = Math.max(this.shake, 4);
+          }
+          break;
         case 'knockdown':
         case 'land':
         case 'dash': {

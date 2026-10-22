@@ -53,7 +53,7 @@
  * @typedef {object} MoveData  Everything about one move. Frame numbers are 1-based:
  * frame 1 is the frame the move starts on. "startup 5" means the first hitbox is out on frame 5.
  * @property {string} name
- * @property {'normal'|'special'|'super'|'throw'} kind
+ * @property {'normal'|'special'|'super'|'throw'|'guardCancel'|'burst'} kind
  * @property {string} notation  How the move list writes the input: "5L", "236+M", "[4]6+H".
  * @property {'stand'|'crouch'|'air'} stance  Where it can be done (specials: stand covers crouch too).
  * @property {string} [button]  'L' | 'M' | 'H' (any of them: 'LMH').
@@ -137,7 +137,7 @@
  * @property {number} health
  * @property {number} meter
  * @property {string} state  stand | walkF | walkB | crouch | guard | jumpSquat | air | land | dashF | dashB |
- *   move | hitstun | blockstun | airHit | knockdown | wakeup | throwHold | thrown | recover | ko | win
+ *   move | hitstun | blockstun | airHit | knockdown | wakeup | throwHold | thrown | recover | parry | ko | win
  * @property {number} stateFrame  Frames spent in this state (1 on the first frame).
  * @property {number} stun  Frames left in hitstun, blockstun, knockdown, landing...
  * @property {string} move  Current move id ('' when not in a move).
@@ -164,6 +164,7 @@
  * @property {boolean} easy  The current move came from the easy-specials button.
  * @property {number} refill  Training: frames since the combo ended (health refills).
  * @property {boolean} throwBack  The throw in progress is a back throw.
+ * @property {boolean} burst  The burst is still available this round.
  */
 
 /**
@@ -183,7 +184,8 @@
 /**
  * @typedef {object} SimEvent  Things that happened this frame, for sound, effects and displays.
  * @property {string} type  round | fight | swing | hit | block | throw | tech | whiff-throw | ko | timeout |
- *   super | special | jump | land | dash | knockdown | projectile | clash | win | draw
+ *   super | special | jump | land | dash | knockdown | projectile | clash | win | draw |
+ *   parry | guard-cancel | burst
  * @property {number} side  Who did it (the attacker), or -1.
  * @property {number} [x]  Subpixels
  * @property {number} [y]

@@ -11,7 +11,7 @@
  * system never touches the state.
  */
 
-/** @typedef {'hit'|'block'|'swing'|'throw'|'tech'|'ko'|'super'|'round'|'fight'|'jump'|'land'|'dash'|'projectile'|'clash'|'menu'|'confirm'|'back'|'knockdown'|'special'} SoundName */
+/** @typedef {'hit'|'block'|'swing'|'throw'|'tech'|'ko'|'super'|'round'|'fight'|'jump'|'land'|'dash'|'projectile'|'clash'|'menu'|'confirm'|'back'|'knockdown'|'special'|'parry'|'guardCancel'|'burst'} SoundName */
 
 export class Sfx {
   constructor() {
@@ -136,6 +136,20 @@ export class Sfx {
       case 'tech':
         this.tone(1500, 1400, 0.05, 0.2, 'square');
         this.tone(1900, 1800, 0.06, 0.18, 'square', 0.06);
+        break;
+      case 'parry':
+        // A bright, ringing deflection: higher and cleaner than a block.
+        this.tone(2400, 2350, 0.35, 0.18, 'sine');
+        this.tone(3600, 3550, 0.25, 0.1, 'sine', 0.01);
+        this.hiss(0.05, 0.2, 'highpass', 5000);
+        break;
+      case 'guardCancel':
+        this.tone(300, 900, 0.15, 0.2, 'sawtooth');
+        this.hiss(0.15, 0.25, 'bandpass', 600, 2400, 2);
+        break;
+      case 'burst':
+        this.tone(90, 400, 0.35, 0.35, 'sawtooth');
+        this.hiss(0.45, 0.35, 'bandpass', 300, 4000, 1.5);
         break;
       case 'knockdown':
         this.tone(80, 35, 0.3, 0.6, 'sine');

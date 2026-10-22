@@ -111,7 +111,23 @@ export class Hud {
       const fill = Math.round((mW * f.meter) / 1000);
       ctx.fillStyle = full ? (Math.floor(s.frame / 6) % 2 ? '#7fe3ff' : '#c7f4ff') : '#3f8fd8';
       ctx.fillRect(side === 0 ? mx : mx + mW - fill, my, fill, 6);
+      // The halfway mark: a guard cancel costs half the meter.
+      ctx.fillStyle = f.meter >= 500 ? '#c7f4ff' : '#6b6380';
+      ctx.fillRect(mx + mW / 2 - 1, my - 2, 2, 10);
       outlined(ctx, full ? 'SUPER READY' : 'SUPER', side === 0 ? mx : mx + mW, my - 5, { size: 9, align: side === 0 ? 'left' : 'right', color: full ? '#c7f4ff' : '#9fb3cc' });
+
+      // Burst: a diamond beside the meter while it's still available this round.
+      const bx = side === 0 ? mx + mW + 14 : mx - 14;
+      const by = my + 2;
+      ctx.save();
+      ctx.translate(bx, by);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = '#140d1c';
+      ctx.fillRect(-6, -6, 12, 12);
+      ctx.fillStyle = f.burst ? '#ff8adf' : '#3a2836';
+      ctx.fillRect(-4, -4, 8, 8);
+      ctx.restore();
+      outlined(ctx, f.burst ? 'BURST' : '', bx, by - 9, { size: 7, align: 'center', color: '#ffb3ec' });
 
       // Combo counter, on the attacker's side.
       const defender = s.fighters[1 - side];

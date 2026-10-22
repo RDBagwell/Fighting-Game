@@ -205,10 +205,13 @@ export function formatAdvantage(value, tag = '') {
  * What a fighter is doing on this frame, for the frame meter.
  * @param {import('./types.js').FighterState} f
  * @param {import('./types.js').CharacterData} ch
- * @returns {'idle'|'startup'|'active'|'recovery'|'hitstun'|'blockstun'|'down'|'movement'|'throw'|'invuln'}
+ * @param {number} [parryWindow]  Frames a parry catches hits (config.parry.window).
+ * @returns {'idle'|'startup'|'active'|'recovery'|'hitstun'|'blockstun'|'down'|'movement'|'throw'|'invuln'|'parry'}
  */
-export function classifyFrame(f, ch) {
+export function classifyFrame(f, ch, parryWindow = 0) {
   switch (f.state) {
+    case 'parry':
+      return f.stateFrame <= parryWindow ? 'parry' : 'recovery';
     case 'move': {
       const mv = ch.moves[f.move];
       const t = f.moveFrame;

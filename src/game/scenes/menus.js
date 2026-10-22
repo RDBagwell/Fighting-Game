@@ -8,7 +8,7 @@ import { ACTIONS, ACTION_LABELS, PAD_BUTTON_NAMES, keyName, DEFAULT_KEYS, DEFAUL
 import { summarise, formatAdvantage } from '../../engine/sim/frameData.js';
 import { CREDITS } from '../data/credits.js';
 import { roster } from '../data/characters/index.js';
-import { howTo } from '../ui/howTo.js';
+import { howTo, parryHowTo } from '../ui/howTo.js';
 
 /**
  * Opens a modal over the current screen. Back (Escape, the gamepad's B,
@@ -67,21 +67,23 @@ export function openMoveList(app, first = roster[0]) {
       ['Throw', 'throw'],
       ['Specials', 'special'],
       ['Super (full meter)', 'super'],
+      ['Universal: parry, guard cancel (half the meter) and burst (once a round)', 'guardCancel', 'burst'],
     ];
-    const rows = (/** @type {string} */ kind) =>
+    /** @param {ReturnType<typeof howTo>} how @param {string} notation */
+    const howCell = (how, notation) => h('td', { class: 'how' },
+      h('div', { class: 'how-arrows' }, how.arrows),
+      h('div', {}, h('span', { class: 'how-label' }, 'Keys '), how.keyboard),
+      h('div', {}, h('span', { class: 'how-label' }, 'Pad '), how.pad),
+      how.easy ? h('div', { class: 'how-easy' }, h('span', { class: 'how-label' }, 'Easy '), `${how.easy.keyboard} · ${how.easy.pad} (80% damage)`) : null,
+      h('div', { class: 'notation', title: 'Numpad notation, as fighting-game players write it' }, notation));
+    const rows = (/** @type {string[]} */ kinds) =>
       Object.entries(ch.moves)
-        .filter(([, m]) => m.kind === kind)
+        .filter(([, m]) => kinds.includes(m.kind))
         .map(([, m]) => {
           const d = summarise(m, sim.config);
           const air = m.stance === 'air';
-          const how = howTo(m, sim.motions, app.settings.controls);
           return h('tr', {},
-            h('td', { class: 'how' },
-              h('div', { class: 'how-arrows' }, how.arrows),
-              h('div', {}, h('span', { class: 'how-label' }, 'Keys '), how.keyboard),
-              h('div', {}, h('span', { class: 'how-label' }, 'Pad '), how.pad),
-              how.easy ? h('div', { class: 'how-easy' }, h('span', { class: 'how-label' }, 'Easy '), `${how.easy.keyboard} · ${how.easy.pad} (80% damage)`) : null,
-              h('div', { class: 'notation', title: 'Numpad notation, as fighting-game players write it' }, m.notation)),
+            howCell(howTo(m, sim.motions, app.settings.controls), m.notation),
             h('td', {}, h('strong', {}, m.name), h('div', { class: 'desc' }, m.description ?? '')),
             h('td', { class: 'num' }, String(d.startup)),
             h('td', { class: 'num' }, m.projectile && !m.hits ? '—' : String(d.active)),
@@ -91,6 +93,19 @@ export function openMoveList(app, first = roster[0]) {
             h('td', { class: 'num' }, String(d.damage)),
             h('td', {}, d.guard));
         });
+    // The parry is a rule rather than a move: its own row, from the config.
+    const pc = sim.config.parry;
+    const parryRow = h('tr', {},
+      howCell(parryHowTo(app.settings.controls), 'MH'),
+      h('td', {}, h('strong', {}, 'Parry'), h('div', { class: 'desc' },
+        `Catches a strike or projectile in its first ${pc.window} frames: standing for highs and mids, crouching for lows and mids. The hit does nothing and you act first, while they finish their move. Miss, and you are stuck for ${pc.recovery} more frames. Throws beat it.`)),
+      h('td', { class: 'num' }, '1'),
+      h('td', { class: 'num' }, String(pc.window)),
+      h('td', { class: 'num' }, String(pc.recovery)),
+      h('td', { class: 'num' }, '—'),
+      h('td', { class: 'num' }, '—'),
+      h('td', { class: 'num' }, '—'),
+      h('td', {}, '—'));
     panel.replaceChildren(
       h('p', { class: 'char-blurb' }, h('strong', {}, `${ch.name}, ${ch.title}. `), `${ch.style}. ${ch.blurb}`),
       h('p', { class: 'fine' }, 'How to read the inputs: they are written for facing right, so → means toward your opponent. When you face left, swap left and right. ',
@@ -98,11 +113,11 @@ export function openMoveList(app, first = roster[0]) {
         '"Keys" are your Player 1 keyboard keys and "Pad" your controller buttons, as set in Settings. ',
         '"Easy" is the Special-button shortcut: the same move without the motion, at 80% damage (on touch screens, the Special button). ',
         'The small code under each (like 236M) is numpad notation, the way fighting-game players write inputs.'),
-      ...groups.map(([title, kind]) => h('section', {},
+      ...groups.map(([title, ...kinds]) => h('section', {},
         h('h3', {}, title),
         h('table', {},
           h('thead', {}, h('tr', {}, ...['How to do it', 'Move', 'Startup', 'Active', 'Recovery', 'On hit', 'On block', 'Damage', 'Guard'].map((t) => h('th', { scope: 'col' }, t)))),
-          h('tbody', {}, ...rows(kind))))),
+          h('tbody', {}, ...(kinds.includes('guardCancel') ? [parryRow] : []), ...rows(kinds))))),
       h('p', { class: 'fine' }, 'Frame data is computed from the move data; tests measure every grounded move in the simulation and check it matches. Air moves’ advantage depends on how high they hit. "KD" = knocks down; the number includes the opponent getting up.'),
     );
   };
@@ -197,7 +212,7 @@ export function openSettings(app, onClose) {
       toggle('Mute', s.muted, (v) => (s.muted = v))),
     h('section', {}, h('h3', {}, 'Accessibility'),
       toggle('Reduced motion', s.reducedMotion, (v) => (s.reducedMotion = v), 'No screen shake, flashes or drifting petals.'),
-      toggle('Captions for sounds', s.captions, (v) => (s.captions = v), 'Text for the sounds that matter: round start, K.O., throws and escapes, supers, fireballs, clashes, knockdowns.')),
+      toggle('Captions for sounds', s.captions, (v) => (s.captions = v), 'Text for the sounds that matter: round start, K.O., throws and escapes, supers, fireballs, clashes, knockdowns, parries, guard cancels and bursts.')),
     h('section', {}, h('h3', {}, 'Touch'),
       choice('Touch controls', [['auto', 'Automatic (touch screens)'], ['on', 'Always on'], ['off', 'Off']], s.touch, (v) => (s.touch = /** @type {'auto'} */ (v))),
       toggle('Easy specials', s.easySpecials, (v) => (s.easySpecials = v), 'A Special button: specials without the motions (80% damage).')),
@@ -228,11 +243,16 @@ export function openHowToPlay(app) {
         h('tr', {}, h('td', {}, 'Move, jump, crouch'), h('td', {}, `${keys('up')} ${keys('left')} ${keys('down')} ${keys('right')}`), h('td', {}, 'D-pad / left stick'), h('td', {}, 'Left thumb')),
         h('tr', {}, h('td', {}, 'Light / Medium / Heavy'), h('td', {}, `${keys('L')} / ${keys('M')} / ${keys('H')}`), h('td', {}, 'X / Y / B'), h('td', {}, 'L / M / H')),
         h('tr', {}, h('td', {}, 'Throw (L+M)'), h('td', {}, keys('throw')), h('td', {}, 'A'), h('td', {}, 'Throw')),
+        h('tr', {}, h('td', {}, 'Parry / guard cancel (M+H)'), h('td', {}, keys('parry')), h('td', {}, 'LB'), h('td', {}, 'Parry')),
+        h('tr', {}, h('td', {}, 'Burst (L+M+H)'), h('td', {}, keys('burst')), h('td', {}, 'RT'), h('td', {}, 'Burst')),
         h('tr', {}, h('td', {}, 'Easy special'), h('td', {}, keys('SP')), h('td', {}, 'RB'), h('td', {}, 'Special')),
         h('tr', {}, h('td', {}, 'Pause'), h('td', {}, 'Esc'), h('td', {}, 'Menu / Options'), h('td', {}, 'II')))),
     h('ul', {},
       h('li', {}, 'Block by holding back (away from the opponent). Hold down-back to block lows; stand to block overheads and jump-ins.'),
       h('li', {}, 'Dash: tap forward twice. Throw: L+M close up; press L+M as you get grabbed to escape.'),
+      h('li', {}, 'Parry: press M+H just before a hit lands (hold down for lows). It does nothing to you, and you can act first. Miss it and you are open for a moment; throws beat it.'),
+      h('li', {}, 'Guard cancel: press M+H while blocking to strike back out of the block. Costs half your meter.'),
+      h('li', {}, 'Burst: press L+M+H while being hit to break out of a combo, once a round. It can be blocked.'),
       h('li', {}, 'Specials are a direction motion, then a button. ↓ ↘ → + button: roll from down to forward (facing right: S, S+D, D on the keyboard), pressing the button at the end. → ↓ ↘ + button: forward, down, down-forward. Hold ← then → + button: hold back for about ⅔ of a second, then forward. Super, with a full meter: ↓ ↘ → twice, then Heavy. The move list shows the exact keys and buttons for each move, and the Easy shortcut (Special + a direction) for doing them without the motion.'),
       h('li', {}, 'Training mode shows hitboxes, frame data, a frame meter and your inputs: the best way to see how it all works.')));
   return openModal(app, 'How to play', body, undefined, 'wide');

@@ -147,6 +147,8 @@ Choose **Training → Free training**, walk up to the dummy and attack it. Then:
   - stand, crouch or jump;
   - block nothing, everything, or everything after the first hit;
   - escape throws;
+  - parry every hit, guard-cancel out of blocks, or burst on the second
+    hit of a combo;
   - **record and play back** whatever you make it do (O to record, Y to
     replay).
 
@@ -168,12 +170,22 @@ diagrams.
 | Move, jump, crouch | W A S D | Arrow keys | D-pad / left stick | Left thumb (the stick appears where you touch) |
 | Light / Medium / Heavy | J / K / L | Num 1 / 2 / 3 (or , . /) | X / Y / B | L / M / H |
 | Throw (L+M) | U | Num 4 (or ;) | A | Throw |
+| Parry / guard cancel (M+H) | H | Num 6 (or M) | LB | Parry |
+| Burst (L+M+H) | E | Num 0 (or \\) | RT | Burst |
 | Easy special | I | Num 5 (or ') | RB | Special |
 | Pause | Esc | Esc | Menu / Options | II |
 
 - **Blocking.** Hold back to block. Hold down-back to block lows; stand to
   block overheads and jump-ins.
 - **Moving.** Tap forward twice to dash.
+- **Parry** (M+H) just before a hit lands: standing for highs and mids,
+  crouching for lows. The hit does nothing and you act first. Mistime it
+  and you're open; throws beat it.
+- **Guard cancel** (M+H while blocking) strikes back out of a block for
+  half your meter. **Burst** (L+M+H while being hit) breaks a combo, once
+  a round, but it can be blocked. The tutorial has a lesson on all three,
+  and [docs/FRAME-DATA.md](docs/FRAME-DATA.md#parry-guard-cancel-and-burst)
+  has the numbers.
 - **Specials** are in the move list (title screen or pause menu). Each
   move says exactly what to press on your keyboard and on a controller,
   using your own key settings: for example, Shippū is "S, S+D, D, then K"

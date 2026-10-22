@@ -168,6 +168,7 @@ export class FightRenderer {
     let source;
     if (choice.tint === 'flash') source = sheet.variant('flash', '#ffffff', 0.55);
     else if (choice.tint === 'guard') source = sheet.variant('guard', '#5aa8ff', 0.35);
+    else if (choice.tint === 'parry') source = sheet.variant('parry', '#7fe8ff', 0.5);
     drawFrame(ctx, sheet, choice.frame, x + jitter, y, {
       anchor: anchorFor(ch.sprites, choice.sheet, choice.frame),
       scale: ch.sprites.scale,

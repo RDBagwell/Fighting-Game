@@ -9,7 +9,7 @@ import { LESSONS } from '../src/game/data/lessons.js';
 import { LessonRunner } from '../src/game/training/LessonRunner.js';
 import { Dummy } from '../src/game/training/Dummy.js';
 import { parseScript, scriptBits } from '../src/engine/input/script.js';
-import { fromNumpad, L, M } from '../src/engine/input/bits.js';
+import { fromNumpad, L, M, H } from '../src/engine/input/bits.js';
 import { keyLabels, howTo } from '../src/game/ui/howTo.js';
 import { DEFAULT_KEYS, DEFAULT_PAD } from '../src/engine/input/bindings.js';
 
@@ -48,6 +48,28 @@ const perfectBlocker = () => {
   return (/** @type {any} */ s) => d.think(s, 0);
 };
 
+/**
+ * Player 1 parries (the training dummy's own logic, on side 0), and can
+ * punish after, guard-cancel out of blocks, or burst when hit.
+ * @param {{ punish?: boolean, guardCancel?: boolean, burst?: boolean }} o
+ */
+const defender = (o) => {
+  const d = new Dummy(sim, 0);
+  d.parry = !o.guardCancel && !o.burst;
+  d.block = o.guardCancel ? 'all' : 'none';
+  d.guardCancel = !!o.guardCancel;
+  let parried = -1;
+  return (/** @type {any} */ s) => {
+    if (s.events.some((e) => e.type === 'parry' && e.side === 0)) parried = s.frame;
+    if (o.punish && parried > 0 && s.freeze === 0 && sim.isNeutral(s.fighters[0])) {
+      parried = -1;
+      return fromNumpad(5, s.fighters[0].facing, L);
+    }
+    if (o.burst) return (s.fighters[0].state === 'hitstun' && s.freeze === 0) ? L | M | H : 0;
+    return d.think(s, 0);
+  };
+};
+
 /** Player 1 escapes every throw. */
 const techer = (/** @type {any} */ s) => (s.fighters[0].state === 'thrown' ? L | M : 0);
 
@@ -60,6 +82,7 @@ describe('tutorial lessons', () => {
       if (st.demo) p1 = scripted(st.demo);
       else if (l.id === 'high-low') p1 = perfectBlocker();
       else if (l.id === 'throws') p1 = techer;
+      else if (l.id === 'defence') p1 = defender([{}, {}, { punish: true }, { guardCancel: true }, { burst: true }][si]);
       else throw new Error('no way to play this step in the test');
       expect(playStep(li, si, p1, 60 * 20).passed).toBe(true);
     });

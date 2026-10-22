@@ -7,7 +7,7 @@
  * Units as in mack.js: boxes in pixels relative to the feet, facing right.
  */
 import { px } from '../../../engine/sim/fixed.js';
-import { hit, deepFreeze, strike, frames } from './build.js';
+import { hit, deepFreeze, strike, frames, guardCancel, burst } from './build.js';
 
 /** @typedef {import('../../../engine/sim/types.js').MoveData} MoveData */
 
@@ -150,6 +150,7 @@ export const elumlur = deepFreeze(/** @type {CharacterData} */ ({
     throwHold: { sheet: 'attack1', len: 1, frame: 1 },
     thrown: { sheet: 'take-hit', len: 1, frame: 1 },
     recover: { sheet: 'idle', len: 1, frame: 0 },
+    parry: { sheet: 'attack1', len: 1, frame: 0 },
     win: { sheet: 'idle', len: 9 },
   },
   moves: {
@@ -266,5 +267,9 @@ export const elumlur = deepFreeze(/** @type {CharacterData} */ ({
       ],
       description: 'Lightning arcs all around him: four hits, invincible as it starts, and it catches jumps too. Costs the full meter.',
     },
+
+    // ── Universal (the same frames for everyone, config.js) ─────────
+    GC: guardCancel({ windup: frames('attack2', 0, 1), impact: frames('attack2', 2, 3), recover: frames('attack2', 4, 6) }, [0, -112, 100, 92], 'A storm slash out of a block. Costs half the meter.'),
+    burst: burst({ windup: [['take-hit', 0], ['attack3', 1]], impact: frames('attack3', 3, 5), recover: frames('attack3', 6, 7) }),
   },
 }));

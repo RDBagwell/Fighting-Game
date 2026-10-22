@@ -13,8 +13,12 @@
  * - **Inputs take time.** A special is typed as its motion over several
  *   frames; a block is held for a while.
  * - **Probabilities by difficulty**: how often it blocks, anti-airs,
- *   punishes, finishes combos, and how often it just makes a mistake
- *   (a random jump, a whiffed button, a dropped input).
+ *   punishes, finishes combos, parries, guard-cancels and bursts, and how
+ *   often it just makes a mistake (a random jump, a whiffed button, a
+ *   dropped input).
+ * - **Parries are reads.** It only parries a hit it saw coming in time
+ *   (after its reaction delay), and more often when you keep repeating
+ *   the same move.
  *
  * It has its own seeded random generator, separate from the simulation's,
  * so a CPU match is reproducible from its seed but the simulation's own
@@ -37,13 +41,16 @@ import { PROFILES } from './profiles.js';
  * @property {number} aggression  How often it attacks rather than waits in neutral.
  * @property {number} tech  Chance to escape a throw.
  * @property {number} think  Frames between neutral decisions.
+ * @property {number} parry  Chance to parry a hit it sees coming in time.
+ * @property {number} guardCancel  Chance, each time it starts blocking with half a meter, to guard-cancel.
+ * @property {number} burst  Chance, once a combo reaches 2 hits, to burst.
  */
 
 /** @type {Record<'easy'|'normal'|'hard', Difficulty>} */
 export const DIFFICULTIES = {
-  easy: { name: 'Easy', reaction: 26, block: 0.2, antiAir: 0.12, punish: 0, combo: 0.15, mistake: 0.25, aggression: 0.35, tech: 0.05, think: 22 },
-  normal: { name: 'Normal', reaction: 17, block: 0.5, antiAir: 0.45, punish: 0.35, combo: 0.55, mistake: 0.1, aggression: 0.5, tech: 0.25, think: 14 },
-  hard: { name: 'Hard', reaction: 11, block: 0.82, antiAir: 0.75, punish: 0.85, combo: 0.9, mistake: 0.03, aggression: 0.6, tech: 0.5, think: 8 },
+  easy: { name: 'Easy', reaction: 26, block: 0.2, antiAir: 0.12, punish: 0, combo: 0.15, mistake: 0.25, aggression: 0.35, tech: 0.05, think: 22, parry: 0, guardCancel: 0, burst: 0.05 },
+  normal: { name: 'Normal', reaction: 17, block: 0.5, antiAir: 0.45, punish: 0.35, combo: 0.55, mistake: 0.1, aggression: 0.5, tech: 0.25, think: 14, parry: 0.08, guardCancel: 0.1, burst: 0.15 },
+  hard: { name: 'Hard', reaction: 11, block: 0.82, antiAir: 0.75, punish: 0.85, combo: 0.9, mistake: 0.03, aggression: 0.6, tech: 0.5, think: 8, parry: 0.2, guardCancel: 0.25, burst: 0.3 },
 };
 
 /**
@@ -80,6 +87,13 @@ export class Cpu {
     this.wait = 0;
     this.lastCancelFrame = -1;
     this.techTried = false;
+    /** The opponent's last few moves (repeats make it parry more). */
+    this.oppMoves = /** @type {string[]} */ ([]);
+    /** The move (and frame it was seen starting) it already decided whether to parry. */
+    this.parryDecided = '';
+    this.defenceDecided = '';
+    /** Already decided whether to burst out of the current combo. */
+    this.burstDecided = false;
   }
 
   random() {
@@ -148,6 +162,10 @@ export class Cpu {
     const view = this.seen[Math.max(0, this.seen.length - 1 - this.level.reaction)];
     const dist = Math.abs(view.x - me.x / SUB);
     const profile = PROFILES[me.char];
+    if (view.state === 'move' && view.moveFrame === 1) {
+      this.oppMoves.push(view.move);
+      if (this.oppMoves.length > 4) this.oppMoves.shift();
+    }
 
     // Thrown: maybe escape (a guess more than a reaction, like a person).
     if (me.state === 'thrown') {
@@ -176,6 +194,20 @@ export class Cpu {
 
     if (this.plan.length) return this.output(me);
     if (state.freeze > 0) return 0;
+
+    // Being hit or blocking: maybe burst out, or guard-cancel (decided once each time).
+    const cfg = this.sim.config;
+    if (me.combo === 0) this.burstDecided = false;
+    if ((me.state === 'hitstun' || me.state === 'airHit') && me.burst && me.combo >= 2 && !this.burstDecided) {
+      this.burstDecided = true;
+      if (this.roll(this.level.burst)) return this.act(me, '5+LMH');
+    } else if (me.state === 'blockstun' && me.stateFrame <= 2 && me.meter >= cfg.guardCancel.cost) {
+      const key = `gc:${state.frame - me.stateFrame}`;
+      if (this.defenceDecided !== key) {
+        this.defenceDecided = key;
+        if (this.roll(this.level.guardCancel)) return this.act(me, '4+MH');
+      }
+    }
     if (!this.sim.isNeutral(me) && me.state !== 'blockstun') return this.output(me);
     if (this.wait > 0) {
       this.wait--;
@@ -191,6 +223,17 @@ export class Cpu {
     if (airborne && dist < 210 && approaching) {
       if (this.roll(this.level.antiAir)) return this.act(me, profile.antiAir);
       if (this.roll(this.level.block)) return this.act(me, '4*16');
+    }
+    if (oppMove && oppMove.kind !== 'throw' && this.sim.isNeutral(me)) {
+      // Parry: only a hit it can see coming in time, decided once per move.
+      const next = (oppMove.hits ?? []).find((h) => h.frames[0] > view.moveFrame);
+      const ahead = next ? next.frames[0] - view.moveFrame - this.level.reaction : -1;
+      const key = `${view.move}:${state.frame - view.moveFrame - this.level.reaction}:${next?.frames[0]}`;
+      if (next && next.guard !== 'unblockable' && ahead >= 0 && ahead < cfg.parry.window - 1 && this.parryDecided !== key) {
+        this.parryDecided = key;
+        const repeats = this.oppMoves.filter((m) => m === view.move).length;
+        if (this.roll(this.level.parry * (repeats >= 2 ? 2 : 1))) return this.act(me, next.guard === 'low' ? '2+MH' : '5+MH');
+      }
     }
     if (oppMove && oppMove.kind !== 'throw') {
       const range = activeRange(oppMove);

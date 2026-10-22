@@ -13,7 +13,7 @@
  * @property {string} sheet
  * @property {number} frame
  * @property {number} squash  Vertical scale (crouching stand-ins)
- * @property {'flash'|'guard'|''} tint
+ * @property {'flash'|'guard'|'parry'|''} tint
  */
 
 const CROUCH_SQUASH = 0.72;
@@ -67,6 +67,10 @@ export function chooseSprite(f, ch) {
       break;
     case 'guard':
       out.tint = 'guard';
+      break;
+    case 'parry':
+      out.tint = 'parry';
+      if (f.crouching) out.squash = CROUCH_SQUASH;
       break;
     case 'blockstun':
       out.tint = 'guard';

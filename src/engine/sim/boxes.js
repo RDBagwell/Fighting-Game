@@ -66,7 +66,7 @@ export function stanceOf(f, ch) {
   if (f.state === 'knockdown' || f.state === 'wakeup' || (f.state === 'ko' && f.y === 0)) return 'down';
   if (f.y < 0 || f.state === 'air' || f.state === 'airHit') return 'air';
   if (f.state === 'crouch') return 'crouch';
-  if (f.state === 'blockstun' || f.state === 'hitstun') return f.crouching ? 'crouch' : 'stand';
+  if (f.state === 'blockstun' || f.state === 'hitstun' || f.state === 'parry') return f.crouching ? 'crouch' : 'stand';
   if (f.state === 'move') {
     const move = ch.moves[f.move];
     if (move && move.stance === 'crouch') return 'crouch';

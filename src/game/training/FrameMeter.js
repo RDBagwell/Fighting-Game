@@ -32,6 +32,7 @@ export const FRAME_STYLE = /** @type {Record<FrameKind, { color: string, label: 
   movement: { color: '#7e8aa3', label: 'Moving / jumping', mark: '' },
   throw: { color: '#c86bd8', label: 'Throw', mark: 't' },
   invuln: { color: '#ffffff', label: 'Invincible', mark: 'i' },
+  parry: { color: '#7fe8ff', label: 'Parrying', mark: 'p' },
 });
 
 const LENGTH = 88;
@@ -76,7 +77,7 @@ export class FrameMeter {
     }
     if (frozen) return;
 
-    const kinds = /** @type {[FrameKind, FrameKind]} */ (s.fighters.map((f) => classifyFrame(f, this.sim.characters[f.char])));
+    const kinds = /** @type {[FrameKind, FrameKind]} */ (s.fighters.map((f) => classifyFrame(f, this.sim.characters[f.char], this.sim.config.parry.window)));
     const idle = kinds[0] === 'idle' && kinds[1] === 'idle';
     if (idle) this.quiet++;
     else {

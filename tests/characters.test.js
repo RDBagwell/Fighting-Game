@@ -81,7 +81,9 @@ describe.each(Object.entries(sim.characters))('%s', (id, ch) => {
       expect(h.boxes.length).toBeGreaterThan(0);
       for (const b of h.boxes) expect(isBox(b)).toBe(true);
       expect(['mid', 'high', 'low', 'unblockable']).toContain(h.guard);
-      expect(h.damage).toBeGreaterThan(0);
+      // A burst knocks the attacker away without damage.
+      if (mv.kind === 'burst') expect(h.damage).toBe(0);
+      else expect(h.damage).toBeGreaterThan(0);
       expect(h.hitstop).toBeGreaterThan(0);
     }
     for (const e of mv.hurt ?? []) {
@@ -112,6 +114,9 @@ describe.each(Object.entries(sim.characters))('%s', (id, ch) => {
     expect(moves.some((m) => m.kind === 'throw')).toBe(true);
     expect(moves.some((m) => m.stance !== 'air' && m.hits?.some((h) => h.guard === 'high'))).toBe(true);
     expect(moves.some((m) => m.hits?.some((h) => h.guard === 'low'))).toBe(true);
+    expect(moves.filter((m) => m.kind === 'guardCancel').length, 'one guard cancel').toBe(1);
+    expect(moves.filter((m) => m.kind === 'burst').length, 'one burst').toBe(1);
+    expect(ch.anims.parry, 'a parry pose').toBeDefined();
   });
 
   it('each easy-specials input does exactly one move', () => {
