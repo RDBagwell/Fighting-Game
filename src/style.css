@@ -183,7 +183,7 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
   text-align: left;
 }
 .modal.wide .modal-card { max-width: 60em; }
-.modal-head { display: flex; justify-content: space-between; align-items: center; position: sticky; top: -0.8em; background: var(--panel); padding: 0.3em 0; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; position: sticky; top: -0.8em; z-index: 1; background: rgb(24, 16, 34); padding: 0.3em 0; margin: 0 -1em; padding-left: 1em; padding-right: 1em; }
 .modal-head h2 { margin: 0; font-size: 1.5em; }
 .modal h3 { margin: 0.6em 0 0.3em; color: var(--accent); font-size: 1.05em; }
 .settings, .training-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.4em; }
@@ -206,7 +206,11 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
 .movelist th, .movelist td { border-bottom: 1px solid var(--line); padding: 0.25em 0.35em; text-align: left; vertical-align: top; }
 .movelist th { color: var(--muted); font-weight: 600; }
 .movelist .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.movelist .notation { font-family: ui-monospace, monospace; white-space: nowrap; color: var(--accent-2); }
+.movelist .notation { font-family: ui-monospace, monospace; white-space: nowrap; color: var(--muted); font-size: 0.85em; }
+.movelist .how { min-width: 15em; }
+.movelist .how-arrows { font-weight: 800; font-size: 1.1em; color: var(--accent-2); white-space: nowrap; }
+.movelist .how-label { color: var(--muted); font-size: 0.85em; }
+.movelist .how-easy { color: var(--muted); }
 .movelist .desc { color: var(--muted); font-size: 0.9em; }
 
 /* Training */
@@ -424,4 +428,47 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
   background: rgba(8, 5, 12, 0.85);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+/* Training: the chooser, the tutorial and the combo trials. */
+.learn .menu { min-width: 0; width: min(100%, 30em); }
+.learn .menu .btn { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 0.1em; }
+.learn .menu .btn[data-back] { align-items: center; }
+.learn .menu .btn small { color: var(--muted); font-size: 0.78em; font-weight: 400; }
+.learn .learn-list { max-height: 58vh; overflow: auto; }
+.learn-intro { max-width: 32em; text-align: center; }
+
+.coach {
+  position: absolute;
+  right: 0.6em;
+  top: 5em;
+  width: min(22em, 40%);
+  max-height: calc(100% - 9.5em);
+  overflow: auto;
+  background: rgba(18, 12, 26, 0.92);
+  border: 1px solid var(--line);
+  padding: 0.6em 0.8em;
+  font-size: 0.82em;
+  text-align: left;
+  z-index: 3;
+}
+.coach h2 { margin: 0 0 0.3em; font-size: 1.25em; }
+.coach-kicker { margin: 0; color: var(--muted); font-size: 0.85em; }
+.coach-steps { list-style: none; margin: 0.3em 0; padding: 0; display: grid; gap: 0.35em; }
+.coach-steps li { padding: 0.3em 0.4em; border-left: 3px solid transparent; }
+.coach-steps li.next { border-left-color: var(--accent-2); background: rgba(255, 255, 255, 0.05); }
+.coach-steps li.done { opacity: 0.75; }
+.coach-step-head { display: flex; gap: 0.4em; align-items: baseline; flex-wrap: wrap; }
+.coach-tick { display: inline-grid; place-items: center; min-width: 1.4em; height: 1.4em; border-radius: 50%; border: 1px solid var(--line); font-size: 0.8em; font-weight: 800; }
+.coach-steps li.done .coach-tick { background: #3fbf7f; border-color: #3fbf7f; color: #0b0710; }
+.coach-arrows { color: var(--accent-2); font-weight: 800; }
+.coach-how, .coach-note { font-size: 0.9em; padding-left: 1.8em; }
+.coach-note { color: #ffe08a; }
+.coach-text { margin: 0.3em 0 0; }
+.coach-count { color: var(--accent-2); font-weight: 800; }
+.coach-tip { color: var(--muted); margin: 0.4em 0; }
+.coach-status { min-height: 1.3em; margin: 0.3em 0; font-weight: 700; color: #c7f4ff; }
+.coach-buttons { display: flex; gap: 0.3em; flex-wrap: wrap; }
+@media (max-width: 700px), (max-height: 420px) {
+  .coach { top: 3.6em; width: 46%; font-size: 0.7em; max-height: calc(100% - 7em); }
 }

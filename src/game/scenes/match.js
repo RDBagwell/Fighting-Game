@@ -15,6 +15,7 @@ import { ResultsScene } from './results.js';
 import { TitleScene } from './title.js';
 import { SelectScene } from './select.js';
 import { saveReplay, makeReplay } from '../replay/replays.js';
+import { LearnScene } from './learn.js';
 
 /** Frames after the match is decided before the results screen. */
 const RESULTS_DELAY = 150;
@@ -155,7 +156,9 @@ export class MatchScene {
         h('button', { class: 'btn', onclick: () => openMoveList(app, this.config.chars[0]) }, 'Move list'),
         h('button', { class: 'btn', onclick: () => openSettings(app) }, 'Settings'),
         h('button', { class: 'btn', onclick: () => { this.resume(); app.setScene(new MatchScene(app, this.config)); } }, this.training ? 'Restart training' : 'Restart match'),
-        h('button', { class: 'btn', onclick: () => quit('select') }, 'Character select'),
+        this.config.trial || this.config.lesson
+          ? h('button', { class: 'btn', onclick: () => app.setScene(new LearnScene(app, this.config.trial ? 'trials' : 'lessons', this.config.trial?.char)) }, this.config.trial ? 'Back to combo trials' : 'Back to the tutorial')
+          : h('button', { class: 'btn', onclick: () => quit('select') }, 'Character select'),
         h('button', { class: 'btn', onclick: () => quit('title') }, 'Quit to title')));
     app.ui.append(this.pauseMenu);
     focusFirst(this.pauseMenu);

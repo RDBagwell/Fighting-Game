@@ -39,7 +39,8 @@ for (const size of SIZES) {
 
     test(`training mode with hitboxes and the frame meter (${size.name}) @screenshots`, async ({ page }) => {
       await openGame(page);
-      await page.getByRole('button', { name: 'Training mode' }).click();
+      await page.getByRole('button', { name: 'Training', exact: true }).click();
+      await page.getByRole('button', { name: /Free training/ }).click();
       await page.getByRole('button', { name: 'Start training' }).click();
       await waitForScene(page, 'match');
       await page.keyboard.down('KeyD');

@@ -97,9 +97,43 @@ recorded with a different version of the game is refused.
 
 ![The replay viewer, paused on a hit with hitboxes, the frame meter and both players' inputs](docs/media/replay.png)
 
+## Learn to play: the tutorial and combo trials
+
+**Title → Training** has three ways in:
+
+- **Tutorial:** eight short lessons against the dummy. They cover moving,
+  attacks, blocking, high and low, throws and escapes, special moves,
+  cancels and the super.
+  - Each step says what to do in your own keys and controller buttons.
+  - The dummy plays its part: it attacks so you can block, and it tries
+    to throw you so you can escape.
+  - The game checks you did it, then moves on.
+- **Combo trials:** six combos per character, easiest first.
+  - Each step shows how to do it on the keyboard and a controller, and
+    ticks off as it lands.
+  - **Demonstrate** plays the combo for you, so you can see the rhythm.
+  - A dropped combo tells you which step was too slow.
+- **Free training:** everything below.
+
+Progress (✓) is kept in this browser.
+
+Every trial is proven possible by a test:
+[`tests/trials.test.js`](tests/trials.test.js) plays each trial's
+demonstration through the real simulation, from either side and against
+either character. Every tutorial step is tested too: it passes when you do
+what it says, and doesn't pass when you do nothing
+([`tests/lessons.test.js`](tests/lessons.test.js)). The lessons and trials
+are data ([`lessons.js`](src/game/data/lessons.js),
+[`trials.js`](src/game/data/trials.js)).
+
+| | |
+| --- | --- |
+| ![A combo trial: each step with how to do it on the keyboard and a controller](docs/media/trial.png) | ![A tutorial lesson: block three lows, with the keys to hold](docs/media/lesson.png) |
+| A combo trial: each step with its keys and buttons | A tutorial lesson: the dummy attacks low, you block |
+
 ## The training mode
 
-Choose **Training mode**, walk up to the dummy and attack it. Then:
+Choose **Training → Free training**, walk up to the dummy and attack it. Then:
 
 - the **hitbox overlay** shows where each attack can hit (red, hatched) and
   where each fighter can be hit (green), frame by frame;
@@ -140,7 +174,10 @@ diagrams.
 - **Blocking.** Hold back to block. Hold down-back to block lows; stand to
   block overheads and jump-ins.
 - **Moving.** Tap forward twice to dash.
-- **Specials** are in the move list (title screen or pause menu).
+- **Specials** are in the move list (title screen or pause menu). Each
+  move says exactly what to press on your keyboard and on a controller,
+  using your own key settings: for example, Shippū is "S, S+D, D, then K"
+  on the keyboard, or "↓ ↘ →, then Y" on a controller.
 - **Who controls whom.** In single-player and online modes, every keyboard
   set and gamepad controls you. In local versus, player 1 has the left
   keys and the first gamepad, player 2 the right keys and the second.
@@ -291,7 +328,7 @@ invite link in the other.
 
 ### Tests
 
-**`npm test`** runs 250 tests, in 16 files. The main ones:
+**`npm test`** runs 316 tests, in 19 files. The main ones:
 
 - **Rollback** ([`tests/rollback.test.js`](tests/rollback.test.js)):
   - two sessions under every network preset, with late, reordered,
@@ -318,15 +355,23 @@ invite link in the other.
   - a recorded match plays back to the identical state;
   - seeking equals playing straight through;
   - malformed and wrong-version replays are rejected.
+- **Tutorial and trials** ([`tests/trials.test.js`](tests/trials.test.js),
+  [`tests/lessons.test.js`](tests/lessons.test.js),
+  [`tests/howTo.test.js`](tests/howTo.test.js)):
+  - every combo trial's demonstration completes it;
+  - every tutorial step passes when done and not when idle;
+  - every move's keyboard and controller instructions follow the
+    player's bindings.
 - **Session 1's tests**: determinism (including the golden hash), motion
   inputs, frame data measured in the simulation, blocking, throws, combos,
   rounds, the CPU, the data validator and assets.
 
-**`npm run test:e2e`** runs 11 Playwright tests:
+**`npm run test:e2e`** runs 14 Playwright tests:
 - smoke tests;
 - the lab;
 - the replay viewer;
 - captions;
+- a combo trial done by hand, and a tutorial lesson step;
 - two real browsers playing online over a direct WebRTC connection, with
   matching checksums and the pause when one disconnects.
 

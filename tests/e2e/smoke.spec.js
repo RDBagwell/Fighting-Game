@@ -51,7 +51,8 @@ test('local versus: each keyboard set drives its own player', async ({ page }) =
 
 test('training mode: overlays toggle, frame step advances one frame, the menu opens', async ({ page }) => {
   const errors = await openGame(page);
-  await page.getByRole('button', { name: 'Training mode' }).click();
+  await page.getByRole('button', { name: 'Training', exact: true }).click();
+  await page.getByRole('button', { name: /Free training/ }).click();
   await page.getByRole('button', { name: 'Start training' }).click();
   await waitForScene(page, 'match');
   const show = () => page.evaluate(() => ({ ...window.__game.scene.training.show }));
@@ -86,7 +87,7 @@ test('training mode: overlays toggle, frame step advances one frame, the menu op
 test('the move list and settings open from the title', async ({ page }) => {
   const errors = await openGame(page);
   await page.getByRole('button', { name: 'Move list' }).click();
-  await expect(page.getByRole('cell', { name: '236+M' }).first()).toBeVisible();
+  await expect(page.getByRole('cell', { name: /↓ ↘ → \+ Medium.*S, S\+D, D, then K/ }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Back', exact: true }).click();
   await page.getByRole('button', { name: 'Settings' }).click();
   await expect(page.getByText('Player 1 keyboard')).toBeVisible();
