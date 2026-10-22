@@ -105,7 +105,7 @@ export function openMoveList(app, first = roster[0]) {
       h('td', { class: 'num' }, '—'),
       h('td', { class: 'num' }, '—'),
       h('td', { class: 'num' }, '—'),
-      h('td', {}, 'parry'));
+      h('td', {}, '—'));
     panel.replaceChildren(
       h('p', { class: 'char-blurb' }, h('strong', {}, `${ch.name}, ${ch.title}. `), `${ch.style}. ${ch.blurb}`),
       h('p', { class: 'fine' }, 'How to read the inputs: they are written for facing right, so → means toward your opponent. When you face left, swap left and right. ',

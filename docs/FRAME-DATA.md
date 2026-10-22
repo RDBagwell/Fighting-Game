@@ -31,7 +31,7 @@ Contents:
 6. [Hit-stop](#6-hit-stop)
 7. [The input buffer](#7-the-input-buffer)
 8. [Motion inputs](#8-motion-inputs)
-9. [Blocking, throws and throw escapes](#9-blocking-throws-and-throw-escapes)
+9. [Blocking, throws and throw escapes](#9-blocking-throws-and-throw-escapes), and [parry, guard cancel and burst](#parry-guard-cancel-and-burst)
 10. [Combos: cancels, damage scaling, the juggle limit](#10-combos-cancels-damage-scaling-the-juggle-limit)
 11. [The training mode: showing the invisible](#11-the-training-mode-showing-the-invisible)
 12. [How the numbers are kept honest](#12-how-the-numbers-are-kept-honest)
@@ -393,6 +393,55 @@ opponent behind you.
 
 ([tests/combat.test.js](../tests/combat.test.js) covers each case.)
 
+### Parry, guard cancel and burst
+
+Three defensive rules shared by every character, with their numbers in
+[config.js](../src/game/data/config.js) (`parry`, `guardCancel`, `burst`).
+
+**Parry (M+H).** For its first **6 frames** a parry catches any strike or
+projectile that would hit you: standing, highs and mids; crouching, lows
+and mids. The hit does nothing. Both fighters freeze for 12 frames, then
+you are free at once while the attacker finishes the move:
+
+```
+attacker:  s s s s s s s A r r r r r r r r r r r r r r r r |      (Mack 5M, parried on frame 8)
+defender:          p p p P|free ........................ |      ← acts 16 frames first
+                           └ the hit, parried: 12 frozen frames, not shown
+```
+
+So a parried move is as punishable as its rest (`total − hit frame`, 16
+for Mack's 5M), which is the reward for reading it. A parry that catches
+nothing is stuck for **20 more frames** (26 in all), long enough for most
+moves to punish, and a throw beats it outright: mashing it loses. Multi-hit
+moves need a parry per hit: after each one you are free, so press it again
+for the next. The parrying fighter gains a little meter (50).
+
+Like a throw, the parry is read from both buttons pressed within 3 frames
+of each other (`findChordPress` in [motion.js](../src/engine/sim/motion.js));
+L+M+H is not read as a parry.
+
+**Guard cancel (M+H while blocking).** Costs half the meter. Each character
+has their own guard-cancel move (`GC`, its own animation and hitbox), with
+the same frame data for everyone: startup 6, invincible until its last
+active frame, 40 damage and a knockdown, and **−21 on block**. It builds no
+meter for either side. It's the way out of pressure; using it into a block
+loses half a meter and the round's momentum.
+
+**Burst (L+M+H while being hit).** Once a round (in training, it comes
+back when your health refills). Each character's `burst`: invincible until
+its last active frame, a hitbox all around you (reaching down, for a burst
+in the air) that knocks the attacker away with no damage. It can be
+**blocked**, and then it's −21: an attacker who expects it stops the combo,
+blocks, and punishes. Its frame data is in the tables below.
+
+[tests/defence.test.js](../tests/defence.test.js) plays all three in the
+simulation: the parry window, the advantage after a parry, standing parries
+missing lows, a whiffed parry being punished, a throw beating a parry, a
+projectile parried, a **perfect parrier against every hit of every
+grounded strike of every character**, guard cancel costs and invincibility,
+bursts once a round, in the air, and blocked and punished, and a save and
+load mid-match with all three in play.
+
 ---
 
 ## 10. Combos: cancels, damage scaling, the juggle limit
@@ -509,6 +558,8 @@ throws, can't be blocked, so they have no block advantage.
 | `623+M` | Tenkū (M) | 5 | 8 | 26 | KD +42 | -17 | 110 | mid |
 | `623+H` | Tenkū (H) | 6 | 8 | 28 | KD +44 | -16 | 130 | mid |
 | `236236+H` | Kazekiri: Hundred Gales | 6 | 15 | 30 | KD +45 | -16 | 330 | mid |
+| `M+H (blocking)` | Guard Cancel | 6 | 4 | 30 | KD +12 | -21 | 40 | mid |
+| `L+M+H (being hit)` | Burst | 8 | 6 | 36 | KD +32 | -21 | 0 | mid |
 
 #### Kenji (Footsies and zoning)
 
@@ -532,6 +583,8 @@ throws, can't be blocked, so they have no block advantage.
 | `[4]6+M` | Iai Rush (M) | 10 | 4 | 20 | -1 | -7 | 90 | mid |
 | `[4]6+H` | Iai Rush (H) | 11 | 4 | 20 | KD +22 | -7 | 100 | mid |
 | `236236+H` | Tsukiotoshi: Falling Moon | 10 | — | 34 | — | — | 280 | mid |
+| `M+H (blocking)` | Guard Cancel | 6 | 4 | 30 | KD +12 | -21 | 40 | mid |
+| `L+M+H (being hit)` | Burst | 8 | 6 | 36 | KD +32 | -21 | 0 | mid |
 
 #### Deka (Brawler)
 
@@ -555,6 +608,8 @@ throws, can't be blocked, so they have no block advantage.
 | `623+M` | Rising Crescent (M) | 6 | 8 | 27 | KD +41 | -18 | 115 | mid |
 | `623+H` | Rising Crescent (H) | 7 | 8 | 29 | KD +43 | -17 | 140 | mid |
 | `236236+H` | Thousand Crescents | 7 | 16 | 31 | KD +43 | -18 | 325 | mid |
+| `M+H (blocking)` | Guard Cancel | 6 | 4 | 30 | KD +12 | -21 | 40 | mid |
+| `L+M+H (being hit)` | Burst | 8 | 6 | 36 | KD +32 | -21 | 0 | mid |
 
 #### Elumlur (All-rounder)
 
@@ -578,6 +633,8 @@ throws, can't be blocked, so they have no block advantage.
 | `623+M` | Thunder Rise (M) | 5 | 8 | 26 | KD +42 | -17 | 105 | mid |
 | `623+H` | Thunder Rise (H) | 6 | 8 | 28 | KD +44 | -16 | 125 | mid |
 | `236236+H` | Storm Arc | 8 | 18 | 30 | KD +49 | -16 | 300 | mid |
+| `M+H (blocking)` | Guard Cancel | 6 | 4 | 30 | KD +12 | -21 | 40 | mid |
+| `L+M+H (being hit)` | Burst | 8 | 6 | 36 | KD +32 | -21 | 0 | mid |
 
 #### Mav (Heavy grappler)
 
@@ -601,6 +658,8 @@ throws, can't be blocked, so they have no block advantage.
 | `236+M` | Crown Cleave (M) | 15 | 4 | 22 | -3 | -10 | 100 | mid |
 | `236+H` | Crown Cleave (H) | 16 | 4 | 22 | KD +20 | -10 | 115 | mid |
 | `236236+H` | Regicide | 9 | 14 | 32 | KD +42 | -19 | 320 | mid |
+| `M+H (blocking)` | Guard Cancel | 6 | 4 | 30 | KD +12 | -21 | 40 | mid |
+| `L+M+H (being hit)` | Burst | 8 | 6 | 36 | KD +32 | -21 | 0 | mid |
 
 #### Reroe (Spear zoner)
 
@@ -624,6 +683,8 @@ throws, can't be blocked, so they have no block advantage.
 | `214+M` | Fading Sweep (M) | 10 | 3 | 18 | -1 | -5 | 65 | mid |
 | `214+H` | Fading Sweep (H) | 10 | 3 | 18 | -1 | -5 | 70 | mid |
 | `236236+H` | Hunter’s Volley | 11 | — | 34 | — | — | 280 | mid |
+| `M+H (blocking)` | Guard Cancel | 6 | 4 | 30 | KD +12 | -21 | 40 | mid |
+| `L+M+H (being hit)` | Burst | 8 | 6 | 36 | KD +32 | -21 | 0 | mid |
 
 The supers' damage is before scaling; Kazekiri's five hits are scaled as a
 combo (330 listed, 253 dealt from a clean start).
