@@ -164,6 +164,16 @@ describe('throws', () => {
     expect(tech).toBe(true);
   });
 
+  it('a command grab (Mav\'s Royal Decree) can\'t be teched', () => {
+    const s = setup({ chars: ['mav', 'mack'], x: [480, 520] });
+    let tech = false;
+    // P2 presses throw on every frame the grab could be teched.
+    const mash = Array.from({ length: 20 }, (_, i) => `5*${i ? 1 : 8} 5+LM`).join(' ');
+    run(s, script('2 1 4+M 5*80', 1), script(`${mash} 5*60`, -1), (st) => (tech ||= st.events.some((e) => e.type === 'tech')));
+    expect(tech).toBe(false);
+    expect(s.fighters[1].health).toBe(1000 - sim.characters.mav.moves['214M'].throw.damage);
+  });
+
   it('a fighter in blockstun can\'t be thrown, nor for a few frames after', () => {
     const s = setup({ x: [480, 510] });
     s.fighters[1].state = 'blockstun';
