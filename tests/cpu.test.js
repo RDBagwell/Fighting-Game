@@ -5,7 +5,7 @@
  * matches, and check that difficulty matters.
  */
 import { describe, it, expect } from 'vitest';
-import { sim } from './helpers/harness.js';
+import { sim, setup, script, bits, inputFor } from './helpers/harness.js';
 import { Cpu, DIFFICULTIES } from '../src/game/cpu/Cpu.js';
 import { saveState } from '../src/engine/sim/state.js';
 import { roster } from '../src/game/data/characters/index.js';
@@ -44,6 +44,35 @@ function cpuMatch(chars, levels, seed) {
     }
   }
   return { s, stats };
+}
+
+/**
+ * Does `opener` cancelled into the special typed as `ender` combo at this
+ * distance, against an opponent who blocks as soon as the opener hits?
+ * Null if the opener itself misses. Tries every cancel timing.
+ * @param {string} char
+ * @param {string} opener
+ * @param {string} ender  Numpad input, as in a profile.
+ * @param {number} distance
+ */
+function combos(char, opener, ender, distance) {
+  for (let wait = 1; wait <= 14; wait++) {
+    const s = setup({ chars: [char, 'mack'], x: [400, 400 + distance] });
+    const p1 = [...script(inputFor(sim.characters[char].moves[opener]), 1), ...Array(wait).fill(0), ...script(ender, 1), ...Array(90).fill(0)];
+    let openerHit = false;
+    let followUp = '';
+    for (const input of p1) {
+      sim.step(s, [input, openerHit ? bits('1', -1) : 0]);
+      for (const e of s.events) {
+        if (e.side !== 0) continue;
+        if (e.move === opener && e.type === 'hit') openerHit = true;
+        else if (openerHit && !followUp && (e.type === 'hit' || e.type === 'block')) followUp = e.type;
+      }
+    }
+    if (!openerHit) return null;
+    if (followUp === 'hit') return true;
+  }
+  return false;
 }
 
 describe('the CPU', () => {
@@ -105,6 +134,21 @@ describe('the CPU', () => {
     }
     expect(hard.every((n) => n > 0), `hard: ${hard}`).toBe(true);
     expect(easy, 'easy').toEqual([0, 0]);
+  });
+
+  it('only cancels into a special where it combos: each combo ender combos from its normals out to its distance', () => {
+    for (const char of roster) {
+      for (const e of PROFILES[char].comboEnders) {
+        for (const opener of e.from ?? ['5L', '2L', '5M', '2M', '5H']) {
+          if (!sim.characters[char].moves[opener]?.cancel) continue;
+          // The furthest the opener still hits, up to the ender's limit.
+          let d = Math.min(e.max, 200);
+          let result = combos(char, opener, e.input, d);
+          while (result === null && d > 40) result = combos(char, opener, e.input, (d -= 10));
+          expect(result, `${char} ${opener} > ${e.input} at ${d}`).toBe(true);
+        }
+      }
+    }
   });
 
   it('a CPU match is reproducible from its seeds', () => {

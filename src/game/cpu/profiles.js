@@ -16,10 +16,16 @@
  * @typedef {object} Profile
  * @property {number} preferred
  * @property {string} antiAir
- * @property {string} comboEnder
+ * @property {ComboEnder[]} comboEnders  Best first; the CPU cancels into the first that combos
+ *   from where it is (tools/combo-ranges.mjs measures these), or not at all.
  * @property {string} superInput
  * @property {Array<{ move: string, input: string, super?: boolean }>} punishes  Best first.
  * @property {NeutralOption[]} neutral
+ *
+ * @typedef {object} ComboEnder  A special to cancel a hit into.
+ * @property {string} input
+ * @property {number} max  Only up to this distance: past it, it no longer combos.
+ * @property {string[]} [from]  Only from these normals (default: any).
  */
 
 /** @type {Record<string, Profile>} */
@@ -27,7 +33,7 @@ export const PROFILES = {
   mack: {
     preferred: 85,
     antiAir: '6 2 3+M',
-    comboEnder: '2 3 6+M',
+    comboEnders: [{ input: '2 3 6+M', max: 999 }],
     superInput: '2 3 6 2 3 6+H',
     punishes: [
       { move: '5H', input: '5+H', super: true },
@@ -51,7 +57,7 @@ export const PROFILES = {
   kenji: {
     preferred: 135,
     antiAir: '2+H',
-    comboEnder: '2 3 6+L',
+    comboEnders: [{ input: '2 3 6+H', max: 100, from: ['5M', '2M', '5H'] }, { input: '2 3 6+H', max: 70 }],
     superInput: '2 3 6 2 3 6+H',
     punishes: [
       { move: '5H', input: '5+H', super: true },
@@ -63,7 +69,7 @@ export const PROFILES = {
       { min: 0, max: 55, input: '5+LM', weight: 2 },
       { min: 0, max: 75, input: '2+L', weight: 1 },
       { min: 40, max: 110, input: '6+M', weight: 1 },
-      { min: 80, max: 145, input: '5+M', weight: 3 },
+      { min: 80, max: 125, input: '5+M', weight: 3 },
       { min: 80, max: 135, input: '2+M', weight: 3 },
       { min: 70, max: 130, input: '5+H', weight: 1 },
       { min: 170, max: 900, input: '2 3 6+M', weight: 4, noProjectile: true },
@@ -76,7 +82,7 @@ export const PROFILES = {
   deka: {
     preferred: 90,
     antiAir: '6 2 3+M',
-    comboEnder: '2 3 6+M',
+    comboEnders: [{ input: '2 3 6+M', max: 999 }],
     superInput: '2 3 6 2 3 6+H',
     punishes: [
       { move: '5H', input: '5+H', super: true },
@@ -100,7 +106,7 @@ export const PROFILES = {
   elumlur: {
     preferred: 100,
     antiAir: '6 2 3+M',
-    comboEnder: '2 3 6+M',
+    comboEnders: [{ input: '2 3 6+H', max: 100, from: ['5L', '5M', '2M', '5H'] }, { input: '2 3 6+H', max: 70 }],
     superInput: '2 3 6 2 3 6+H',
     punishes: [
       { move: '5H', input: '5+H', super: true },
@@ -124,7 +130,7 @@ export const PROFILES = {
   mav: {
     preferred: 95,
     antiAir: '2+H',
-    comboEnder: '2 3 6+M',
+    comboEnders: [{ input: '2 3 6+M', max: 999, from: ['5M', '2M', '5H'] }, { input: '2 3 6+L', max: 999 }],
     superInput: '2 3 6 2 3 6+H',
     punishes: [
       { move: '5H', input: '5+H', super: true },
@@ -146,9 +152,9 @@ export const PROFILES = {
     ],
   },
   reroe: {
-    preferred: 112,
+    preferred: 125,
     antiAir: '2+H',
-    comboEnder: '2 3 6+M',
+    comboEnders: [{ input: '2 3 6+H', max: 100, from: ['5M', '2M', '5H'] }, { input: '2 1 4+L', max: 90 }],
     superInput: '2 3 6 2 3 6+H',
     punishes: [
       { move: '5H', input: '5+H', super: true },

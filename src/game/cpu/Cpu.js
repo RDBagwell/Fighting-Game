@@ -94,6 +94,13 @@ export class Cpu {
     this.defenceDecided = '';
     /** Already decided whether to burst out of the current combo. */
     this.burstDecided = false;
+    /** Threats already decided on (block, anti-air, punish), so each gets one roll. */
+    this.decided = /** @type {Set<string>} */ (new Set());
+    /** The frame the opponent's current jump, or the nearest incoming projectile, was first seen (-1: none). */
+    this.jumpSeen = -1;
+    this.projectileSeen = -1;
+    /** In hitstun or blockstun last frame. */
+    this.wasStunned = false;
   }
 
   random() {
@@ -185,15 +192,20 @@ export class Cpu {
       const mv = this.sim.characters[me.char].moves[me.move];
       if (mv.kind === 'normal' && mv.cancel && this.plan.length === 0) {
         this.lastCancelFrame = me.moveFrame;
+        const gap = Math.abs(opp.x - me.x) / SUB;
+        const ender = profile.comboEnders.find((e) => gap <= e.max && (!e.from || e.from.includes(me.move)));
         if (this.roll(this.level.combo)) {
-          const finisher = me.meter >= 1000 && this.roll(0.5) ? profile.superInput : profile.comboEnder;
-          this.queue(finisher);
+          const finisher = me.meter >= 1000 && this.roll(0.5) ? profile.superInput : ender?.input;
+          if (finisher) this.queue(finisher);
         }
       }
     }
 
-    if (this.plan.length) return this.output(me);
-    if (state.freeze > 0) return 0;
+    // A plan of buttons runs to the end; walking or blocking can still be
+    // interrupted by a threat below, as a person would.
+    const moving = this.plan.length > 0 && this.plan.every((p) => p.buttons === 0) && this.sim.isNeutral(me);
+    if (this.plan.length && !moving) return this.output(me);
+    if (state.freeze > 0) return this.output(me);
 
     // Being hit or blocking: maybe burst out, or guard-cancel (decided once each time).
     const cfg = this.sim.config;
@@ -208,7 +220,22 @@ export class Cpu {
         if (this.roll(this.level.guardCancel)) return this.act(me, '4+MH');
       }
     }
+    // Just out of hitstun or blockstun: keep blocking a moment, as people do,
+    // rather than wait to see the next attack coming.
+    const stunned = me.state === 'hitstun' || me.state === 'blockstun' || me.state === 'airHit';
+    if (this.wasStunned && !stunned && this.sim.isNeutral(me) && this.roll(this.level.block)) {
+      this.wasStunned = stunned;
+      return this.act(me, '1*16');
+    }
+    this.wasStunned = stunned;
     if (!this.sim.isNeutral(me) && me.state !== 'blockstun') return this.output(me);
+    // Each threat is decided once: whether to block it is one roll, not one a frame.
+    const decide = (/** @type {string} */ key, /** @type {number} */ chance) => {
+      if (this.decided.has(key)) return false;
+      this.decided.add(key);
+      if (this.decided.size > 16) this.decided.delete(this.decided.values().next().value);
+      return this.roll(chance);
+    };
     if (this.wait > 0) {
       this.wait--;
       // While waiting, keep reacting to threats below.
@@ -220,9 +247,11 @@ export class Cpu {
     const airborne = view.y < -20 || view.state === 'air';
     const approaching = Math.sign(me.x / SUB - view.x) === Math.sign(view.vx) || Math.abs(view.vx) < 0.1;
 
+    if (!airborne) this.jumpSeen = -1;
+    else if (this.jumpSeen < 0) this.jumpSeen = state.frame;
     if (airborne && dist < 210 && approaching) {
-      if (this.roll(this.level.antiAir)) return this.act(me, profile.antiAir);
-      if (this.roll(this.level.block)) return this.act(me, '4*16');
+      if (decide(`aa:${this.jumpSeen}`, this.level.antiAir)) return this.act(me, profile.antiAir);
+      if (decide(`air:${this.jumpSeen}`, this.level.block)) return this.act(me, '4*16');
     }
     if (oppMove && oppMove.kind !== 'throw' && this.sim.isNeutral(me)) {
       // Parry: only a hit it can see coming in time, decided once per move.
@@ -236,9 +265,10 @@ export class Cpu {
       }
     }
     if (oppMove && oppMove.kind !== 'throw') {
+      const started = state.frame - view.moveFrame - this.level.reaction;
       const range = activeRange(oppMove);
       const lastActive = range ? range[1] : (oppMove.projectile?.frame ?? 0);
-      if (view.moveFrame <= lastActive && dist < 220 && this.roll(this.level.block)) {
+      if (view.moveFrame <= lastActive && dist < 220 && decide(`block:${view.move}:${started}`, this.level.block)) {
         const guard = (oppMove.hits ?? [])[0]?.guard;
         // Low or mid: crouch-block. An overhead fools it unless it reads it.
         const stand = guard === 'high' && this.roll(0.6);
@@ -246,13 +276,17 @@ export class Cpu {
       }
       // Punish: the opponent is recovering from a move that leaves them open.
       const total = moveLength(oppMove);
-      const left = total - view.moveFrame - this.level.reaction;
-      if (range && view.moveFrame > range[1] && left > 6 && this.roll(this.level.punish)) {
+      // Frames the opponent still can't act, minus those we can't (still blocking).
+      const left = total - view.moveFrame - this.level.reaction - (me.state === 'blockstun' ? me.stun : 0);
+      if (range && view.moveFrame > range[1] && left > 6 && decide(`punish:${view.move}:${started}`, this.level.punish)) {
         const punish = profile.punishes.find((p) => this.reach(me.char, p.move) + 16 >= dist && this.sim.characters[me.char].moves[p.move].startup <= left);
         if (punish) return this.act(me, me.meter >= 1000 && punish.super ? profile.superInput : punish.input);
       }
     }
-    if (view.projectileDist < 160 && this.roll(this.level.block)) return this.act(me, '4*10');
+    if (view.projectileDist === Infinity) this.projectileSeen = -1;
+    else if (this.projectileSeen < 0) this.projectileSeen = state.frame;
+    if (view.projectileDist < 160 && decide(`shot:${this.projectileSeen}`, this.level.block)) return this.act(me, '4*12');
+    if (this.plan.length) return this.output(me);
     if (view.state === 'knockdown' || view.state === 'wakeup') {
       return this.act(me, dist > 70 ? '6*8' : this.roll(0.5) ? '5*6' : '1*10');
     }
