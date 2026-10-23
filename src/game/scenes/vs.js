@@ -7,6 +7,8 @@ import { drawFrame } from '../../engine/render/sprites.js';
 import { outlined } from '../hud/Hud.js';
 import { drawBackdrop } from './backdrop.js';
 import { MatchScene } from './match.js';
+import { nextFight, LADDER_LENGTH } from '../arcade/ladder.js';
+import { ARCADE } from '../data/arcade.js';
 
 const LENGTH = 120;
 
@@ -78,5 +80,12 @@ export class VsScene {
       outlined(ctx, ch.title, side === 0 ? 30 : WIDTH - 30, 340, { size: 12, align: side === 0 ? 'left' : 'right' });
     });
     outlined(ctx, 'VS', WIDTH / 2, HEIGHT / 2, { size: 56, align: 'center', color: '#f2d14a', outline: 8 });
+    const arcade = this.config.arcade;
+    if (arcade) {
+      const next = nextFight(arcade.run);
+      outlined(ctx, next.rival ? `FINAL FIGHT · YOUR RIVAL` : `FIGHT ${next.number} OF ${LADDER_LENGTH}`, WIDTH / 2, 40, { size: 20, align: 'center', color: next.rival ? '#ff7a59' : '#ffffff', outline: 5 });
+      outlined(ctx, `CPU ${next.level.name}`, WIDTH / 2, 60, { size: 12, align: 'center' });
+      if (next.rival) outlined(ctx, ARCADE[arcade.run.char].rivalIntro, WIDTH / 2, 84, { size: 13, align: 'center' });
+    }
   }
 }

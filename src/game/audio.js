@@ -16,9 +16,9 @@ export const EVENT_SOUNDS = /** @type {Record<string, import('../engine/audio/Sf
  */
 export function trackFor(name) {
   switch (name) {
-    case 'select': case 'vs': case 'online-room': case 'lab-setup': return 'select';
+    case 'select': case 'arcade-select': case 'vs': case 'online-room': case 'lab-setup': return 'select';
     case 'match': case 'online-match': case 'lab': case 'replay': return 'stage';
-    case 'results': case 'online-results': return 'results';
+    case 'results': case 'online-results': case 'ending': return 'results';
     default: return 'title';
   }
 }
