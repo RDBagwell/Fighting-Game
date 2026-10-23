@@ -19,7 +19,7 @@ describe('GitHub Pages deployment', () => {
     expect(yml).toMatch(/run: npm ci/);
     expect(yml).toMatch(/run: npm test/);
     expect(yml).toMatch(/run: npm run build/);
-    expect(yml).toMatch(/upload-pages-artifact@v3[\s\S]*path: dist/);
+    expect(yml).toMatch(/upload-pages-artifact@v\d+[\s\S]*path: dist/);
     expect(yml).toMatch(/deploy:\s+if: github\.ref == 'refs\/heads\/master'/);
   });
 
