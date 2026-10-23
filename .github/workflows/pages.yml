@@ -62,9 +62,17 @@ jobs:
         env:
           VITE_SERVER_URL: ${{ vars.GAME_SERVER_URL }}
       - run: npm run build:e2e
+      # The browser is kept between runs, keyed on the locked Playwright
+      # version. No --with-deps: the runner image already has the libraries
+      # headless Chromium needs, and installing the extra fonts from Ubuntu's
+      # mirror sometimes took 9 minutes.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: Smoke tests (Playwright, headless Chromium)
         run: |
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
           npx playwright test --grep-invert @screenshots
       - uses: actions/upload-artifact@v4
         if: failure()
