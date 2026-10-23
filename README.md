@@ -8,7 +8,7 @@ fighting games are actually built:
 - an **input buffer with motion inputs**;
 - a real **training mode** that shows all of it.
 
-Six fighters, a CPU opponent, local versus, **online play** (peer to peer
+Six fighters, an **arcade mode**, a CPU opponent, local versus, **online play** (peer to peer
 over WebRTC), **replays**, and touch controls for phones. It's plain
 JavaScript on a canvas.
 
@@ -75,6 +75,29 @@ game.** [SECURITY.md](SECURITY.md) explains what that means for trust.
 | --- | --- |
 | ![A private room with its code and invite link](docs/media/online-room.png) | ![Two browsers in an online match over a direct WebRTC connection](docs/media/online-match.png) |
 | A private room: the code and the invite link | An online match, on the direct path (captured from two real browsers) |
+
+## Arcade mode
+
+**Title → Arcade**: pick a fighter and climb a ladder of six CPU fights.
+
+- You fight everyone else once, in a random order, then your character's
+  **rival** (Mack's is Kenji, Deka's is Mav, and so on).
+- The CPU gets tougher each fight, from Easy to Hard.
+- **Lose, and you can continue**: you fight the same opponent again, and
+  the continue is counted. A draw is fought again for free.
+- **Clearing the ladder** plays your character's ending: four short
+  captioned scenes at the shrine. Then a summary shows the fight time,
+  continues and rounds lost.
+- **Progress is saved in this browser.** A run in progress survives
+  closing the page, a ✓ marks every character you've cleared, and the
+  select screen shows each one's best clear (fewest continues, then
+  fastest).
+
+![Mav's ending: Mav and Deka on the shrine steps, with the caption "He offers Deka a place at his court. To everyone's surprise, Deka accepts."](docs/media/arcade-ending.png)
+
+The rivals and endings are plain text in
+[`src/game/data/arcade.js`](src/game/data/arcade.js), to rewrite freely; a
+test checks that every character has a rival and an ending.
 
 ## Replays
 
@@ -292,7 +315,9 @@ Then:
 3. its sprite sheets in `public/sprites/`, listed in [ASSETS.md](ASSETS.md);
 4. a CPU profile in [`cpu/profiles.js`](src/game/cpu/profiles.js);
 5. its id in `CHARACTERS` in [`shared/protocol.js`](shared/protocol.js), so
-   the server accepts it online (a test checks this).
+   the server accepts it online (a test checks this);
+6. a rival and an ending in [`data/arcade.js`](src/game/data/arcade.js)
+   (a test checks this too).
 
 Any data change also changes the game version, so older replays are
 refused instead of playing out differently.
@@ -377,12 +402,20 @@ invite link in the other.
   - every tutorial step passes when done and not when idle;
   - every move's keyboard and controller instructions follow the
     player's bindings.
+- **Arcade mode** ([`tests/arcade.test.js`](tests/arcade.test.js)):
+  - the ladder is everyone else once, then the rival;
+  - the CPU climbs from Easy to Hard, every setting moving the same way;
+  - a loss costs a continue and a draw doesn't;
+  - a saved run survives a reload and a broken one is ignored;
+  - only a better clear replaces a character's best.
 - **Session 1's tests**: determinism (including the golden hash), motion
   inputs, frame data measured in the simulation, blocking, throws, combos,
   rounds, the CPU, the data validator and assets.
 
-**`npm run test:e2e`** runs 14 Playwright tests:
+**`npm run test:e2e`** runs 15 Playwright tests:
 - smoke tests;
+- a whole arcade ladder, with a continue, a reload in the middle, the
+  rival, the ending and the clear;
 - the lab;
 - the replay viewer;
 - captions;
@@ -424,8 +457,8 @@ visitor after that waits about a minute (the lobby says so).
 
 ## Privacy
 
-- **No accounts and no tracking.** The game stores your settings and
-  recent replays in your browser's local storage. Nothing is sent anywhere
+- **No accounts and no tracking.** The game stores your settings, recent
+  replays and arcade progress in your browser's local storage. Nothing is sent anywhere
   unless you play online.
 - **Online play.**
   - The matchmaking server sees your IP address and your room. It keeps
