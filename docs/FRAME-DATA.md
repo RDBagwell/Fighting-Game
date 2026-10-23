@@ -676,9 +676,9 @@ throws, can't be blocked, so they have no block advantage.
 | `j.M` | Diving Sweep | 7 | 5 | 12 | — | — | 50 | high |
 | `j.H` | Plunging Spear | 10 | 4 | 16 | — | — | 75 | high |
 | `L+M (4L+M: back)` | Hunter’s Trip | 5 | 2 | 22 | KD +47 | — | 100 | throw |
-| `236+L` | Hunting Spear (L) | 15 | — | 27 | — | — | 75 | mid |
-| `236+M` | Hunting Spear (M) | 15 | — | 27 | — | — | 75 | mid |
-| `236+H` | Hunting Spear (H) | 15 | — | 27 | — | — | 75 | mid |
+| `236+L` | Hunting Spear (L) | 13 | — | 27 | — | — | 75 | mid |
+| `236+M` | Hunting Spear (M) | 13 | — | 27 | — | — | 75 | mid |
+| `236+H` | Hunting Spear (H) | 13 | — | 27 | — | — | 75 | mid |
 | `214+L` | Fading Sweep (L) | 10 | 3 | 18 | -1 | -5 | 60 | mid |
 | `214+M` | Fading Sweep (M) | 10 | 3 | 18 | -1 | -5 | 65 | mid |
 | `214+H` | Fading Sweep (H) | 10 | 3 | 18 | -1 | -5 | 70 | mid |

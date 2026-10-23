@@ -154,7 +154,7 @@ export const PROFILES = {
   reroe: {
     preferred: 125,
     antiAir: '2+H',
-    comboEnders: [{ input: '2 3 6+H', max: 100, from: ['5M', '2M', '5H'] }, { input: '2 1 4+L', max: 90 }],
+    comboEnders: [{ input: '2 3 6+H', max: 110, from: ['5M', '2M', '5H'] }, { input: '2 3 6+H', max: 80 }],
     superInput: '2 3 6 2 3 6+H',
     punishes: [
       { move: '5H', input: '5+H', super: true },

@@ -18,7 +18,7 @@ import { hit, deepFreeze, strike, frames, guardCancel, burst } from './build.js'
  * @returns {MoveData}
  */
 function huntingSpear(b) {
-  const startup = 15;
+  const startup = 13;
   const recovery = 27;
   return {
     name: `Hunting Spear (${b})`,
