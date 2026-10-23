@@ -162,6 +162,20 @@ select { font: inherit; background: var(--panel-2); color: var(--ink); border: 2
 .pause { background: rgba(14, 9, 22, 0.75); }
 .results .headline { font-size: 2.6em; color: var(--accent-2); }
 
+/* Arcade */
+.arcade .side { width: 100%; max-width: 26em; }
+.arcade-run { background: var(--panel); border: 2px solid var(--accent-2); padding: 0.5em 0.9em; max-width: 30em; }
+.arcade-run p { margin: 0 0 0.5em; }
+.arcade-run .actions { justify-content: center; flex-wrap: wrap; }
+.arcade-summary { border-collapse: collapse; font-size: 1.05em; }
+.arcade-summary th { text-align: left; color: var(--muted); font-weight: 400; padding: 0.15em 1.2em 0.15em 0; }
+.arcade-summary td { text-align: right; font-weight: 800; }
+.new-best { margin: 0; color: var(--accent); font-weight: 800; letter-spacing: 0.05em; }
+.ending { justify-content: flex-start; }
+.ending-box { background: rgba(14, 9, 22, 0.82); border: 2px solid var(--line); padding: 0.7em 1.1em; max-width: 36em; width: 100%; }
+.ending-text { margin: 0 0 0.6em; font-size: 1.15em; line-height: 1.4; min-height: 2.8em; }
+.ending .actions { justify-content: flex-end; }
+
 /* Modals */
 .modal {
   position: absolute;

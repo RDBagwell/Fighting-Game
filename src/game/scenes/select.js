@@ -11,13 +11,15 @@ import { VsScene } from './vs.js';
 import { MatchScene } from './match.js';
 import { TitleScene } from './title.js';
 
-/** @typedef {'cpu'|'versus'|'training'} Mode */
+/** @typedef {'cpu'|'versus'|'training'|'arcade'} Mode */
 
 /**
  * @typedef {object} MatchConfig
  * @property {Mode} mode
  * @property {[string, string]} chars
  * @property {'easy'|'normal'|'hard'} cpu
+ * @property {import('../cpu/Cpu.js').Difficulty} [level]  Arcade: the CPU for this fight of the ladder (instead of `cpu`).
+ * @property {{ run: import('../arcade/ladder.js').Run }} [arcade]  Arcade: the run this fight belongs to.
  * @property {string} stage
  * @property {{ char: string, index: number }} [trial]  Training: run this combo trial.
  * @property {{ index: number }} [lesson]  Training: run this tutorial lesson.
@@ -31,7 +33,8 @@ export class SelectScene {
    */
   constructor(app, mode, previous = {}) {
     this.app = app;
-    this.mode = mode;
+    /** @type {Exclude<Mode, 'arcade'>} */
+    this.mode = mode === 'arcade' ? 'cpu' : mode;
     this.name = 'select';
     this.time = 0;
     /** @type {[string, string]} */

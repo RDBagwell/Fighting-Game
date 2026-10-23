@@ -10,14 +10,15 @@ import { drawDuskShrine, GROUND_Y } from '../stage/duskShrine.js';
  * @param {import('../App.js').App} app
  * @param {CanvasRenderingContext2D} ctx
  * @param {number} time  Seconds
- * @param {[string, string]} [chars]
+ * @param {string[]} [chars]  Two face each other; one stands in the middle.
  * @param {number} [dim]  0..1 darkening, so menu text stays readable
+ * @param {boolean} [pan]  Pan the camera slowly (false: it stays centred on the fighters).
  */
-export function drawBackdrop(app, ctx, time, chars = ['mack', 'kenji'], dim = 0.35) {
+export function drawBackdrop(app, ctx, time, chars = ['mack', 'kenji'], dim = 0.35, pan = true) {
   const assets = /** @type {NonNullable<typeof app.assets>} */ (app.assets);
   const still = app.settings.reducedMotion;
   const span = app.sim.config.stage.width - WIDTH;
-  const camX = still ? span / 2 : span / 2 + Math.sin(time * 0.08) * (span / 2 - 10);
+  const camX = still || !pan ? span / 2 : span / 2 + Math.sin(time * 0.08) * (span / 2 - 10);
   drawDuskShrine(ctx, assets.shrine, camX, time, still);
   const mid = app.sim.config.stage.width / 2 - camX;
   chars.forEach((id, side) => {
@@ -25,7 +26,8 @@ export function drawBackdrop(app, ctx, time, chars = ['mack', 'kenji'], dim = 0.
     const sheet = assets.sheets[id].idle;
     const frame = Math.floor(time * 8) % sheet.frames;
     const facing = side === 0 ? 1 : -1;
-    drawFrame(ctx, sheet, frame, Math.round(mid + (side === 0 ? -90 : 90)), GROUND_Y, {
+    const x = chars.length === 1 ? mid : mid + (side === 0 ? -90 : 90);
+    drawFrame(ctx, sheet, frame, Math.round(x), GROUND_Y, {
       anchor: ch.sprites.anchor, scale: ch.sprites.scale, flip: facing !== ch.nativeFacing,
     });
   });

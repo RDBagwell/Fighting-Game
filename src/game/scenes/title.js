@@ -9,6 +9,7 @@ import { SelectScene } from './select.js';
 import { OnlineLobbyScene, LabSetupScene } from './online.js';
 import { ReplayListScene } from './replay.js';
 import { LearnScene } from './learn.js';
+import { ArcadeSelectScene } from './arcade.js';
 
 export class TitleScene {
   /** @param {import('../App.js').App} app */
@@ -30,7 +31,8 @@ export class TitleScene {
         h('h1', { class: 'logo' }, 'Dusk ', h('span', {}, 'Duel')),
         h('p', { class: 'tagline' }, 'A 2D fighting game with rollback netcode, real frame data and a training mode.')),
       h('nav', { class: 'menu', 'aria-label': 'Main menu' },
-        h('button', { class: 'btn primary', 'data-autofocus': true, onclick: () => go('cpu') }, 'Versus CPU'),
+        h('button', { class: 'btn primary', 'data-autofocus': true, onclick: () => { app.click('confirm'); app.setScene(new ArcadeSelectScene(app)); } }, 'Arcade'),
+        h('button', { class: 'btn', onclick: () => go('cpu') }, 'Versus CPU'),
         h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new OnlineLobbyScene(app)); } }, 'Online'),
         h('button', { class: 'btn', onclick: () => { app.click('confirm'); app.setScene(new LabSetupScene(app)); } }, 'Rollback lab'),
         h('button', { class: 'btn', onclick: () => go('versus') }, 'Versus (2 players)'),

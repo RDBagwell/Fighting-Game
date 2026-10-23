@@ -16,6 +16,7 @@ import { TitleScene } from './title.js';
 import { SelectScene } from './select.js';
 import { saveReplay, makeReplay } from '../replay/replays.js';
 import { LearnScene } from './learn.js';
+import { arcadeMatchOver, ArcadeSelectScene } from './arcade.js';
 
 /** Frames after the match is decided before the results screen. */
 const RESULTS_DELAY = 150;
@@ -43,13 +44,14 @@ export class MatchScene {
     this.renderer = new FightRenderer(/** @type {NonNullable<typeof app.assets>} */ (app.assets), app.sim);
     this.effects = new Effects();
     this.hud = new Hud();
-    this.cpu = config.mode === 'cpu' ? new Cpu(1, DIFFICULTIES[config.cpu], app.sim, (Math.random() * 2 ** 31) | 0) : null;
+    const level = config.level ?? DIFFICULTIES[config.cpu];
+    this.cpu = config.mode === 'cpu' || config.mode === 'arcade' ? new Cpu(1, level, app.sim, (Math.random() * 2 ** 31) | 0) : null;
     this.training = training
       ? new Training(app, { getState: () => this.state, setState: (s) => (this.state = s), config, openPauseMenu: () => this.onPause() })
       : null;
     const names = config.chars.map((c) => app.sim.characters[c].name);
     this.names = /** @type {[string, string]} */ (names);
-    this.tags = /** @type {[string, string]} */ ({ cpu: ['P1', `CPU ${DIFFICULTIES[config.cpu].name}`], versus: ['P1', 'P2'], training: ['YOU', 'DUMMY'] }[config.mode]);
+    this.tags = /** @type {[string, string]} */ ({ cpu: ['P1', `CPU ${level.name}`], arcade: ['P1', `CPU ${level.name}`], versus: ['P1', 'P2'], training: ['YOU', 'DUMMY'] }[config.mode]);
   }
 
   enter() {
@@ -107,7 +109,8 @@ export class MatchScene {
           // Never block the results on storage.
         }
       }
-      this.app.setScene(new ResultsScene(this.app, this.config, s.matchWinner, [s.wins[0], s.wins[1]]));
+      if (this.config.arcade) arcadeMatchOver(this.app, this.config, s.matchWinner, [s.wins[0], s.wins[1]], s.frame);
+      else this.app.setScene(new ResultsScene(this.app, this.config, s.matchWinner, [s.wins[0], s.wins[1]]));
     }
   }
 
@@ -155,8 +158,11 @@ export class MatchScene {
         this.training ? h('button', { class: 'btn', onclick: () => { this.resume(); this.training?.openPanel(); } }, 'Training menu') : null,
         h('button', { class: 'btn', onclick: () => openMoveList(app, this.config.chars[0]) }, 'Move list'),
         h('button', { class: 'btn', onclick: () => openSettings(app) }, 'Settings'),
-        h('button', { class: 'btn', onclick: () => { this.resume(); app.setScene(new MatchScene(app, this.config)); } }, this.training ? 'Restart training' : 'Restart match'),
-        this.config.trial || this.config.lesson
+        // In arcade, losing costs a continue: no free restarts.
+        this.config.arcade ? null : h('button', { class: 'btn', onclick: () => { this.resume(); app.setScene(new MatchScene(app, this.config)); } }, this.training ? 'Restart training' : 'Restart match'),
+        this.config.arcade
+          ? h('button', { class: 'btn', onclick: () => app.setScene(new ArcadeSelectScene(app)) }, 'Arcade menu (the run is saved)')
+          : this.config.trial || this.config.lesson
           ? h('button', { class: 'btn', onclick: () => app.setScene(new LearnScene(app, this.config.trial ? 'trials' : 'lessons', this.config.trial?.char)) }, this.config.trial ? 'Back to combo trials' : 'Back to the tutorial')
           : h('button', { class: 'btn', onclick: () => quit('select') }, 'Character select'),
         h('button', { class: 'btn', onclick: () => quit('title') }, 'Quit to title')));

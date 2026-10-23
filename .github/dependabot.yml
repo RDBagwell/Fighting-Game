@@ -1,0 +1,31 @@
+# Dependabot: pull requests that keep dependencies up to date. CI tests each
+# one (unit tests, the audit, the build and the smoke tests) before merging.
+#
+# Security fixes come separately and at once, as soon as an advisory is
+# published, once "Dependabot security updates" is on in the repository's
+# Settings → Code security. These scheduled updates catch everything else.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # Versions are pinned exactly in package.json; keep them that way.
+    versioning-strategy: increase
+    # One PR a week for the small updates, not one per package.
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  # The workflow's actions (checkout, setup-node, cache...), which GitHub
+  # is moving off Node.js 20.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ['*']
