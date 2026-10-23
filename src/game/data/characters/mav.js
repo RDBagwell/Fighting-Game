@@ -1,5 +1,5 @@
 /**
- * Mav, the heavy: the most health, the longest reach and the biggest
+ * Mav, the heavy: the most health, long reach and the biggest
  * damage, paid for with the slowest walk, jump and buttons. A command grab
  * (214 + button) that can't be escaped punishes blocking; a stepping
  * cleave closes distance. Sprites: "Medieval King Pack 2" by Luiz Melo
