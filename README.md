@@ -438,6 +438,14 @@ Measured numbers, and how to reproduce them, are in
   and deploys `master` to GitHub Pages.
 - One-time setup: **Settings → Pages → Source: GitHub Actions**.
 
+**Dependencies: Dependabot**, from [`.github/dependabot.yml`](.github/dependabot.yml).
+- Every Monday it opens a PR with the week's minor and patch updates (npm,
+  and the workflow's actions), which CI tests like any other.
+- One-time setup: **Settings → Code security → Dependabot security
+  updates: Enable**. Then a fix for a new security advisory arrives as a
+  PR as soon as the advisory is published, instead of failing the next
+  CI run's audit.
+
 **The server: Render's free tier**, from [`render.yaml`](render.yaml).
 1. In Render, create a **Blueprint** from this repository.
 2. When asked for `ALLOWED_ORIGINS`, enter `https://rdbagwell.github.io`
