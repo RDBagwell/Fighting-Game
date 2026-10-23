@@ -9,6 +9,9 @@ import { sim, setup, script, run, bits } from './helpers/harness.js';
 import { SUB } from '../src/engine/sim/fixed.js';
 import { RIGHT, LEFT } from '../src/engine/input/bits.js';
 
+/** Mack's health: the default fighter's, before any damage. */
+const FULL = sim.characters.mack.stats.health;
+
 /**
  * Plays P1's script against P2 holding one input; returns the contact events.
  * @param {string} p1
@@ -88,7 +91,7 @@ describe('blocking', () => {
 
   it('chip damage goes through a block', () => {
     const { s } = contact('2 3 6+L', STAND_BLOCK);
-    expect(s.fighters[1].health).toBe(1000 - 10);
+    expect(s.fighters[1].health).toBe(FULL - 10);
   });
 });
 
@@ -136,7 +139,7 @@ describe('hitstun, hit-stop and pushback', () => {
 describe('throws', () => {
   it('a throw beats a blocking opponent and knocks them down', () => {
     const { s } = contact('5+LM', STAND_BLOCK);
-    expect(s.fighters[1].health).toBe(1000 - 110);
+    expect(s.fighters[1].health).toBe(FULL - 110);
     expect(['knockdown', 'wakeup', 'stand', 'walkB', 'guard', 'airHit']).toContain(s.fighters[1].state);
   });
 
@@ -148,13 +151,13 @@ describe('throws', () => {
       if (st.events.some((e) => e.type === 'tech')) states.push('tech');
     });
     expect(states).toEqual(['tech']);
-    expect(s.fighters[1].health).toBe(1000);
+    expect(s.fighters[1].health).toBe(FULL);
   });
 
   it('a late tech does nothing', () => {
     const s = setup({ x: [480, 510] });
     run(s, script('5+LM 5*60', 1), script(`5*${4 + sim.config.techWindow + 4} 5+LM 5*60`, -1));
-    expect(s.fighters[1].health).toBe(1000 - 110);
+    expect(s.fighters[1].health).toBe(FULL - 110);
   });
 
   it('both throwing on the same frame is a tech', () => {
@@ -171,7 +174,7 @@ describe('throws', () => {
     const mash = Array.from({ length: 20 }, (_, i) => `5*${i ? 1 : 8} 5+LM`).join(' ');
     run(s, script('2 1 4+M 5*80', 1), script(`${mash} 5*60`, -1), (st) => (tech ||= st.events.some((e) => e.type === 'tech')));
     expect(tech).toBe(false);
-    expect(s.fighters[1].health).toBe(1000 - sim.characters.mav.moves['214M'].throw.damage);
+    expect(s.fighters[1].health).toBe(FULL - sim.characters.mav.moves['214M'].throw.damage);
   });
 
   it('a fighter in blockstun can\'t be thrown, nor for a few frames after', () => {
@@ -179,7 +182,7 @@ describe('throws', () => {
     s.fighters[1].state = 'blockstun';
     s.fighters[1].stun = 10;
     run(s, script('5+LM 5*30', 1), [STAND_BLOCK]);
-    expect(s.fighters[1].health).toBe(1000);
+    expect(s.fighters[1].health).toBe(FULL);
   });
 
   it('back throw (4+L+M) throws the opponent behind you', () => {
@@ -193,7 +196,7 @@ describe('throws', () => {
     s.fighters[1].state = 'air';
     s.fighters[1].y = -30 * SUB;
     run(s, script('5+LM 5*20', 1), [0]);
-    expect(s.fighters[1].health).toBe(1000);
+    expect(s.fighters[1].health).toBe(FULL);
   });
 });
 
@@ -206,7 +209,7 @@ describe('combos', () => {
       for (const e of st.events) if (e.type === 'hit') damage.push(e.damage);
     });
     const sc = sim.config.scaling;
-    expect(damage).toEqual([30 * sc[0] / 100, 30 * sc[1] / 100, Math.trunc(25 * sc[2] / 100), Math.trunc(80 * sc[3] / 100)]);
+    expect(damage).toEqual([30 * sc[0] / 100, 30 * sc[1] / 100, Math.trunc(25 * sc[2] / 100), Math.trunc(sim.characters.mack.moves['236L'].hits[0].damage * sc[3] / 100)]);
     expect(s.fighters[1].comboDamage === 0 || s.fighters[1].combo === 0).toBe(true);
   });
 
@@ -254,10 +257,10 @@ describe('invincibility, projectiles and supers', () => {
   it('a kunai crosses the screen and hits; holding back blocks it', () => {
     const hit = setup({ chars: ['kenji', 'mack'], x: [300, 700] });
     run(hit, script('2 3 6+H 5*120', 1), [0]);
-    expect(hit.fighters[1].health).toBe(1000 - 50);
+    expect(hit.fighters[1].health).toBe(FULL - sim.characters.kenji.moves['236H'].projectile.hit.damage);
     const block = setup({ chars: ['kenji', 'mack'], x: [300, 700] });
     run(block, script('2 3 6+H 5*120', 1), [STAND_BLOCK]);
-    expect(block.fighters[1].health).toBe(1000 - 8);
+    expect(block.fighters[1].health).toBe(FULL - sim.characters.kenji.moves['236H'].projectile.hit.chip);
   });
 
   it('only one kunai at a time', () => {

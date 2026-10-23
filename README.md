@@ -212,7 +212,7 @@ guesses not yet confirmed are hollow, and stalls are full height.
 | **Deka**, the Wild Crescent | Brawler: slow, wide slashes that hit hardest | Crescent Rush (236 + attack): a lunging sweep. Rising Crescent (623 + attack): an invincible rising slash | Four crescents in a rush |
 | **Elumlur**, the Storm Blade | All-rounder: a projectile, reach and an anti-air | Storm Wave (236 + attack): a projectile. Thunder Rise (623 + attack): an invincible rising slash | Four lightning arcs all around him |
 | **Mav**, the Iron King | Heavy grappler: slow, the most health | Royal Decree (214 + attack): a command grab that can't be escaped. Crown Cleave (236 + attack): a stepping cleave | Three royal strikes |
-| **Reroe**, the Huntress | Spear zoner: the longest reach, quick feet | Hunting Spear (236 + attack): a thrown spear. Fading Sweep (214 + attack): a poke that hops back | A huge spear that hits four times |
+| **Reroe**, the Huntress | Spear zoner: long reach, quick feet | Hunting Spear (236 + attack): a thrown spear. Fading Sweep (214 + attack): a poke that hops back | A huge spear that hits four times |
 
 ## Architecture
 

@@ -36,7 +36,7 @@ function shippu(b) {
     velocity: [[1, speed, 0], [12, Math.trunc(speed / 2), 0], [16, 0, 0]],
     anim: [['run', 0, 3], ['run', 2, 3], ['run', 4, 3], ['run', 6, 2], ['attack1', 4, 4], ['attack1', 5, 8], ['attack1', 3, 10]],
     hits: [hit([12, 15], [[0, -84, 72, 30]], {
-      damage: { L: 80, M: 90, H: 100 }[b], chip: 10, hitstun: 20, blockstun: 14, hitstop: 11, push: 12,
+      damage: { L: 70, M: 80, H: 90 }[b], chip: 10, hitstun: 20, blockstun: 14, hitstop: 11, push: 12,
       knockdown: b === 'H',
     })],
     cancel: { on: 'hit', into: ['super'], frames: [12, 18] },
@@ -108,7 +108,7 @@ export const mack = deepFreeze(/** @type {CharacterData} */ ({
     color: '#d8433a',
   },
   stats: {
-    health: 1000,
+    health: 950,
     walkForward: px(2.5),
     walkBack: px(2),
     jumpVx: px(3.25),

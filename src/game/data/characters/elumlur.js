@@ -18,7 +18,7 @@ import { hit, deepFreeze, strike, frames, guardCancel, burst } from './build.js'
  * @returns {MoveData}
  */
 function stormWave(b) {
-  const startup = 14;
+  const startup = 13;
   const recovery = 26;
   return {
     name: `Storm Wave (${b})`,

@@ -1,7 +1,7 @@
 /**
- * Reroe, the spear zoner: the longest pokes in the game, a thrown spear,
+ * Reroe, the spear zoner: long spear pokes, a thrown spear,
  * a retreating sweep that pokes while backing away, and a volley of spears
- * for a super. Fast on her feet but tied for the least health: keep the opponent at
+ * for a super. Fast on her feet but light on health: keep the opponent at
  * the end of the spear. Sprites: "Huntress" by Luiz Melo (CC0), drawn
  * facing right; the thrown spear is the pack's own spear art.
  *
@@ -18,7 +18,7 @@ import { hit, deepFreeze, strike, frames, guardCancel, burst } from './build.js'
  * @returns {MoveData}
  */
 function huntingSpear(b) {
-  const startup = 15;
+  const startup = 13;
   const recovery = 27;
   return {
     name: `Hunting Spear (${b})`,
@@ -84,7 +84,7 @@ export const reroe = deepFreeze(/** @type {CharacterData} */ ({
   name: 'Reroe',
   title: 'The Huntress',
   style: 'Spear zoner',
-  blurb: 'A hunter who never lets prey get close. The longest reach of anyone, a spear to throw, and quick feet; but if you get past the spear, she can’t take much.',
+  blurb: 'A hunter who never lets prey get close. Long reach, a spear to throw, and quick feet; but if you get past the spear, she can’t take much.',
   nativeFacing: /** @type {1} */ (1),
   sprites: {
     dir: 'sprites/reroe/',

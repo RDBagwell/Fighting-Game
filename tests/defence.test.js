@@ -9,6 +9,9 @@ import { moveLength } from '../src/engine/sim/frameData.js';
 import { saveState, loadState, hashState } from '../src/engine/sim/state.js';
 import { L, M, H } from '../src/engine/input/bits.js';
 
+/** Mack's health: the default fighter's, before any damage. */
+const FULL = sim.characters.mack.stats.health;
+
 const cfg = sim.config;
 
 /**
@@ -67,7 +70,7 @@ describe('parry', () => {
     expect(parry, 'parried').toBeDefined();
     expect(parry.side).toBe(1);
     expect(events.some((e) => e.type === 'hit')).toBe(false);
-    expect(s.fighters[1].health).toBe(1000);
+    expect(s.fighters[1].health).toBe(FULL);
     expect(s.fighters[1].meter).toBe(cfg.parry.meter);
 
     // Replay it, measuring who can act first after the freeze.
@@ -133,7 +136,7 @@ describe('parry', () => {
     const s = setup({ x: [480, 510] });
     const events = drive(s, (st, i) => [script('5*2 5+LM 5*60', 1)[i] ?? 0, script('5+MH 5*60', -1)[i] ?? 0], 60);
     expect(events.some((e) => e.type === 'throw')).toBe(true);
-    expect(s.fighters[1].health).toBeLessThan(1000);
+    expect(s.fighters[1].health).toBeLessThan(FULL);
   });
 
   it('catches a projectile, which is used up', () => {
@@ -149,7 +152,7 @@ describe('parry', () => {
       return [script('2 3 6+M 5*120', 1)[i] ?? 0, p2];
     }, 120);
     expect(parried).toBe(true);
-    expect(s.fighters[1].health).toBe(1000);
+    expect(s.fighters[1].health).toBe(FULL);
     expect(s.projectiles.length).toBe(0);
   });
 

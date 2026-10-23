@@ -551,9 +551,9 @@ throws, can't be blocked, so they have no block advantage.
 | `j.M` | Diving Slash | 7 | 5 | 12 | — | — | 55 | high |
 | `j.H` | Skyfall Cleave | 10 | 4 | 16 | — | — | 80 | high |
 | `L+M (4L+M: back)` | Shoulder Throw | 5 | 2 | 22 | KD +47 | — | 110 | throw |
-| `236+L` | Shippū (L) | 12 | 4 | 18 | -1 | -7 | 80 | mid |
-| `236+M` | Shippū (M) | 12 | 4 | 18 | -1 | -7 | 90 | mid |
-| `236+H` | Shippū (H) | 12 | 4 | 18 | KD +24 | -7 | 100 | mid |
+| `236+L` | Shippū (L) | 12 | 4 | 18 | -1 | -7 | 70 | mid |
+| `236+M` | Shippū (M) | 12 | 4 | 18 | -1 | -7 | 80 | mid |
+| `236+H` | Shippū (H) | 12 | 4 | 18 | KD +24 | -7 | 90 | mid |
 | `623+L` | Tenkū (L) | 5 | 6 | 24 | KD +44 | -13 | 90 | mid |
 | `623+M` | Tenkū (M) | 5 | 8 | 26 | KD +42 | -17 | 110 | mid |
 | `623+H` | Tenkū (H) | 6 | 8 | 28 | KD +44 | -16 | 130 | mid |
@@ -576,9 +576,9 @@ throws, can't be blocked, so they have no block advantage.
 | `j.M` | Falling Thrust | 8 | 5 | 11 | — | — | 55 | high |
 | `j.H` | Moon Drop | 11 | 4 | 15 | — | — | 80 | high |
 | `L+M (4L+M: back)` | Hip Toss | 5 | 2 | 22 | KD +47 | — | 100 | throw |
-| `236+L` | Kunai (L) | 13 | — | 27 | — | — | 50 | mid |
-| `236+M` | Kunai (M) | 13 | — | 27 | — | — | 50 | mid |
-| `236+H` | Kunai (H) | 13 | — | 27 | — | — | 50 | mid |
+| `236+L` | Kunai (L) | 13 | — | 27 | — | — | 65 | mid |
+| `236+M` | Kunai (M) | 13 | — | 27 | — | — | 65 | mid |
+| `236+H` | Kunai (H) | 13 | — | 27 | — | — | 65 | mid |
 | `[4]6+L` | Iai Rush (L) | 9 | 4 | 20 | -1 | -7 | 80 | mid |
 | `[4]6+M` | Iai Rush (M) | 10 | 4 | 20 | -1 | -7 | 90 | mid |
 | `[4]6+H` | Iai Rush (H) | 11 | 4 | 20 | KD +22 | -7 | 100 | mid |
@@ -626,9 +626,9 @@ throws, can't be blocked, so they have no block advantage.
 | `j.M` | Gale Turn | 7 | 5 | 12 | — | — | 55 | high |
 | `j.H` | Falling Storm | 10 | 4 | 16 | — | — | 82 | high |
 | `L+M (4L+M: back)` | Storm Grip | 5 | 2 | 22 | KD +47 | — | 110 | throw |
-| `236+L` | Storm Wave (L) | 14 | — | 26 | — | — | 70 | mid |
-| `236+M` | Storm Wave (M) | 14 | — | 26 | — | — | 70 | mid |
-| `236+H` | Storm Wave (H) | 14 | — | 26 | — | — | 70 | mid |
+| `236+L` | Storm Wave (L) | 13 | — | 26 | — | — | 70 | mid |
+| `236+M` | Storm Wave (M) | 13 | — | 26 | — | — | 70 | mid |
+| `236+H` | Storm Wave (H) | 13 | — | 26 | — | — | 70 | mid |
 | `623+L` | Thunder Rise (L) | 5 | 6 | 24 | KD +44 | -13 | 85 | mid |
 | `623+M` | Thunder Rise (M) | 5 | 8 | 26 | KD +42 | -17 | 105 | mid |
 | `623+H` | Thunder Rise (H) | 6 | 8 | 28 | KD +44 | -16 | 125 | mid |
@@ -676,9 +676,9 @@ throws, can't be blocked, so they have no block advantage.
 | `j.M` | Diving Sweep | 7 | 5 | 12 | — | — | 50 | high |
 | `j.H` | Plunging Spear | 10 | 4 | 16 | — | — | 75 | high |
 | `L+M (4L+M: back)` | Hunter’s Trip | 5 | 2 | 22 | KD +47 | — | 100 | throw |
-| `236+L` | Hunting Spear (L) | 15 | — | 27 | — | — | 75 | mid |
-| `236+M` | Hunting Spear (M) | 15 | — | 27 | — | — | 75 | mid |
-| `236+H` | Hunting Spear (H) | 15 | — | 27 | — | — | 75 | mid |
+| `236+L` | Hunting Spear (L) | 13 | — | 27 | — | — | 75 | mid |
+| `236+M` | Hunting Spear (M) | 13 | — | 27 | — | — | 75 | mid |
+| `236+H` | Hunting Spear (H) | 13 | — | 27 | — | — | 75 | mid |
 | `214+L` | Fading Sweep (L) | 10 | 3 | 18 | -1 | -5 | 60 | mid |
 | `214+M` | Fading Sweep (M) | 10 | 3 | 18 | -1 | -5 | 65 | mid |
 | `214+H` | Fading Sweep (H) | 10 | 3 | 18 | -1 | -5 | 70 | mid |
