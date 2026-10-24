@@ -71,6 +71,11 @@ export class InputManager {
     this.onKeyUp = (/** @type {KeyboardEvent} */ e) => this.keys.delete(e.code);
     // Keys held when the window loses focus never get their keyup.
     this.onBlur = () => this.keys.clear();
+    // A finger on the screen, anywhere (a menu too): this is a touch device.
+    this.onPointer = (/** @type {PointerEvent} */ e) => {
+      if (e.pointerType === 'touch') this.lastDevice = 'touch';
+    };
+    win.addEventListener('pointerdown', this.onPointer, { capture: true });
     win.addEventListener('keydown', this.onKeyDown);
     win.addEventListener('keyup', this.onKeyUp);
     win.addEventListener('blur', this.onBlur);
@@ -80,6 +85,7 @@ export class InputManager {
     this.win.removeEventListener('keydown', this.onKeyDown);
     this.win.removeEventListener('keyup', this.onKeyUp);
     this.win.removeEventListener('blur', this.onBlur);
+    this.win.removeEventListener('pointerdown', this.onPointer, { capture: true });
   }
 
   /** Reads the gamepads once per animation frame. */

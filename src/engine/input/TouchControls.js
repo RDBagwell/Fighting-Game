@@ -76,12 +76,24 @@ export class TouchControls {
     };
     this.zone.addEventListener('pointerup', release);
     this.zone.addEventListener('pointercancel', release);
+    this.zone.addEventListener('lostpointercapture', release);
 
-    /** Buttons held, by pointer: a thumb can slide from one button to the next. */
-    const held = new Map();
+    /**
+     * Buttons held, by pointer: a thumb can slide from one button to the
+     * next. The release is watched on the whole window, not the button: a
+     * thumb that slides off and lifts over the game screen must still let
+     * go, or the button stays held.
+     * @type {Map<number, number>}
+     */
+    this.held = new Map();
+    const held = this.held;
+    const show = () => {
+      const down = [...held.values()];
+      root.querySelectorAll('.tb').forEach((o) => o.classList.toggle('down', down.includes(Number(/** @type {HTMLElement} */ (o).dataset.bits))));
+      this.refreshButtons(held);
+    };
     root.querySelectorAll('.tb').forEach((el) => {
       const b = /** @type {HTMLElement} */ (el);
-      const bit = Number(b.dataset.bits);
       b.addEventListener('pointerdown', (e) => {
         e.preventDefault();
         // Touch pointers are captured by the element they start on; release
@@ -91,24 +103,36 @@ export class TouchControls {
         } catch {
           // not captured
         }
-        held.set(e.pointerId, bit);
-        b.classList.add('down');
-        this.refreshButtons(held);
+        held.set(e.pointerId, Number(b.dataset.bits));
+        show();
       });
-      b.addEventListener('pointerenter', (e) => {
-        if (!held.has(e.pointerId)) return;
-        held.set(e.pointerId, bit);
-        root.querySelectorAll('.tb').forEach((o) => o.classList.toggle('down', [...held.values()].includes(Number(/** @type {HTMLElement} */ (o).dataset.bits))));
-        this.refreshButtons(held);
-      });
-      const up = (/** @type {PointerEvent} */ e) => {
-        held.delete(e.pointerId);
-        root.querySelectorAll('.tb').forEach((o) => o.classList.toggle('down', [...held.values()].includes(Number(/** @type {HTMLElement} */ (o).dataset.bits))));
-        this.refreshButtons(held);
-      };
-      b.addEventListener('pointerup', up);
-      b.addEventListener('pointercancel', up);
     });
+    // A held thumb moving: onto another button holds that one instead; off
+    // the buttons lets go.
+    window.addEventListener('pointermove', (e) => {
+      if (!held.has(e.pointerId)) return;
+      const under = document.elementFromPoint(e.clientX, e.clientY)?.closest('.tb');
+      const bit = under && root.contains(under) ? Number(/** @type {HTMLElement} */ (under).dataset.bits) : 0;
+      if (bit === held.get(e.pointerId)) return;
+      if (bit) held.set(e.pointerId, bit);
+      else held.delete(e.pointerId);
+      show();
+    });
+    const up = (/** @type {PointerEvent} */ e) => {
+      if (held.delete(e.pointerId)) show();
+    };
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    // Switching apps or tabs mid-press never delivers the release.
+    const releaseAll = () => {
+      if (held.size) {
+        held.clear();
+        show();
+      }
+    };
+    window.addEventListener('blur', releaseAll);
+    document.addEventListener('visibilitychange', () => document.hidden && releaseAll());
+    this.releaseAll = releaseAll;
     root.querySelector('.touch-pause')?.addEventListener('click', () => onPause());
   }
 
@@ -161,6 +185,8 @@ export class TouchControls {
   setVisible(visible) {
     this.root.classList.toggle('visible', visible);
     if (!visible) {
+      this.held.clear();
+      this.root.querySelectorAll('.tb.down').forEach((o) => o.classList.remove('down'));
       this.stickBits = 0;
       this.buttonBits = 0;
       this.update();
