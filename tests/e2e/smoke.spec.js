@@ -115,6 +115,45 @@ test('phone: touch controls appear in a match and move the fighter', async ({ br
   await context.close();
 });
 
+test('phone: a touch button lets go when the thumb slides off it, or lifts anywhere', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  const errors = await openGame(page);
+  await page.getByRole('button', { name: 'Versus CPU' }).tap();
+  // A tap is enough for the game to know it's on a touch screen.
+  expect(await page.evaluate(() => window.__game.input.lastDevice)).toBe('touch');
+  await page.getByRole('button', { name: 'Fight!' }).tap();
+  await waitForScene(page, 'match');
+  await expect(page.locator('.tb-l')).toBeVisible();
+  const bits = () => page.evaluate(() => window.__game.touch.bits);
+  const l = /** @type {{ x: number, y: number, width: number, height: number }} */ (await page.locator('.tb-l').boundingBox());
+  const m = /** @type {{ x: number, y: number, width: number, height: number }} */ (await page.locator('.tb-m').boundingBox());
+  const at = (/** @type {typeof l} */ b) => ({ clientX: b.x + b.width / 2, clientY: b.y + b.height / 2 });
+  const pointer = (/** @type {string} */ type, /** @type {string} */ selector, /** @type {number} */ id, /** @type {{ clientX: number, clientY: number }} */ xy) =>
+    page.dispatchEvent(selector, type, { pointerId: id, pointerType: 'touch', isPrimary: true, bubbles: true, ...xy });
+
+  // Pressed, then lifted over the game screen instead of the button.
+  await pointer('pointerdown', '.tb-l', 11, at(l));
+  expect(await bits()).not.toBe(0);
+  await pointer('pointerup', 'canvas', 11, { clientX: 200, clientY: 200 });
+  expect(await bits()).toBe(0);
+
+  // Slid from L onto M (M is held instead), then off the buttons altogether (let go).
+  await pointer('pointerdown', '.tb-l', 12, at(l));
+  await pointer('pointermove', '.tb-m', 12, at(m));
+  expect(await page.evaluate(() => window.__game.touch.buttonBits)).toBe(await page.evaluate(() => Number(document.querySelector('.tb-m').dataset.bits)));
+  await pointer('pointermove', 'canvas', 12, { clientX: 200, clientY: 200 });
+  expect(await bits()).toBe(0);
+  await pointer('pointerup', 'canvas', 12, { clientX: 200, clientY: 200 });
+
+  // A cancelled touch (the browser took the gesture) lets go too.
+  await pointer('pointerdown', '.tb-l', 13, at(l));
+  await pointer('pointercancel', 'canvas', 13, { clientX: 0, clientY: 0 });
+  expect(await bits()).toBe(0);
+  expectNoErrors(errors);
+  await context.close();
+});
+
 test('captions for important sounds appear when turned on', async ({ page }) => {
   await page.addInitScript(() => {
     try {
