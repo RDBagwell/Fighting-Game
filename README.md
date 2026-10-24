@@ -412,8 +412,9 @@ invite link in the other.
   inputs, frame data measured in the simulation, blocking, throws, combos,
   rounds, the CPU, the data validator and assets.
 
-**`npm run test:e2e`** runs 15 Playwright tests:
+**`npm run test:e2e`** runs 16 Playwright tests:
 - smoke tests;
+- "Send feedback" opening the beta form with the match filled in;
 - a whole arcade ladder, with a continue, a reload in the middle, the
   rival, the ending and the clear;
 - the lab;
@@ -480,6 +481,13 @@ visitor after that waits about a minute (the lobby says so).
   - If a direct connection can't be made, your inputs go **through the
     matchmaking server** (the relay) instead.
 - **Replays** stay on your device unless you download one or copy its link.
+- **Send feedback** (on the title screen, the pause menu and every results
+  screen) opens the beta feedback form, a Tally form, in a new tab. The
+  form is already filled in with the game version, the mode, the
+  characters, the CPU level, the result, your input device, your browser
+  and, for short matches, a replay link. Nothing is sent unless you submit
+  the form. The form's address is `feedbackForm` in
+  [`site.config.js`](site.config.js).
 
 ## What to look at (for reviewers)
 

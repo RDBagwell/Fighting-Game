@@ -13,6 +13,12 @@ export const site = {
   repo: 'dusk-duel',
   /** Vite's base path. './' = relative, works under any folder. */
   base: './',
+  /**
+   * The beta feedback form ("Send feedback" in the game). Its hidden fields
+   * are filled in from the match: version, mode, p1, p2, cpu, result,
+   * device, browser and replay (src/game/feedback.js).
+   */
+  feedbackForm: 'https://tally.so/r/yXP8zd',
 };
 
 export const pagesUrl = `https://${site.owner.toLowerCase()}.github.io/${site.repo}/`;

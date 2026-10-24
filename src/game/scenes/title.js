@@ -10,6 +10,7 @@ import { OnlineLobbyScene, LabSetupScene } from './online.js';
 import { ReplayListScene } from './replay.js';
 import { LearnScene } from './learn.js';
 import { ArcadeSelectScene } from './arcade.js';
+import { feedbackButton } from '../feedback.js';
 
 export class TitleScene {
   /** @param {import('../App.js').App} app */
@@ -41,7 +42,8 @@ export class TitleScene {
         h('button', { class: 'btn', onclick: () => openMoveList(app) }, 'Move list'),
         h('button', { class: 'btn', onclick: () => openHowToPlay(app) }, 'How to play'),
         h('button', { class: 'btn', onclick: () => openSettings(app) }, 'Settings'),
-        h('button', { class: 'btn', onclick: () => openCredits(app) }, 'Credits')),
+        h('button', { class: 'btn', onclick: () => openCredits(app) }, 'Credits'),
+        feedbackButton(app)),
       h('p', { class: 'footer' }, 'Pixel art / character assets by Luiz Melo · Stage and sound made in code'));
     app.ui.append(screen);
     focusFirst(screen);

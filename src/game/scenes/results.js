@@ -4,8 +4,10 @@
 import { h, focusFirst } from '../ui/dom.js';
 import { drawBackdrop } from './backdrop.js';
 import { VsScene } from './vs.js';
+import { DIFFICULTIES } from '../cpu/Cpu.js';
 import { SelectScene } from './select.js';
 import { TitleScene } from './title.js';
+import { feedbackButton, resultText } from '../feedback.js';
 
 export class ResultsScene {
   /**
@@ -13,8 +15,10 @@ export class ResultsScene {
    * @param {import('./select.js').MatchConfig} config
    * @param {number} winner  0, 1, or 2 for a draw
    * @param {[number, number]} wins
+   * @param {import('../replay/replays.js').Replay} [replay]  The match, for the feedback form
    */
-  constructor(app, config, winner, wins) {
+  constructor(app, config, winner, wins, replay) {
+    this.replay = replay;
     this.app = app;
     this.config = config;
     this.winner = winner;
@@ -41,6 +45,11 @@ export class ResultsScene {
       h('nav', { class: 'menu' },
         h('button', { class: 'btn primary', 'data-autofocus': true, onclick: () => go('rematch') }, 'Rematch'),
         h('button', { class: 'btn', onclick: () => go('select') }, 'Character select'),
+        feedbackButton(app, {
+          mode: this.config.mode, p1: names[0], p2: names[1],
+          cpu: this.config.mode === 'cpu' ? (this.config.level ?? DIFFICULTIES[this.config.cpu]).name : undefined,
+          result: resultText(/** @type {[string, string]} */ (names), this.winner, this.wins), replay: this.replay,
+        }),
         h('button', { class: 'btn', 'data-back': true, onclick: () => go('title') }, 'Title screen')));
     app.ui.append(screen);
     focusFirst(screen);
