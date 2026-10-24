@@ -18,6 +18,11 @@ updates:
       minor-and-patch:
         update-types: [minor, patch]
     open-pull-requests-limit: 5
+    ignore:
+      # Node's types follow the Node version the game runs on (22, in CI and
+      # on Render), not the newest Node. Move both together, by hand.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
 
   # The workflow's actions (checkout, setup-node, cache...), which GitHub
   # is moving off Node.js 20.
