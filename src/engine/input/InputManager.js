@@ -108,7 +108,11 @@ export class InputManager {
       }
       return bits;
     }
-    if (device === 'touch') return this.touch ? this.touch.bits | this.touch.latched : 0;
+    if (device === 'touch') {
+      const bits = this.touch ? this.touch.bits | this.touch.latched : 0;
+      if (bits) this.lastDevice = 'touch';
+      return bits;
+    }
     const pad = this.pad(device === 'pad0' ? 0 : 1);
     if (!pad) return 0;
     let bits = 0;

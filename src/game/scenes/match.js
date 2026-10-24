@@ -17,6 +17,7 @@ import { SelectScene } from './select.js';
 import { saveReplay, makeReplay } from '../replay/replays.js';
 import { LearnScene } from './learn.js';
 import { arcadeMatchOver, ArcadeSelectScene } from './arcade.js';
+import { feedbackButton } from '../feedback.js';
 
 /** Frames after the match is decided before the results screen. */
 const RESULTS_DELAY = 150;
@@ -102,15 +103,18 @@ export class MatchScene {
 
     if (s.phase === 'intro' && s.phaseFrame === 1) this.hud.reset();
     if (s.phase === 'matchEnd' && s.phaseFrame >= RESULTS_DELAY) {
+      /** @type {import('../replay/replays.js').Replay | undefined} */
+      let replay;
       if (!this.training) {
         try {
-          saveReplay(makeReplay(this.app.sim, { chars: this.config.chars, seed: this.seed, stage: this.config.stage }, this.log, { mode: this.config.mode === 'versus' ? 'versus' : 'cpu', names: this.names }));
+          replay = makeReplay(this.app.sim, { chars: this.config.chars, seed: this.seed, stage: this.config.stage }, this.log, { mode: this.config.mode === 'versus' ? 'versus' : 'cpu', names: this.names });
+          saveReplay(replay);
         } catch {
           // Never block the results on storage.
         }
       }
-      if (this.config.arcade) arcadeMatchOver(this.app, this.config, s.matchWinner, [s.wins[0], s.wins[1]], s.frame);
-      else this.app.setScene(new ResultsScene(this.app, this.config, s.matchWinner, [s.wins[0], s.wins[1]]));
+      if (this.config.arcade) arcadeMatchOver(this.app, this.config, s.matchWinner, [s.wins[0], s.wins[1]], s.frame, replay);
+      else this.app.setScene(new ResultsScene(this.app, this.config, s.matchWinner, [s.wins[0], s.wins[1]], replay));
     }
   }
 
@@ -158,6 +162,7 @@ export class MatchScene {
         this.training ? h('button', { class: 'btn', onclick: () => { this.resume(); this.training?.openPanel(); } }, 'Training menu') : null,
         h('button', { class: 'btn', onclick: () => openMoveList(app, this.config.chars[0]) }, 'Move list'),
         h('button', { class: 'btn', onclick: () => openSettings(app) }, 'Settings'),
+        feedbackButton(app, () => this.feedback()),
         // In arcade, losing costs a continue: no free restarts.
         this.config.arcade ? null : h('button', { class: 'btn', onclick: () => { this.resume(); app.setScene(new MatchScene(app, this.config)); } }, this.training ? 'Restart training' : 'Restart match'),
         this.config.arcade
@@ -168,6 +173,16 @@ export class MatchScene {
         h('button', { class: 'btn', onclick: () => quit('title') }, 'Quit to title')));
     app.ui.append(this.pauseMenu);
     focusFirst(this.pauseMenu);
+  }
+
+  /** The match so far, for the feedback form. */
+  feedback() {
+    const s = this.state;
+    const level = this.cpu ? this.tags[1].replace(/^CPU /, '') : undefined;
+    return {
+      mode: this.config.mode, p1: this.names[0], p2: this.names[1], cpu: level,
+      result: `In progress, round ${s.round}: ${this.names[0]} ${s.wins[0]}–${s.wins[1]} ${this.names[1]}`,
+    };
   }
 
   resume() {

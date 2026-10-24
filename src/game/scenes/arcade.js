@@ -15,6 +15,7 @@ import {
 } from '../arcade/ladder.js';
 import { VsScene } from './vs.js';
 import { TitleScene } from './title.js';
+import { feedbackButton, resultText } from '../feedback.js';
 
 /**
  * The match config for a run's next fight.
@@ -119,15 +120,16 @@ export class ArcadeSelectScene {
  * @param {number} winner  0 (you), 1 (the CPU) or 2 (draw)
  * @param {[number, number]} wins
  * @param {number} frames  How long the match took
+ * @param {import('../replay/replays.js').Replay} [replay]  The match, for the feedback form
  */
-export function arcadeMatchOver(app, config, winner, wins, frames) {
+export function arcadeMatchOver(app, config, winner, wins, frames, replay) {
   const before = /** @type {NonNullable<typeof config.arcade>} */ (config.arcade).run;
   const run = recordFight(before, { winner, roundsLost: wins[1], frames });
   if (isCleared(run)) {
     app.setScene(new EndingScene(app, run, recordClear(run, roster)));
   } else {
     saveRun(run, roster);
-    app.setScene(new ArcadeResultScene(app, config, run, winner, before.fight));
+    app.setScene(new ArcadeResultScene(app, config, run, winner, before.fight, wins, replay));
   }
 }
 
@@ -139,8 +141,12 @@ export class ArcadeResultScene {
    * @param {import('../arcade/ladder.js').Run} run  The run after it
    * @param {number} winner
    * @param {number} fought  The fight just played, 0-based
+   * @param {[number, number]} [wins]
+   * @param {import('../replay/replays.js').Replay} [replay]
    */
-  constructor(app, config, run, winner, fought) {
+  constructor(app, config, run, winner, fought, wins = [0, 0], replay = undefined) {
+    this.wins = wins;
+    this.replay = replay;
     this.app = app;
     this.config = config;
     this.run = run;
@@ -176,6 +182,11 @@ export class ArcadeResultScene {
       h('p', {}, sub),
       h('nav', { class: 'menu' },
         primary,
+        feedbackButton(app, {
+          mode: 'arcade', p1: app.sim.characters[this.config.chars[0]].name, p2: opponent, cpu: this.config.level?.name,
+          result: `Fight ${this.fought + 1} of ${LADDER_LENGTH}: ${resultText([app.sim.characters[this.config.chars[0]].name, opponent], this.winner, this.wins)}`,
+          replay: this.replay,
+        }),
         this.winner === 1
           ? h('button', { class: 'btn', 'data-back': true, onclick: () => { saveRun(null, roster); quit(); } }, 'Give up the run')
           : h('button', { class: 'btn', 'data-back': true, onclick: quit }, 'Save and quit')));
@@ -294,6 +305,7 @@ export class ArcadeClearScene {
         row(`${name}’s clears`, String(this.clear.best.clears))),
       h('nav', { class: 'menu' },
         h('button', { class: 'btn primary', 'data-autofocus': true, onclick: () => { app.click('confirm'); app.setScene(new ArcadeSelectScene(app)); } }, 'Arcade again'),
+        feedbackButton(app, { mode: 'arcade', p1: name, result: `Cleared arcade: ${run.continues} continue${run.continues === 1 ? '' : 's'}, ${formatTime(run.frames)}` }),
         h('button', { class: 'btn', 'data-back': true, onclick: () => { app.click('back'); app.setScene(new TitleScene(app)); } }, 'Title screen')));
     app.ui.append(screen);
     focusFirst(screen);

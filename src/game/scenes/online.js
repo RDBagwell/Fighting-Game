@@ -4,6 +4,7 @@
  * The match itself is a NetplayScene.
  */
 import { h, focusFirst } from '../ui/dom.js';
+import { feedbackButton } from '../feedback.js';
 import { drawBackdrop, portrait } from './backdrop.js';
 import { OnlineClient, serverUrl } from '../online/OnlineClient.js';
 import { PeerLink } from '../online/PeerLink.js';
@@ -264,6 +265,7 @@ export class OnlineResultsScene {
       h('nav', { class: 'menu' },
         forfeit ? null : h('button', { class: 'btn primary', 'data-autofocus': true, onclick: async () => { await c.rematch(); waiting.textContent = 'Waiting for your opponent…'; } }, 'Rematch'),
         forfeit ? null : h('button', { class: 'btn', onclick: () => c.changeCharacters() }, 'Change characters'),
+        feedbackButton(app, { mode: 'online', result: forfeit ? `${headline} (forfeit)` : headline }),
         h('button', { class: 'btn', 'data-back': true, onclick: async () => { await c.leave(); /** @type {any} */ (app).peerLink?.close(); /** @type {any} */ (app).peerLink = null; app.setScene(new OnlineLobbyScene(app)); } }, 'Leave')),
       waiting);
     app.ui.append(screen);
